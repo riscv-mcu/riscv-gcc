@@ -27,6 +27,12 @@
 (define_register_constraint "j" "SIBCALL_REGS"
   "@internal")
 
+(define_register_constraint "uep" "EVEN_PAIRS"
+  "@internal")
+
+(define_register_constraint "uea" "EVEN_PAIRS_ALT"
+  "@internal")
+
 ;; Avoid using register t0 for JALR's argument, because for some
 ;; microarchitectures that is a return-address stack hint.
 (define_register_constraint "l" "JALR_REGS"
