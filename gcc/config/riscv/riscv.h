@@ -353,6 +353,8 @@ enum reg_class
   SIBCALL_REGS,			/* registers used by indirect sibcalls */
   JALR_REGS,			/* registers used by indirect calls */
   GR_REGS,			/* integer registers */
+  EVEN_PAIRS,			/* even paired registers */
+  EVEN_PAIRS_ALT,		/* alternative even paired registers */
   FP_REGS,			/* floating-point registers */
   FRAME_REGS,			/* arg pointer and frame pointer */
   ALL_REGS,			/* all registers */
@@ -373,6 +375,8 @@ enum reg_class
   "SIBCALL_REGS",							\
   "JALR_REGS",								\
   "GR_REGS",								\
+  "EVEN_PAIRS",								\
+  "EVEN_PAIRS_ALT",							\
   "FP_REGS",								\
   "FRAME_REGS",								\
   "ALL_REGS"								\
@@ -395,6 +399,8 @@ enum reg_class
   { 0xf00000c0, 0x00000000, 0x00000000 },	/* SIBCALL_REGS */	\
   { 0xffffffc0, 0x00000000, 0x00000000 },	/* JALR_REGS */		\
   { 0xffffffff, 0x00000000, 0x00000000 },	/* GR_REGS */		\
+  { 0xcccccccc, 0x00000000, 0x00000000 },	/* EVEN_PAIRS */	\
+  { 0x33333330, 0x00000000, 0x00000000 },	/* EVEN_PAIRS_ALT */	\
   { 0x00000000, 0xffffffff, 0x00000000 },	/* FP_REGS */		\
   { 0x00000000, 0x00000000, 0x00000003 },	/* FRAME_REGS */	\
   { 0xffffffff, 0xffffffff, 0x00000003 }	/* ALL_REGS */		\
