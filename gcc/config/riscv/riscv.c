@@ -4872,6 +4872,9 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
 
       if (VECTOR_MODE_P (mode))
 	return false;
+
+      if ((regno % 2 != 0) && (mode == E_DImode) && (!TARGET_64BIT))
+	return false;
     }
   else if (FP_REG_P (regno))
     {
