@@ -1,3 +1,12 @@
+2020-3-28 Lujun <lujun@nucleisys.com>
+
+	* common/config/riscv/riscv-common.c (riscv_parse_arch_string):
+	Add support to parse rv*p*
+	* config/riscv/riscv-c.c (riscv_cpu_cpp_bultins):
+	add __riscv_dsp macro when march has p-extension
+	* gcc/config/riscv/riscv.opt : add DSP mask.
+
+
 2019-08-12  Release Manager
 
 	* GCC 9.2.0 released.
