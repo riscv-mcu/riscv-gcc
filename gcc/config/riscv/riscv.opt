@@ -164,6 +164,8 @@ Mask(VECTOR)
 
 Mask(RVZFH)
 
+Mask(DSP)
+
 mriscv-attribute
 Target Report Var(riscv_emit_attribute_p) Init(-1)
 Emit RISC-V ELF attribute.
