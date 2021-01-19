@@ -385,12 +385,12 @@ riscv_subset_list::parsing_subset_version (const char *p,
 
 	  if (!ISDIGIT (np))
 	    {
-	      /* Might be beginning of `p` extension.  */
+	      /* Might be the beginning of `p` extension. But current extension
+		 is right before p. */
 	      if (std_ext_p)
 		{
-		  *major_version = version;
-		  *minor_version = 0;
-		  *explicit_version_p = true;
+		  *major_version = default_major_version;
+		  *minor_version = default_minor_version;
 		  return p;
 		}
 	      else
@@ -795,6 +795,10 @@ riscv_parse_arch_string (const char *isa, int *flags, location_t loc)
   if (subset_list->lookup ("c"))
     *flags |= MASK_RVC;
 
+  *flags &= ~MASK_DSP;
+  if (subset_list->lookup("p"))
+    *flags |= MASK_DSP;
+
   *flags &= ~MASK_VECTOR;
   if (subset_list->lookup ("v"))
     *flags |= MASK_VECTOR;
@@ -808,10 +812,6 @@ riscv_parse_arch_string (const char *isa, int *flags, location_t loc)
 
       *flags |= MASK_RVZFH;
     }
-
-  *flags &= ~MASK_DSP;
-  if (subset_list->lookup ("p"))
-    *flags |= MASK_DSP;
 
   if (current_subset_list)
     delete current_subset_list;
