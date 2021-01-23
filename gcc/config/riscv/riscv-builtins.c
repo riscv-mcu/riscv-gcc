@@ -37,6 +37,9 @@ along with GCC; see the file COPYING3.  If not see
 #include "expr.h"
 #include "langhooks.h"
 #include "stringpool.h"
+#include "explow.h"
+#include "function.h"
+#include "emit-rtl.h"
 #include "riscv-vector-iterator.h"
 
 /* We don't want the PTR definition from ansi-decl.h.  */
@@ -150,6 +153,7 @@ struct riscv_builtin_description {
 
 AVAIL (hard_float, TARGET_HARD_FLOAT)
 AVAIL (vector, TARGET_VECTOR)
+AVAIL (dsp, TARGET_DSP)
 
 /* Construct a riscv_builtin_description from the given arguments.
 
@@ -429,6 +433,14 @@ AVAIL (vector, TARGET_VECTOR)
 #define RISCV_ATYPE_VUI64M4X2 rvvuint64m4x2_t_node
 #define RISCV_ATYPE_VF64M4X2  rvvfloat64m4x2_t_node
 
+/* P-extension argument types. */
+#define RISCV_ATYPE_intXLEN  intxlen_t_node
+#define RISCV_ATYPE_uintXLEN uintxlen_t_node
+#define RISCV_ATYPE_V4QI     build_vector_type(intQI_type_node, 4)
+#define RISCV_ATYPE_UV4QI    build_vector_type(unsigned_intQI_type_node, 4)
+#define RISCV_ATYPE_V8QI     build_vector_type(intQI_type_node, 8)
+#define RISCV_ATYPE_UV8QI    build_vector_type(unsigned_intQI_type_node, 8)
+
 /* Helper type nodes for vector support.  */
 tree const_float_ptr_type_node;
 tree const_double_ptr_type_node;
@@ -501,6 +513,18 @@ tree rvvbool8_t_node;
 tree rvvbool16_t_node;
 tree rvvbool32_t_node;
 tree rvvbool64_t_node;
+
+/*
+  P-extension type nodes.
+  RV32:
+    typedef int32_t  intXLEN_t
+    typedef uint32_t uintXLEN_t
+  RV64:
+    typedef int64_t  intXLEN_t
+    typedef uint64_t uintXLEN_t
+ */
+tree intxlen_t_node;
+tree uintxlen_t_node;
 
 #define F16_TYPE_NODE fp16_type_node
 #define F32_TYPE_NODE float_type_node
@@ -2556,6 +2580,22 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 
   _RVV_SEG (VUNDEFINED_VT_INT)
   _RVV_SEG_NO_SEW8 (VUNDEFINED_VT_FLOAT)
+
+  /* p-extension builtin functions. */
+  /* 8-bit Add/Subtract. */
+  DIRECT_NAMED (addv4qi3, addv4qi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (addv4qi3, saddv4qi,
+		RISCV_FTYPE_NAME2 (V4QI, V4QI, V4QI), dsp),
+  DIRECT_NAMED (addv4qi3, uaddv4qi,
+		RISCV_FTYPE_NAME2 (UV4QI, UV4QI, UV4QI), dsp),
+
+  DIRECT_NAMED (addv8qi3, addv8qi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (addv8qi3, saddv8qi,
+		RISCV_FTYPE_NAME2 (V8QI, V8QI, V8QI), dsp),
+  DIRECT_NAMED (addv8qi3, uaddv8qi,
+		RISCV_FTYPE_NAME2 (UV8QI, UV8QI, UV8QI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the
@@ -2705,6 +2745,23 @@ riscv_init_builtins (void)
   TYPE_PRECISION (fp16_type_node) = 16;
   layout_type (fp16_type_node);
   (*lang_hooks.types.register_builtin_type) (fp16_type_node, "__fp16");
+
+  if (TARGET_DSP)
+    {
+      if (TARGET_64BIT)
+	{
+	  intxlen_t_node = intDI_type_node;
+	  uintxlen_t_node = unsigned_intDI_type_node;
+	}
+      else
+	{
+	  intxlen_t_node = intSI_type_node;
+	  uintxlen_t_node = unsigned_intSI_type_node;
+	}
+
+      (*lang_hooks.types.register_builtin_type) (intxlen_t_node, "intXLEN_t");
+      (*lang_hooks.types.register_builtin_type) (uintxlen_t_node, "uintXLEN_t");
+    }
 
   if (TARGET_VECTOR)
     {
@@ -2918,10 +2975,49 @@ riscv_builtin_decl (unsigned int code, bool initialize_p ATTRIBUTE_UNUSED)
    an expand operand.  Store the operand in *OP.  */
 
 static void
-riscv_prepare_builtin_arg (struct expand_operand *op, tree exp, unsigned argno)
+riscv_prepare_builtin_arg (struct expand_operand *op, tree exp, unsigned argno,
+		enum insn_code icode, bool has_target_p)
 {
-  tree arg = CALL_EXPR_ARG (exp, argno);
-  create_input_operand (op, expand_normal (arg), TYPE_MODE (TREE_TYPE (arg)));
+  enum machine_mode mode = insn_data[icode].operand[argno + has_target_p].mode;
+  rtx arg = expand_normal (CALL_EXPR_ARG (exp, argno));
+  rtx tmp_rtx = gen_reg_rtx (mode);
+
+  if (!(*insn_data[icode].operand[argno + has_target_p].predicate) (arg, mode))
+    {
+      if (GET_MODE_SIZE (mode).to_constant() < GET_MODE_SIZE (GET_MODE (arg)).to_constant())
+	{
+	  tmp_rtx = simplify_gen_subreg (mode, arg, GET_MODE (arg), 0);
+	  arg = tmp_rtx;
+	}
+      else if (VECTOR_MODE_P (mode) && CONST_INT_P (arg))
+	{
+	  /* Handle CONST_INT covert to CONST_VECTOR.  */
+	  int nunits = GET_MODE_NUNITS (mode).to_constant();
+	  int i, shift = 0;
+	  rtvec v = rtvec_alloc (nunits);
+	  HOST_WIDE_INT val = INTVAL (arg);
+	  enum machine_mode val_mode = GET_MODE_INNER (mode);
+	  int shift_acc = GET_MODE_BITSIZE (val_mode).to_constant();
+	  unsigned HOST_WIDE_INT mask = GET_MODE_MASK (val_mode);
+	  HOST_WIDE_INT tmp_val = val;
+
+	  for (i = 0; i < nunits; i++)
+	    {
+		tmp_val = (val >> shift) & mask;
+		RTVEC_ELT (v, i) = gen_int_mode (tmp_val, val_mode);
+		shift += shift_acc;
+	    }
+
+	  arg = copy_to_mode_reg (mode, gen_rtx_CONST_VECTOR (mode, v));
+	}
+      else
+	{
+	  convert_move (tmp_rtx, arg, false);
+	  arg = tmp_rtx;
+	}
+  }
+
+  create_input_operand (op, arg, mode);
 }
 
 /* Expand instruction ICODE as part of a built-in function sequence.
@@ -2970,14 +3066,22 @@ riscv_expand_builtin_direct (enum insn_code icode, rtx target, tree exp,
 
   /* Map any target to operand 0.  */
   int opno = 0;
+	enum machine_mode mode = insn_data[icode].operand[opno].mode;
+
   if (has_target_p)
-    create_output_operand (&ops[opno++], target, TYPE_MODE (TREE_TYPE (exp)));
+    {
+      if (! target
+	  || GET_MODE (target) != mode
+	  || ! (*insn_data[icode].operand[0].predicate) (target, mode))
+	target = gen_reg_rtx (mode);
+	create_output_operand(&ops[opno++], target, mode);
+    }
 
   /* Map the arguments to the other operands.  */
   gcc_assert (opno + call_expr_nargs (exp)
 	      == insn_data[icode].n_generator_args);
   for (int argno = 0; argno < call_expr_nargs (exp); argno++)
-    riscv_prepare_builtin_arg (&ops[opno++], exp, argno);
+    riscv_prepare_builtin_arg (&ops[opno++], exp, argno, icode, has_target_p);
 
   return riscv_expand_builtin_insn (icode, opno, ops, has_target_p);
 }
