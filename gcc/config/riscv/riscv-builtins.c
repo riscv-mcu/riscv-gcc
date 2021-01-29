@@ -440,6 +440,10 @@ AVAIL (dsp, TARGET_DSP)
 #define RISCV_ATYPE_UV4QI    build_vector_type(unsigned_intQI_type_node, 4)
 #define RISCV_ATYPE_V8QI     build_vector_type(intQI_type_node, 8)
 #define RISCV_ATYPE_UV8QI    build_vector_type(unsigned_intQI_type_node, 8)
+#define RISCV_ATYPE_V2HI     build_vector_type(intHI_type_node, 2)
+#define RISCV_ATYPE_UV2HI    build_vector_type(unsigned_intHI_type_node, 2)
+#define RISCV_ATYPE_V4HI     build_vector_type(intHI_type_node, 4)
+#define RISCV_ATYPE_UV4HI    build_vector_type(unsigned_intHI_type_node, 4)
 
 /* Helper type nodes for vector support.  */
 tree const_float_ptr_type_node;
@@ -2582,19 +2586,119 @@ static const struct riscv_builtin_description riscv_builtins[] = {
   _RVV_SEG_NO_SEW8 (VUNDEFINED_VT_FLOAT)
 
   /* p-extension builtin functions. */
+  /* 16-bit Add/Subtract. */
+  DIRECT_NAMED (addv2hi3, addv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (addv2hi3, v_saddv2hi,
+		RISCV_FTYPE_NAME2 (V2HI, V2HI, V2HI), dsp),
+  DIRECT_NAMED (addv2hi3, v_uaddv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (addv4hi3, addv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (addv4hi3, v_uaddv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+  DIRECT_NAMED (addv4hi3, v_saddv4hi,
+		RISCV_FTYPE_NAME2 (V4HI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (raddv2hi3, raddv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (raddv2hi3, v_raddv2hi,
+		RISCV_FTYPE_NAME2 (V2HI, V2HI, V2HI), dsp),
+  DIRECT_NAMED (raddv4hi3, raddv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (raddv4hi3, v_raddv4hi,
+		RISCV_FTYPE_NAME2 (V4HI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (uraddv2hi3, uraddv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (uraddv2hi3, v_uraddv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (uraddv4hi3, uraddv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (uraddv4hi3, v_uraddv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
+  DIRECT_NAMED (kaddv2hi3, kaddv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (kaddv2hi3, v_kaddv2hi,
+		RISCV_FTYPE_NAME2 (V2HI, V2HI, V2HI), dsp),
+  DIRECT_NAMED (kaddv4hi3, kaddv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (kaddv4hi3, v_kaddv4hi,
+		RISCV_FTYPE_NAME2 (V4HI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (ukaddv2hi3, ukaddv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ukaddv2hi3, v_ukaddv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (ukaddv4hi3, ukaddv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ukaddv4hi3, v_ukaddv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
+  DIRECT_NAMED (subv2hi3, subv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (subv2hi3, v_usubv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (subv2hi3, v_ssubv2hi,
+		RISCV_FTYPE_NAME2 (V2HI, V2HI, V2HI), dsp),
+
+  DIRECT_NAMED (subv4hi3, subv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (subv4hi3, v_usubv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+  DIRECT_NAMED (subv4hi3, v_ssubv4hi,
+		RISCV_FTYPE_NAME2 (V4HI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (rsubv2hi3, rsubv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (rsubv2hi3, v_rsubv2hi,
+		RISCV_FTYPE_NAME2 (V2HI, V2HI, V2HI), dsp),
+  DIRECT_NAMED (rsubv4hi3, rsubv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (rsubv4hi3, v_rsubv4hi,
+		RISCV_FTYPE_NAME2 (V4HI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (ursubv2hi3, ursubv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ursubv2hi3, v_ursubv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (ursubv4hi3, ursubv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ursubv4hi3, v_ursubv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
+  DIRECT_NAMED (ksubv2hi3, ksubv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ksubv2hi3, v_ksubv2hi,
+		RISCV_FTYPE_NAME2 (V2HI, V2HI, V2HI), dsp),
+  DIRECT_NAMED (ksubv4hi3, ksubv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ksubv4hi3, v_ksubv4hi,
+		RISCV_FTYPE_NAME2 (V4HI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (uksubv2hi3, uksubv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (uksubv2hi3, v_uksubv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (uksubv4hi3, uksubv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (uksubv4hi3, v_uksubv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
   /* 8-bit Add/Subtract. */
   DIRECT_NAMED (addv4qi3, addv4qi,
 		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
-  DIRECT_NAMED (addv4qi3, saddv4qi,
+  DIRECT_NAMED (addv4qi3, v_saddv4qi,
 		RISCV_FTYPE_NAME2 (V4QI, V4QI, V4QI), dsp),
-  DIRECT_NAMED (addv4qi3, uaddv4qi,
+  DIRECT_NAMED (addv4qi3, v_uaddv4qi,
 		RISCV_FTYPE_NAME2 (UV4QI, UV4QI, UV4QI), dsp),
 
   DIRECT_NAMED (addv8qi3, addv8qi,
 		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
-  DIRECT_NAMED (addv8qi3, saddv8qi,
+  DIRECT_NAMED (addv8qi3, v_saddv8qi,
 		RISCV_FTYPE_NAME2 (V8QI, V8QI, V8QI), dsp),
-  DIRECT_NAMED (addv8qi3, uaddv8qi,
+  DIRECT_NAMED (addv8qi3, v_uaddv8qi,
 		RISCV_FTYPE_NAME2 (UV8QI, UV8QI, UV8QI), dsp),
 };
 
