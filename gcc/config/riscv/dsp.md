@@ -1273,3 +1273,389 @@
   "urstas16\t%0, %1, %2"
   [(set_attr "type" "dalu")
    (set_attr "mode" "V4HI")])
+
+(define_expand "stsa<mode>"
+  [(match_operand:VSHI 0 "register_operand" "")
+   (match_operand:VSHI 1 "register_operand" "")
+   (match_operand:VSHI 2 "register_operand" "")]
+  "TARGET_DSP"
+{
+  emit_insn (gen_stsa<mode>_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "stsa<mode>_le"
+  [(set (match_operand:VSHI 0 "register_operand"         "=r")
+	(vec_merge:VSHI
+	  (vec_duplicate:VSHI
+	    (minus:<VNHALF>
+	      (vec_select:<VNHALF>
+		(match_operand:VSHI 1 "register_operand" " r")
+		(parallel [(const_int 0)]))
+	      (vec_select:<VNHALF>
+		(match_operand:VSHI 2 "register_operand" " r")
+		(parallel [(const_int 0)]))))
+	  (vec_duplicate:VSHI
+	    (plus:<VNHALF>
+	      (vec_select:<VNHALF>
+		(match_dup 1)
+		(parallel [(const_int 1)]))
+	      (vec_select:<VNHALF>
+		(match_dup 2)
+		(parallel [(const_int 1)]))))
+	  (const_int 2)))]
+  "TARGET_DSP"
+  "stsa<bits>\t%0, %1, %2"
+  [(set_attr "type" "dalu")]
+)
+
+(define_expand "kstsa<mode>"
+  [(match_operand:VSHI 0 "register_operand" "")
+   (match_operand:VSHI 1 "register_operand" "")
+   (match_operand:VSHI 2 "register_operand" "")]
+  "TARGET_DSP"
+{
+  emit_insn (gen_kstsa<mode>_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "kstsa<mode>_le"
+  [(set (match_operand:VSHI 0 "register_operand"         "=r")
+	(vec_merge:VSHI
+	  (vec_duplicate:VSHI
+	    (ss_minus:<VNHALF>
+	      (vec_select:<VNHALF>
+		(match_operand:VSHI 1 "register_operand" " r")
+		(parallel [(const_int 0)]))
+	      (vec_select:<VNHALF>
+		(match_operand:VSHI 2 "register_operand" " r")
+		(parallel [(const_int 0)]))))
+	  (vec_duplicate:VSHI
+	    (ss_plus:<VNHALF>
+	      (vec_select:<VNHALF>
+		(match_dup 1)
+		(parallel [(const_int 1)]))
+	      (vec_select:<VNHALF>
+		(match_dup 2)
+		(parallel [(const_int 1)]))))
+	  (const_int 2)))]
+  "TARGET_DSP"
+  "kstsa<bits>\t%0, %1, %2"
+  [(set_attr "type" "dalu")]
+)
+
+(define_expand "ukstsa<mode>"
+  [(match_operand:VSHI 0 "register_operand" "")
+   (match_operand:VSHI 1 "register_operand" "")
+   (match_operand:VSHI 2 "register_operand" "")]
+  "TARGET_DSP"
+{
+  emit_insn (gen_ukstsa<mode>_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "ukstsa<mode>_le"
+  [(set (match_operand:VSHI 0 "register_operand"         "=r")
+	(vec_merge:VSHI
+	  (vec_duplicate:VSHI
+	    (us_minus:<VNHALF>
+	      (vec_select:<VNHALF>
+		(match_operand:VSHI 1 "register_operand" " r")
+		(parallel [(const_int 0)]))
+	      (vec_select:<VNHALF>
+		(match_operand:VSHI 2 "register_operand" " r")
+		(parallel [(const_int 0)]))))
+	  (vec_duplicate:VSHI
+	    (us_plus:<VNHALF>
+	      (vec_select:<VNHALF>
+		(match_dup 1)
+		(parallel [(const_int 1)]))
+	      (vec_select:<VNHALF>
+		(match_dup 2)
+		(parallel [(const_int 1)]))))
+	  (const_int 2)))]
+  "TARGET_DSP"
+  "ukstsa<bits>\t%0, %1, %2"
+  [(set_attr "type" "dalu")]
+)
+
+(define_expand "rstsa<mode>"
+  [(match_operand:VSHI 0 "register_operand" "")
+   (match_operand:VSHI 1 "register_operand" "")
+   (match_operand:VSHI 2 "register_operand" "")]
+  "TARGET_DSP"
+{
+  emit_insn (gen_rstsa<mode>_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "rstsa<mode>_le"
+  [(set (match_operand:VSHI 0 "register_operand"           "=r")
+	(vec_merge:VSHI
+	  (vec_duplicate:VSHI
+	    (truncate:<VNHALF>
+	      (ashiftrt:<VSH_EXT>
+	        (minus:<VSH_EXT>
+		  (sign_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_operand:VSHI 1 "register_operand" " r")
+		      (parallel [(const_int 0)])))
+		  (sign_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_operand:VSHI 2 "register_operand" " r")
+		      (parallel [(const_int 0)]))))
+		(const_int 1))))
+	  (vec_duplicate:VSHI
+	    (truncate:<VNHALF>
+	      (ashiftrt:<VSH_EXT>
+		(plus:<VSH_EXT>
+		  (sign_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_dup 1)
+		      (parallel [(const_int 1)])))
+		  (sign_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_dup 2)
+		      (parallel [(const_int 1)]))))
+		(const_int 1))))
+	  (const_int 2)))]
+  "TARGET_DSP"
+  "rstsa<bits>\t%0, %1, %2"
+  [(set_attr "type" "dalu")]
+)
+
+(define_expand "urstsa<mode>"
+  [(match_operand:VSHI 0 "register_operand" "")
+   (match_operand:VSHI 1 "register_operand" "")
+   (match_operand:VSHI 2 "register_operand" "")]
+  "TARGET_DSP"
+{
+  emit_insn (gen_urstsa<mode>_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "urstsa<mode>_le"
+  [(set (match_operand:VSHI 0 "register_operand"           "=r")
+	(vec_merge:VSHI
+	  (vec_duplicate:VSHI
+	    (truncate:<VNHALF>
+	      (lshiftrt:<VSH_EXT>
+	        (minus:<VSH_EXT>
+		  (zero_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_operand:VSHI 1 "register_operand" " r")
+		      (parallel [(const_int 0)])))
+		  (zero_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_operand:VSHI 2 "register_operand" " r")
+		      (parallel [(const_int 0)]))))
+		(const_int 1))))
+	  (vec_duplicate:VSHI
+	    (truncate:<VNHALF>
+	      (lshiftrt:<VSH_EXT>
+		(plus:<VSH_EXT>
+		  (zero_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_dup 1)
+		      (parallel [(const_int 1)])))
+		  (zero_extend:<VSH_EXT>
+		    (vec_select:<VNHALF>
+		      (match_dup 2)
+		      (parallel [(const_int 1)]))))
+		(const_int 1))))
+	  (const_int 2)))]
+  "TARGET_DSP"
+  "urstsa<bits>\t%0, %1, %2"
+  [(set_attr "type" "dalu")])
+
+(define_expand "stsa16_64"
+  [(match_operand:V4HI 0 "register_operand" "")
+   (match_operand:V4HI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_stsa16_64_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "stsa16_64_le"
+  [(set (match_operand:V4HI 0 "register_operand"         "=r")
+	(vec_concat:V4HI
+	  (vec_concat:V2HI
+	    (plus:HI (vec_select:HI (match_operand:V4HI 1 "register_operand" " r")
+				    (parallel [(const_int 0)]))
+		     (vec_select:HI (match_operand:V4HI 2 "register_operand" " r")
+				    (parallel [(const_int 0)])))
+	    (minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
+		      (vec_select:HI (match_dup 2) (parallel [(const_int 1)]))))
+	  (vec_concat:V2HI
+	    (plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 2)]))
+		     (vec_select:HI (match_dup 2) (parallel [(const_int 2)])))
+	    (minus:HI  (vec_select:HI (match_dup 1) (parallel [(const_int 3)]))
+		       (vec_select:HI (match_dup 2) (parallel [(const_int 3)]))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "stsa16\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "V4HI")])
+
+(define_expand "kstsa16_64"
+  [(match_operand:V4HI 0 "register_operand" "")
+   (match_operand:V4HI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_kstsa16_64_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "kstsa16_64_le"
+  [(set (match_operand:V4HI 0 "register_operand"         "=r")
+	(vec_concat:V4HI
+	  (vec_concat:V2HI
+	    (ss_plus:HI (vec_select:HI (match_operand:V4HI 1 "register_operand" " r")
+				       (parallel [(const_int 0)]))
+			(vec_select:HI (match_operand:V4HI 2 "register_operand" " r")
+				       (parallel [(const_int 0)])))
+	    (ss_minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
+			 (vec_select:HI (match_dup 2) (parallel [(const_int 1)]))))
+	  (vec_concat:V2HI
+	    (ss_plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 2)]))
+			(vec_select:HI (match_dup 2) (parallel [(const_int 2)])))
+	    (ss_minus:HI  (vec_select:HI (match_dup 1) (parallel [(const_int 3)]))
+			  (vec_select:HI (match_dup 2) (parallel [(const_int 3)]))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kstsa16\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "V4HI")])
+
+(define_expand "ukstsa16_64"
+  [(match_operand:V4HI 0 "register_operand" "")
+   (match_operand:V4HI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_ukstsa16_64_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "ukstsa16_64_le"
+  [(set (match_operand:V4HI 0 "register_operand"         "=r")
+	(vec_concat:V4HI
+	  (vec_concat:V2HI
+	    (us_plus:HI (vec_select:HI (match_operand:V4HI 1 "register_operand" " r")
+				       (parallel [(const_int 0)]))
+			(vec_select:HI (match_operand:V4HI 2 "register_operand" " r")
+				       (parallel [(const_int 0)])))
+	    (us_minus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 1)]))
+			 (vec_select:HI (match_dup 2) (parallel [(const_int 1)]))))
+	  (vec_concat:V2HI
+	    (us_plus:HI (vec_select:HI (match_dup 1) (parallel [(const_int 2)]))
+			(vec_select:HI (match_dup 2) (parallel [(const_int 2)])))
+	    (us_minus:HI  (vec_select:HI (match_dup 1) (parallel [(const_int 3)]))
+			  (vec_select:HI (match_dup 2) (parallel [(const_int 3)]))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "ukstsa16\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "V4HI")])
+
+(define_expand "rstsa16_64"
+  [(match_operand:V4HI 0 "register_operand" "")
+   (match_operand:V4HI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_rstsa16_64_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "rstsa16_64_le"
+  [(set (match_operand:V4HI 0 "register_operand"         "=r")
+	(vec_concat:V4HI
+	  (vec_concat:V2HI
+	    (truncate:HI
+	      (ashiftrt:SI
+		(plus:SI
+		  (sign_extend:SI (vec_select:HI (match_operand:V4HI 1 "register_operand" " r")
+						 (parallel [(const_int 0)])))
+		  (sign_extend:SI (vec_select:HI (match_operand:V4HI 2 "register_operand" " r")
+						  (parallel [(const_int 0)]))))
+		(const_int 1)))
+	    (truncate:HI
+	      (ashiftrt:SI
+		(minus:SI
+		  (sign_extend:SI (vec_select:HI (match_dup 1) (parallel [(const_int 1)])))
+		  (sign_extend:SI (vec_select:HI (match_dup 2) (parallel [(const_int 1)]))))
+		(const_int 1))))
+	  (vec_concat:V2HI
+	    (truncate:HI
+	      (ashiftrt:SI
+		(plus:SI
+		  (sign_extend:SI (vec_select:HI (match_dup 1) (parallel [(const_int 2)])))
+		  (sign_extend:SI (vec_select:HI (match_dup 2) (parallel [(const_int 2)]))))
+		(const_int 1)))
+	    (truncate:HI
+	      (ashiftrt:SI
+		(minus:SI
+		  (sign_extend:SI (vec_select:HI (match_dup 1) (parallel [(const_int 3)])))
+		  (sign_extend:SI (vec_select:HI (match_dup 2) (parallel [(const_int 3)]))))
+		(const_int 1))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "rstsa16\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "V4HI")])
+
+(define_expand "urstsa16_64"
+  [(match_operand:V4HI 0 "register_operand" "")
+   (match_operand:V4HI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_urstsa16_64_le (operands[0], operands[1], operands[2]));
+  DONE;
+}
+[(set_attr "type" "dalu")])
+
+(define_insn "urstsa16_64_le"
+  [(set (match_operand:V4HI 0 "register_operand"         "=r")
+	(vec_concat:V4HI
+	  (vec_concat:V2HI
+	    (truncate:HI
+	      (lshiftrt:SI
+		(plus:SI
+		  (zero_extend:SI (vec_select:HI (match_operand:V4HI 1 "register_operand" " r")
+						 (parallel [(const_int 0)])))
+		  (zero_extend:SI (vec_select:HI (match_operand:V4HI 2 "register_operand" " r")
+						  (parallel [(const_int 0)]))))
+		(const_int 1)))
+	    (truncate:HI
+	      (lshiftrt:SI
+		(minus:SI
+		  (zero_extend:SI (vec_select:HI (match_dup 1) (parallel [(const_int 1)])))
+		  (zero_extend:SI (vec_select:HI (match_dup 2) (parallel [(const_int 1)]))))
+		(const_int 1))))
+	  (vec_concat:V2HI
+	    (truncate:HI
+	      (lshiftrt:SI
+		(plus:SI
+		  (zero_extend:SI (vec_select:HI (match_dup 1) (parallel [(const_int 2)])))
+		  (zero_extend:SI (vec_select:HI (match_dup 2) (parallel [(const_int 2)]))))
+		(const_int 1)))
+	    (truncate:HI
+	      (lshiftrt:SI
+		(minus:SI
+		  (zero_extend:SI (vec_select:HI (match_dup 1) (parallel [(const_int 3)])))
+		  (zero_extend:SI (vec_select:HI (match_dup 2) (parallel [(const_int 3)]))))
+		(const_int 1))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "urstsa16\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "V4HI")])
