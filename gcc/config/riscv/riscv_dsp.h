@@ -89,6 +89,22 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__ukcrsa16(a, b) __builtin_riscv_ukcrsav2hi(a, b)
 #define __rv__v_ukcrsa16(a, b) __builtin_riscv_v_ukcrsav2hi(a, b)
 
+#define __rv__stas16(a, b) __builtin_riscv_stasv2hi(a, b)
+#define __rv__v_sstas16(a, b) __builtin_riscv_v_sstasv2hi(a, b)
+#define __rv__v_ustas16(a, b) __builtin_riscv_v_ustasv2hi(a, b)
+
+#define __rv__rstas16(a, b) __builtin_riscv_rstasv2hi(a, b)
+#define __rv__v_rstas16(a, b) __builtin_riscv_v_rstasv2hi(a, b)
+
+#define __rv__urstas16(a, b) __builtin_riscv_urstasv2hi(a, b)
+#define __rv__v_urstas16(a, b) __builtin_riscv_v_urstasv2hi(a, b)
+
+#define __rv__kstas16(a, b) __builtin_riscv_kstasv2hi(a, b)
+#define __rv__v_kstas16(a, b) __builtin_riscv_v_kstasv2hi(a, b)
+
+#define __rv__ukstas16(a, b) __builtin_riscv_ukstasv2hi(a, b)
+#define __rv__v_ukstas16(a, b) __builtin_riscv_v_ukstasv2hi(a, b)
+
 /* 8-bit Add/Subtract */
 #define __rv__add8(a, b) __builtin_riscv_addv4qi(a, b)
 #define __rv__v_sadd8(a, b) __builtin_riscv_v_saddv4qi(a, b)
@@ -159,6 +175,22 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__ukcrsa16(a, b) __builtin_riscv_ukcrsav4hi(a, b)
 #define __rv__v_ukcrsa16(a, b) __builtin_riscv_v_ukcrsav4hi(a, b)
+
+#define __rv__stas16(a, b) __builtin_riscv_stasv4hi(a, b)
+#define __rv__v_sstas16(a, b) __builtin_riscv_v_sstasv4hi(a, b)
+#define __rv__v_ustas16(a, b) __builtin_riscv_v_ustasv4hi(a, b)
+
+#define __rv__rstas16(a, b) __builtin_riscv_rstasv4hi(a, b)
+#define __rv__v_rstas16(a, b) __builtin_riscv_v_rstasv4hi(a, b)
+
+#define __rv__urstas16(a, b) __builtin_riscv_urstasv4hi(a, b)
+#define __rv__v_urstas16(a, b) __builtin_riscv_v_urstasv4hi(a, b)
+
+#define __rv__kstas16(a, b) __builtin_riscv_kstasv4hi(a, b)
+#define __rv__v_kstas16(a, b) __builtin_riscv_v_kstasv4hi(a, b)
+
+#define __rv__ukstas16(a, b) __builtin_riscv_ukstasv4hi(a, b)
+#define __rv__v_ukstas16(a, b) __builtin_riscv_v_ukstasv4hi(a, b)
 
 /* 8-bit Add/Subtract */
 #define __rv__add8(a, b) __builtin_riscv_addv8qi(a, b)
