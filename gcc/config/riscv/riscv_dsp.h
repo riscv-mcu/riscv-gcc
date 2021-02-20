@@ -126,6 +126,34 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__v_sadd8(a, b) __builtin_riscv_v_saddv4qi(a, b)
 #define __rv__v_uadd8(a, b) __builtin_riscv_v_uaddv4qi(a, b)
 
+#define __rv__radd8(a, b) __builtin_riscv_raddv4qi(a, b)
+#define __rv__v_radd8(a, b) __builtin_riscv_v_raddv4qi(a, b)
+
+#define __rv__uradd8(a, b) __builtin_riscv_uraddv4qi(a, b)
+#define __rv__v_uradd8(a, b) __builtin_riscv_v_uraddv4qi(a, b)
+
+#define __rv__kadd8(a, b) __builtin_riscv_kaddv4qi(a, b)
+#define __rv__v_kadd8(a, b) __builtin_riscv_v_kaddv4qi(a, b)
+
+#define __rv__ukadd8(a, b) __builtin_riscv_ukaddv4qi(a, b)
+#define __rv__v_ukadd8(a, b) __builtin_riscv_v_ukaddv4qi(a, b)
+
+#define __rv__sub8(a, b) __builtin_riscv_subv4qi(a, b)
+#define __rv__v_ssub8(a, b) __builtin_riscv_v_ssubv4qi(a, b)
+#define __rv__v_usub8(a, b) __builtin_riscv_v_usubv4qi(a, b)
+
+#define __rv__rsub8(a, b) __builtin_riscv_rsubv4qi(a, b)
+#define __rv__v_rsub8(a, b) __builtin_riscv_v_rsubv4qi(a, b)
+
+#define __rv__ursub8(a, b) __builtin_riscv_ursubv4qi(a, b)
+#define __rv__v_ursub8(a, b) __builtin_riscv_v_ursubv4qi(a, b)
+
+#define __rv__ksub8(a, b) __builtin_riscv_ksubv4qi(a, b)
+#define __rv__v_ksub8(a, b) __builtin_riscv_v_ksubv4qi(a, b)
+
+#define __rv__uksub8(a, b) __builtin_riscv_uksubv4qi(a, b)
+#define __rv__v_uksub8(a, b) __builtin_riscv_v_uksubv4qi(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -228,6 +256,34 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__add8(a, b) __builtin_riscv_addv8qi(a, b)
 #define __rv__v_sadd8(a, b) __builtin_riscv_v_saddv8qi(a, b)
 #define __rv__v_uadd8(a, b) __builtin_riscv_v_uaddv8qi(a, b)
+
+#define __rv__radd8(a, b) __builtin_riscv_raddv8qi(a, b)
+#define __rv__v_radd8(a, b) __builtin_riscv_v_raddv8qi(a, b)
+
+#define __rv__uradd8(a, b) __builtin_riscv_uraddv8qi(a, b)
+#define __rv__v_uradd8(a, b) __builtin_riscv_v_uraddv8qi(a, b)
+
+#define __rv__kadd8(a, b) __builtin_riscv_kaddv8qi(a, b)
+#define __rv__v_kadd8(a, b) __builtin_riscv_v_kaddv8qi(a, b)
+
+#define __rv__ukadd8(a, b) __builtin_riscv_ukaddv8qi(a, b)
+#define __rv__v_ukadd8(a, b) __builtin_riscv_v_ukaddv8qi(a, b)
+
+#define __rv__sub8(a, b) __builtin_riscv_subv8qi(a, b)
+#define __rv__v_ssub8(a, b) __builtin_riscv_v_ssubv8qi(a, b)
+#define __rv__v_usub8(a, b) __builtin_riscv_v_usubv8qi(a, b)
+
+#define __rv__rsub8(a, b) __builtin_riscv_rsubv8qi(a, b)
+#define __rv__v_rsub8(a, b) __builtin_riscv_v_rsubv8qi(a, b)
+
+#define __rv__ursub8(a, b) __builtin_riscv_ursubv8qi(a, b)
+#define __rv__v_ursub8(a, b) __builtin_riscv_v_ursubv8qi(a, b)
+
+#define __rv__ksub8(a, b) __builtin_riscv_ksubv8qi(a, b)
+#define __rv__v_ksub8(a, b) __builtin_riscv_v_ksubv8qi(a, b)
+
+#define __rv__uksub8(a, b) __builtin_riscv_uksubv8qi(a, b)
+#define __rv__v_uksub8(a, b) __builtin_riscv_v_uksubv8qi(a, b)
 
 #else
 #error "unknown xlen"
