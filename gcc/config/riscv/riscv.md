@@ -127,6 +127,65 @@
   UNSPEC_SEG_STORE
   UNSPEC_SEG_LOAD
   UNSPEC_SEG_LOAD_FIRST_FAULT
+
+  ;; P-extension
+  UNSPEC_ROUND
+  UNSPEC_ROUND64
+  UNSPEC_VEC_COMPARE
+  UNSPEC_CLIPS
+  UNSPEC_CLIP
+  UNSPEC_KHM
+  UNSPEC_KHMX
+  UNSPEC_CLIP_OV
+  UNSPEC_CLIPS_OV
+  UNSPEC_BITREV
+  UNSPEC_KABS
+  UNSPEC_KSLRAWU
+  UNSPEC_KSLRAW
+  UNSPEC_KHMTT
+  UNSPEC_KHMBT
+  UNSPEC_KHMBB
+  UNSPEC_KDMTT
+  UNSPEC_KDMBT
+  UNSPEC_KDMBB
+  UNSPEC_KHMTT16
+  UNSPEC_KHMBT16
+  UNSPEC_KHMBB16
+  UNSPEC_KDMTT16
+  UNSPEC_KDMBT16
+  UNSPEC_KDMBB16
+  UNSPEC_KADDH
+  UNSPEC_KSUBH
+  UNSPEC_KADDW
+  UNSPEC_KSUBW
+  UNSPEC_CLO
+  UNSPEC_PBSAD
+  UNSPEC_PBSADA
+  UNSPEC_BSWAP
+  UNSPEC_FFB
+  UNSPEC_FFMISM
+  UNSPEC_FLMISM
+  UNSPEC_UMUL8
+  UNSPEC_SMUL8
+  UNSPEC_UMULX8
+  UNSPEC_SMULX8
+  UNSPEC_UMUL16
+  UNSPEC_SMUL16
+  UNSPEC_UMULX16
+  UNSPEC_SMULX16
+  UNSPEC_UKADDW
+  UNSPEC_UKSUBW
+  UNSPEC_UKADDW64
+  UNSPEC_UKSUBW64
+  UNSPEC_UKADDH
+  UNSPEC_UKSUBH
+  UNSPEC_CLROV
+  UNSPEC_RDOV
+  UNSPEC_KMMW
+  UNSPEC_KMMWU
+  UNSPEC_KDMABB
+  UNSPEC_KDMABT
+  UNSPEC_KDMATT
 ])
 
 (define_c_enum "unspecv" [
@@ -255,7 +314,8 @@
 (define_attr "type"
   "unknown,branch,jump,call,load,fpload,store,fpstore,
    mtc,mfc,const,arith,logical,shift,slt,imul,idiv,move,fmove,fadd,fmul,
-   fmadd,fdiv,fcmp,fcvt,fsqrt,multi,auipc,sfb_alu,nop,ghost,vector,dalu"
+   fmadd,fdiv,fcmp,fcvt,fsqrt,multi,auipc,sfb_alu,nop,ghost,vector,
+   dalu,dalu64,daluround,dcmp,dclip,dmul,dmac,dinsb,dpack,dbpick,dwext"
   (cond [(eq_attr "got" "load") (const_string "load")
 
 	 ;; If a doubleword move uses these expensive instructions,

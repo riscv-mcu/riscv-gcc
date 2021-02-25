@@ -168,3 +168,39 @@
   "POLY_INT"
   (and (match_code "const_poly_int")
        (match_test "CONST_POLY_INT_COEFFS (op)[0] == UNITS_PER_V_REG.coeffs[0]")))
+
+;; Constraints used in P-extension.
+(define_constraint "u01"
+  "Unsigned immediate 1-bit value"
+  (and (match_code "const_int")
+       (match_test "ival == 1 || ival == 0")))
+
+(define_constraint "u02"
+  "Unsigned immediate 2-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 2) && ival >= 0")))
+
+(define_constraint "u03"
+  "Unsigned immediate 3-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 3) && ival >= 0")))
+
+(define_constraint "u04"
+  "Unsigned immediate 4-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 4) && ival >= 0")))
+
+(define_constraint "u05"
+  "Unsigned immediate 5-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 5) && ival >= 0")))
+
+(define_constraint "u06"
+  "Unsigned immediate 6-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 6) && ival >= 0")))
+
+(define_constraint "u08"
+  "Unsigned immediate 8-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 8) && ival >= 0")))
