@@ -204,6 +204,40 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__kslra8_u(a, b) __builtin_riscv_kslrav4qi_u(a, b)
 #define __rv__v_kslra8_u(a, b) __builtin_riscv_v_kslrav4qi_u(a, b)
 
+/* 16-bit Comparison. */
+#define __rv__cmpeq16(a, b) __builtin_riscv_cmpeqv2hi(a, b)
+#define __rv__v_scmpeq16(a, b) __builtin_riscv_v_scmpeqv2hi(a, b)
+#define __rv__v_ucmpeq16(a, b) __builtin_riscv_v_ucmpeqv2hi(a, b)
+
+#define __rv__scmplt16(a, b) __builtin_riscv_scmpltv2hi(a, b)
+#define __rv__v_scmplt16(a, b) __builtin_riscv_v_scmpltv2hi(a, b)
+
+#define __rv__scmple16(a, b) __builtin_riscv_scmplev2hi(a, b)
+#define __rv__v_scmple16(a, b) __builtin_riscv_v_scmplev2hi(a, b)
+
+#define __rv__ucmplt16(a, b) __builtin_riscv_ucmpltv2hi(a, b)
+#define __rv__v_ucmplt16(a, b) __builtin_riscv_v_ucmpltv2hi(a, b)
+
+#define __rv__ucmple16(a, b) __builtin_riscv_ucmplev2hi(a, b)
+#define __rv__v_ucmple16(a, b) __builtin_riscv_v_ucmplev2hi(a, b)
+
+/* 8-bit Comparison. */
+#define __rv__cmpeq8(a, b) __builtin_riscv_cmpeqv4qi(a, b)
+#define __rv__v_scmpeq8(a, b) __builtin_riscv_v_scmpeqv4qi(a, b)
+#define __rv__v_ucmpeq8(a, b) __builtin_riscv_v_ucmpeqv4qi(a, b)
+
+#define __rv__scmplt8(a, b) __builtin_riscv_scmpltv4qi(a, b)
+#define __rv__v_scmplt8(a, b) __builtin_riscv_v_scmpltv4qi(a, b)
+
+#define __rv__scmple8(a, b) __builtin_riscv_scmplev4qi(a, b)
+#define __rv__v_scmple8(a, b) __builtin_riscv_v_scmplev4qi(a, b)
+
+#define __rv__ucmplt8(a, b) __builtin_riscv_ucmpltv4qi(a, b)
+#define __rv__v_ucmplt8(a, b) __builtin_riscv_v_ucmpltv4qi(a, b)
+
+#define __rv__ucmple8(a, b) __builtin_riscv_ucmplev4qi(a, b)
+#define __rv__v_ucmple8(a, b) __builtin_riscv_v_ucmplev4qi(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -384,6 +418,40 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__kslra8_u(a, b) __builtin_riscv_kslrav8qi_u(a, b)
 #define __rv__v_kslra8_u(a, b) __builtin_riscv_v_kslrav8qi_u(a, b)
+
+/* 16-bit Comparison. */
+#define __rv__cmpeq16(a, b) __builtin_riscv_cmpeqv4hi(a, b)
+#define __rv__v_scmpeq16(a, b) __builtin_riscv_v_scmpeqv4hi(a, b)
+#define __rv__v_ucmpeq16(a, b) __builtin_riscv_v_ucmpeqv4hi(a, b)
+
+#define __rv__scmplt16(a, b) __builtin_riscv_scmpltv4hi(a, b)
+#define __rv__v_scmplt16(a, b) __builtin_riscv_v_scmpltv4hi(a, b)
+
+#define __rv__scmple16(a, b) __builtin_riscv_scmplev4hi(a, b)
+#define __rv__v_scmple16(a, b) __builtin_riscv_v_scmplev4hi(a, b)
+
+#define __rv__ucmplt16(a, b) __builtin_riscv_ucmpltv4hi(a, b)
+#define __rv__v_ucmplt16(a, b) __builtin_riscv_v_ucmpltv4hi(a, b)
+
+#define __rv__ucmple16(a, b) __builtin_riscv_ucmplev4hi(a, b)
+#define __rv__v_ucmple16(a, b) __builtin_riscv_v_ucmplev4hi(a, b)
+
+/* 8-bit Comparison. */
+#define __rv__cmpeq8(a, b) __builtin_riscv_cmpeqv8qi(a, b)
+#define __rv__v_scmpeq8(a, b) __builtin_riscv_v_scmpeqv8qi(a, b)
+#define __rv__v_ucmpeq8(a, b) __builtin_riscv_v_ucmpeqv8qi(a, b)
+
+#define __rv__scmplt8(a, b) __builtin_riscv_scmpltv8qi(a, b)
+#define __rv__v_scmplt8(a, b) __builtin_riscv_v_scmpltv8qi(a, b)
+
+#define __rv__scmple8(a, b) __builtin_riscv_scmplev8qi(a, b)
+#define __rv__v_scmple8(a, b) __builtin_riscv_v_scmplev8qi(a, b)
+
+#define __rv__ucmplt8(a, b) __builtin_riscv_ucmpltv8qi(a, b)
+#define __rv__v_ucmplt8(a, b) __builtin_riscv_v_ucmpltv8qi(a, b)
+
+#define __rv__ucmple8(a, b) __builtin_riscv_ucmplev8qi(a, b)
+#define __rv__v_ucmple8(a, b) __builtin_riscv_v_ucmplev8qi(a, b)
 
 #else
 #error "unknown xlen"
