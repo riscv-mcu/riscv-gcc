@@ -238,6 +238,56 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__ucmple8(a, b) __builtin_riscv_ucmplev4qi(a, b)
 #define __rv__v_ucmple8(a, b) __builtin_riscv_v_ucmplev4qi(a, b)
 
+/* 16-bit Multiplications */
+#define __rv__smul16(a, b) __builtin_riscv_smul16_32(a, b)
+#define __rv__v_smul16(a, b) __builtin_riscv_v_smul16_32(a, b)
+
+#define __rv__smulx16(a, b) __builtin_riscv_smulx16_32(a, b)
+#define __rv__v_smulx16(a, b) __builtin_riscv_v_smulx16_32(a, b)
+
+#define __rv__khm16(a, b) __builtin_riscv_khm16v2hi(a, b)
+#define __rv__v_khm16(a, b) __builtin_riscv_v_khm16v2hi(a, b)
+
+#define __rv__khmx16(a, b) __builtin_riscv_khmx16v2hi(a, b)
+#define __rv__v_khmx16(a, b) __builtin_riscv_v_khmx16v2hi(a, b)
+
+/* 8-bit Multiplications */
+#define __rv__smul8(a, b) __builtin_riscv_smul8_32(a, b)
+#define __rv__v_smul8(a, b) __builtin_riscv_v_smul8_32(a, b)
+
+#define __rv__smulx8(a, b) __builtin_riscv_smulx8_32(a, b)
+#define __rv__v_smulx8(a, b) __builtin_riscv_v_smulx8_32(a, b)
+
+#define __rv__khm8(a, b) __builtin_riscv_khm8v4qi(a, b)
+#define __rv__v_khm8(a, b) __builtin_riscv_v_khm8v4qi(a, b)
+
+#define __rv__khmx8(a, b) __builtin_riscv_khmx8v4qi(a, b)
+#define __rv__v_khmx8(a, b) __builtin_riscv_v_khmx8v4qi(a, b)
+
+#define __rv__smin16(a, b) __builtin_riscv_sminv2hi(a, b)
+#define __rv__v_smin16(a, b) __builtin_riscv_v_sminv2hi(a, b)
+
+#define __rv__smax16(a, b) __builtin_riscv_smaxv2hi(a, b)
+#define __rv__v_smax16(a, b) __builtin_riscv_v_smaxv2hi(a, b)
+
+#define __rv__umin16(a, b) __builtin_riscv_uminv2hi(a, b)
+#define __rv__v_umin16(a, b) __builtin_riscv_v_uminv2hi(a, b)
+
+#define __rv__umax16(a, b) __builtin_riscv_umaxv2hi(a, b)
+#define __rv__v_umax16(a, b) __builtin_riscv_v_umaxv2hi(a, b)
+
+#define __rv__smin8(a, b) __builtin_riscv_sminv4qi(a, b)
+#define __rv__v_smin8(a, b) __builtin_riscv_v_sminv4qi(a, b)
+
+#define __rv__smax8(a, b) __builtin_riscv_smaxv4qi(a, b)
+#define __rv__v_smax8(a, b) __builtin_riscv_v_smaxv4qi(a, b)
+
+#define __rv__umin8(a, b) __builtin_riscv_uminv4qi(a, b)
+#define __rv__v_umin8(a, b) __builtin_riscv_v_uminv4qi(a, b)
+
+#define __rv__umax8(a, b) __builtin_riscv_umaxv4qi(a, b)
+#define __rv__v_umax8(a, b) __builtin_riscv_v_umaxv4qi(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -452,6 +502,30 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__ucmple8(a, b) __builtin_riscv_ucmplev8qi(a, b)
 #define __rv__v_ucmple8(a, b) __builtin_riscv_v_ucmplev8qi(a, b)
+
+#define __rv__smin16(a, b) __builtin_riscv_sminv4hi(a, b)
+#define __rv__v_smin16(a, b) __builtin_riscv_v_sminv4hi(a, b)
+
+#define __rv__smax16(a, b) __builtin_riscv_smaxv4hi(a, b)
+#define __rv__v_smax16(a, b) __builtin_riscv_v_smaxv4hi(a, b)
+
+#define __rv__umin16(a, b) __builtin_riscv_uminv4hi(a, b)
+#define __rv__v_umin16(a, b) __builtin_riscv_v_uminv4hi(a, b)
+
+#define __rv__umax16(a, b) __builtin_riscv_umaxv4hi(a, b)
+#define __rv__v_umax16(a, b) __builtin_riscv_v_umaxv4hi(a, b)
+
+#define __rv__smin8(a, b) __builtin_riscv_sminv8qi(a, b)
+#define __rv__v_smin8(a, b) __builtin_riscv_v_sminv8qi(a, b)
+
+#define __rv__smax8(a, b) __builtin_riscv_smaxv8qi(a, b)
+#define __rv__v_smax8(a, b) __builtin_riscv_v_smaxv8qi(a, b)
+
+#define __rv__umin8(a, b) __builtin_riscv_uminv8qi(a, b)
+#define __rv__v_umin8(a, b) __builtin_riscv_v_uminv8qi(a, b)
+
+#define __rv__umax8(a, b) __builtin_riscv_umaxv8qi(a, b)
+#define __rv__v_umax8(a, b) __builtin_riscv_v_umaxv8qi(a, b)
 
 #else
 #error "unknown xlen"
