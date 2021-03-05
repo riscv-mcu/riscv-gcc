@@ -37,10 +37,11 @@
 
 (define_code_iterator sumin_max [smax umax smin umin])
 
-(define_code_iterator unop [clrsb clz])
-
 (define_code_attr opcode
   [(plus "add") (minus "sub") (smax "smax") (umax "umax") (smin "smin") (umin "umin")])
+
+(define_code_attr zs
+  [(sign_extend "s") (zero_extend "z")])
 
 (define_expand "mov<mode>"
   [(set (match_operand:VQIHI 0 "")
@@ -2094,3 +2095,432 @@
   "TARGET_DSP"
   "<opcode><bits>\t%0, %1, %2"
   [(set_attr "type" "dalu")])
+
+(define_insn "sclip8<mode>"
+  [(set (match_operand:VQI 0 "register_operand"              "=  r")
+	(unspec:VQI [(match_operand:VQI 1 "register_operand" "   r")
+		      (match_operand:SI 2 "imm3u_operand"    " u03")]
+		     UNSPEC_CLIPS))]
+  "TARGET_DSP"
+  "sclip8\t%0, %1, %2"
+  [(set_attr "type" "dclip")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "uclip8<mode>"
+  [(set (match_operand:VQI 0 "register_operand"               "=  r")
+	(unspec:VQI [(match_operand:VQI 1 "register_operand"  "   r")
+		     (match_operand:SI 2 "imm3u_operand"      " u03")]
+		     UNSPEC_CLIP))]
+  "TARGET_DSP"
+  "uclip8\t%0, %1, %2"
+  [(set_attr "type" "dclip")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "sclip16<mode>"
+  [(set (match_operand:VHI 0 "register_operand"              "=   r")
+	(unspec:VHI [(match_operand:VHI 1 "register_operand" "    r")
+		     (match_operand:SI 2 "imm4u_operand"     " u04")]
+		     UNSPEC_CLIPS))]
+  "TARGET_DSP"
+  "sclip16\t%0, %1, %2"
+  [(set_attr "type" "dclip")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "uclip16<mode>"
+  [(set (match_operand:VHI 0 "register_operand"               "=   r")
+	(unspec:VHI [(match_operand:VHI 1 "register_operand"  "    r")
+		      (match_operand:SI 2 "imm4u_operand"     " u04")]
+		     UNSPEC_CLIP))]
+  "TARGET_DSP"
+  "uclip16\t%0, %1, %2"
+  [(set_attr "type" "dclip")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "kabs<mode>2"
+  [(set (match_operand:VECI 0 "register_operand"              "=r")
+	(ss_abs:VECI (match_operand:VECI 1 "register_operand" " r")))]
+  "TARGET_DSP"
+  "kabs<bits>\t%0, %1"
+  [(set_attr "type"   "dalu")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "clrs<mode>2"
+  [(set (match_operand:VECI 0 "register_operand"               "=r")
+	(unspec:VECI [(match_operand:VECI 1 "register_operand" " r")]
+		      UNSPEC_CLRS))]
+  "TARGET_DSP"
+  "clrs<bits>\t%0, %1"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "clz<mode>2"
+  [(set (match_operand:VECI 0 "register_operand"               "=r")
+	(unspec:VECI [(match_operand:VECI 1 "register_operand" " r")]
+		      UNSPEC_CLZ))]
+  "TARGET_DSP"
+  "clz<bits>\t%0, %1"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "clo<mode>2"
+  [(set (match_operand:VECI 0 "register_operand"               "=r")
+	(unspec:VECI [(match_operand:VECI 1 "register_operand" " r")]
+		      UNSPEC_CLO))]
+  "TARGET_DSP"
+  "clo<bits>\t%0, %1"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "<MODE>")])
+
+(define_expand "vec_unpacks_lo_v4qi"
+  [(match_operand:V2HI 0 "register_operand" "=r")
+   (match_operand:V4QI 1 "register_operand" " r")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_sunpkd810 (operands[0], operands[1]));
+  DONE;
+})
+
+(define_expand "sunpkd810"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_sunpkd810_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_insn "<zs>unpkd810_imp"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 1)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 0)]))))
+	  (const_int 2)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd810\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_insn "<zs>unpkd810_imp_inv"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 0)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 1)]))))
+	  (const_int 1)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd810\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_expand "sunpkd820"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_sunpkd820_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_insn "<zs>unpkd820_imp"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 2)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 0)]))))
+	  (const_int 2)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd820\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_insn "<zs>unpkd820_imp_inv"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 0)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 2)]))))
+	  (const_int 1)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd820\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_expand "sunpkd830"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_sunpkd830_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_insn "<zs>unpkd830_imp"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 3)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 0)]))))
+	  (const_int 2)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd830\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_insn "<zs>unpkd830_imp_inv"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 0)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 3)]))))
+	  (const_int 1)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd830\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_expand "sunpkd831"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_sunpkd831_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_insn "<zs>unpkd831_imp"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 3)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 1)]))))
+	  (const_int 2)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd831\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_insn "<zs>unpkd831_imp_inv"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 1)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 3)]))))
+	  (const_int 1)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd831\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_expand "sunpkd832"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_sunpkd832_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_insn "<zs>unpkd832_imp"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 3)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 2)]))))
+	  (const_int 2)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd832\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_insn "<zs>unpkd832_imp_inv"
+  [(set (match_operand:V2HI 0 "register_operand"                     "=r")
+	(vec_merge:V2HI
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_operand:V4QI 1 "register_operand"             " r")
+		(parallel [(const_int 2)]))))
+	  (vec_duplicate:V2HI
+	    (any_extend:HI
+	      (vec_select:QI
+		(match_dup 1)
+		(parallel [(const_int 3)]))))
+	  (const_int 1)))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "<zs>unpkd832\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V2HI")])
+
+(define_expand "zunpkd810"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_zunpkd810_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_expand "zunpkd820"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_zunpkd820_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_expand "zunpkd830"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_zunpkd830_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_expand "zunpkd831"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_zunpkd831_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_expand "zunpkd832"
+  [(match_operand:V2HI 0 "register_operand")
+   (match_operand:V4QI 1 "register_operand")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_zunpkd832_imp (operands[0], operands[1]));
+  DONE;
+}
+[(set_attr "type" "dpack")])
+
+(define_insn "<zs>unpkd810_64"
+  [(set (match_operand:V4HI 0 "register_operand"                    "=r")
+	(vec_select:V4HI
+	  (any_extend:V8HI (match_operand:V8QI 1 "register_operand" "r"))
+	  (parallel [(const_int 0) (const_int 1)
+		     (const_int 4) (const_int 5)])))]
+  "TARGET_DSP && TARGET_64BIT"
+  "<zs>unpkd810\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V4HI")])
+
+(define_insn "<zs>unpkd820_64"
+  [(set (match_operand:V4HI 0 "register_operand"                    "=r")
+	(vec_select:V4HI
+	  (any_extend:V8HI (match_operand:V8QI 1 "register_operand" "r"))
+	  (parallel [(const_int 0) (const_int 2)
+		     (const_int 4) (const_int 6)])))]
+  "TARGET_DSP && TARGET_64BIT"
+  "<zs>unpkd820\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V4HI")])
+
+(define_insn "<zs>unpkd830_64"
+  [(set (match_operand:V4HI 0 "register_operand"                    "=r")
+	(vec_select:V4HI
+	  (any_extend:V8HI (match_operand:V8QI 1 "register_operand" "r"))
+	  (parallel [(const_int 0) (const_int 3)
+		     (const_int 4) (const_int 7)])))]
+  "TARGET_DSP && TARGET_64BIT"
+  "<zs>unpkd830\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V4HI")])
+
+(define_insn "<zs>unpkd831_64"
+  [(set (match_operand:V4HI 0 "register_operand"                    "=r")
+	(vec_select:V4HI
+	  (any_extend:V8HI (match_operand:V8QI 1 "register_operand" "r"))
+	  (parallel [(const_int 1) (const_int 3)
+		     (const_int 5) (const_int 7)])))]
+  "TARGET_DSP && TARGET_64BIT"
+  "<zs>unpkd831\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V4HI")])
+
+(define_insn "<zs>unpkd832_64"
+  [(set (match_operand:V4HI 0 "register_operand"                    "=r")
+	(vec_select:V4HI
+	  (any_extend:V8HI (match_operand:V8QI 1 "register_operand" "r"))
+	  (parallel [(const_int 2) (const_int 3)
+		     (const_int 6) (const_int 7)])))]
+  "TARGET_DSP && TARGET_64BIT"
+  "<zs>unpkd832\t%0, %1"
+  [(set_attr "type" "dpack")
+   (set_attr "mode"  "V4HI")])

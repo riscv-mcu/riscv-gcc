@@ -288,6 +288,72 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__umax8(a, b) __builtin_riscv_umaxv4qi(a, b)
 #define __rv__v_umax8(a, b) __builtin_riscv_v_umaxv4qi(a, b)
 
+#define __rv__sclip16(a, b) __builtin_riscv_sclipv2hi(a, b)
+#define __rv__v_sclip16(a, b) __builtin_riscv_v_sclipv2hi(a, b)
+
+#define __rv__uclip16(a, b) __builtin_riscv_uclipv2hi(a, b)
+#define __rv__v_uclip16(a, b) __builtin_riscv_v_uclipv2hi(a, b)
+
+#define __rv__kabs16(a) __builtin_riscv_kabsv2hi(a)
+#define __rv__v_kabs16(a) __builtin_riscv_v_kabsv2hi(a)
+
+#define __rv__clrs16(a) __builtin_riscv_clrsv2hi(a)
+#define __rv__v_clrs16(a) __builtin_riscv_v_clrsv2hi(a)
+
+#define __rv__clz16(a) __builtin_riscv_clzv2hi(a)
+#define __rv__v_clz16(a) __builtin_riscv_v_clzv2hi(a)
+
+#define __rv__clo16(a) __builtin_riscv_clov2hi(a)
+#define __rv__v_clo16(a) __builtin_riscv_v_clov2hi(a)
+
+#define __rv__sclip8(a, b) __builtin_riscv_sclipv4qi(a, b)
+#define __rv__v_sclip8(a, b) __builtin_riscv_v_sclipv4qi(a, b)
+
+#define __rv__uclip8(a, b) __builtin_riscv_uclipv4qi(a, b)
+#define __rv__v_uclip8(a, b) __builtin_riscv_v_uclipv4qi(a, b)
+
+#define __rv__kabs8(a) __builtin_riscv_kabsv4qi(a)
+#define __rv__v_kabs8(a) __builtin_riscv_v_kabsv4qi(a)
+
+#define __rv__clrs8(a) __builtin_riscv_clrsv4qi(a)
+#define __rv__v_clrs8(a) __builtin_riscv_v_clrsv4qi(a)
+
+#define __rv__clz8(a) __builtin_riscv_clzv4qi(a)
+#define __rv__v_clz8(a) __builtin_riscv_v_clzv4qi(a)
+
+#define __rv__clo8(a) __builtin_riscv_clov4qi(a)
+#define __rv__v_clo8(a) __builtin_riscv_v_clov4qi(a)
+
+#define __rv__sunpkd810(a) __builtin_riscv_sunpkd810_32(a)
+#define __rv__v_sunpkd810(a) __builtin_riscv_v_sunpkd810_32(a)
+
+#define __rv__sunpkd820(a) __builtin_riscv_sunpkd820_32(a)
+#define __rv__v_sunpkd820(a) __builtin_riscv_v_sunpkd820_32(a)
+
+#define __rv__sunpkd830(a) __builtin_riscv_sunpkd830_32(a)
+#define __rv__v_sunpkd830(a) __builtin_riscv_v_sunpkd830_32(a)
+
+#define __rv__sunpkd831(a) __builtin_riscv_sunpkd831_32(a)
+#define __rv__v_sunpkd831(a) __builtin_riscv_v_sunpkd831_32(a)
+
+#define __rv__sunpkd832(a) __builtin_riscv_sunpkd832_32(a)
+#define __rv__v_sunpkd832(a) __builtin_riscv_v_sunpkd832_32(a)
+
+#define __rv__zunpkd810(a) __builtin_riscv_zunpkd810_32(a)
+#define __rv__v_zunpkd810(a) __builtin_riscv_v_zunpkd810_32(a)
+
+#define __rv__zunpkd820(a) __builtin_riscv_zunpkd820_32(a)
+#define __rv__v_zunpkd820(a) __builtin_riscv_v_zunpkd820_32(a)
+
+#define __rv__zunpkd830(a) __builtin_riscv_zunpkd830_32(a)
+#define __rv__v_zunpkd830(a) __builtin_riscv_v_zunpkd830_32(a)
+
+#define __rv__zunpkd831(a) __builtin_riscv_zunpkd831_32(a)
+#define __rv__v_zunpkd831(a) __builtin_riscv_v_zunpkd831_32(a)
+
+#define __rv__zunpkd832(a) __builtin_riscv_zunpkd832_32(a)
+#define __rv__v_zunpkd832(a) __builtin_riscv_v_zunpkd832_32(a)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -526,6 +592,42 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__umax8(a, b) __builtin_riscv_umaxv8qi(a, b)
 #define __rv__v_umax8(a, b) __builtin_riscv_v_umaxv8qi(a, b)
+
+#define __rv__sclip16(a, b) __builtin_riscv_sclipv4hi(a, b)
+#define __rv__v_sclip16(a, b) __builtin_riscv_v_sclipv4hi(a, b)
+
+#define __rv__uclip16(a, b) __builtin_riscv_uclipv4hi(a, b)
+#define __rv__v_uclip16(a, b) __builtin_riscv_v_uclipv4hi(a, b)
+
+#define __rv__kabs16(a) __builtin_riscv_kabsv4hi(a)
+#define __rv__v_kabs16(a) __builtin_riscv_v_kabsv4hi(a)
+
+#define __rv__clrs16(a) __builtin_riscv_clrsv4hi(a)
+#define __rv__v_clrs16(a) __builtin_riscv_v_clrsv4hi(a)
+
+#define __rv__clz16(a) __builtin_riscv_clzv4hi(a)
+#define __rv__v_clz16(a) __builtin_riscv_v_clzv4hi(a)
+
+#define __rv__clo16(a) __builtin_riscv_clov4hi(a)
+#define __rv__v_clo16(a) __builtin_riscv_v_clov4hi(a)
+
+#define __rv__sclip8(a, b) __builtin_riscv_sclipv8qi(a, b)
+#define __rv__v_sclip8(a, b) __builtin_riscv_v_sclipv8qi(a, b)
+
+#define __rv__uclip8(a, b) __builtin_riscv_uclipv8qi(a, b)
+#define __rv__v_uclip8(a, b) __builtin_riscv_v_uclipv8qi(a, b)
+
+#define __rv__kabs8(a) __builtin_riscv_kabsv8qi(a)
+#define __rv__v_kabs8(a) __builtin_riscv_v_kabsv8qi(a)
+
+#define __rv__clrs8(a) __builtin_riscv_clrsv8qi(a)
+#define __rv__v_clrs8(a) __builtin_riscv_v_clrsv8qi(a)
+
+#define __rv__clz8(a) __builtin_riscv_clzv8qi(a)
+#define __rv__v_clz8(a) __builtin_riscv_v_clzv8qi(a)
+
+#define __rv__clo8(a) __builtin_riscv_clov8qi(a)
+#define __rv__v_clo8(a) __builtin_riscv_v_clov8qi(a)
 
 #else
 #error "unknown xlen"
