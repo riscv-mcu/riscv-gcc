@@ -2690,3 +2690,216 @@
   "pktb16\t%0, %1, %2"
   [(set_attr "type" "dpack")
    (set_attr "mode" "V4HI")])
+
+(define_insn "smulsi3_highpart"
+  [(set (match_operand:SI 0 "register_operand"                       "=r")
+	(truncate:SI
+	  (lshiftrt:DI
+	    (mult:DI
+	      (sign_extend:DI (match_operand:SI 1 "register_operand" " r"))
+	      (sign_extend:DI (match_operand:SI 2 "register_operand" " r")))
+	    (const_int 32))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "smmul\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "HI")])
+
+(define_insn "smmul_round"
+  [(set (match_operand:SI 0 "register_operand"                       "=r")
+	(truncate:SI
+	  (lshiftrt:DI
+	    (unspec:DI [(mult:DI
+		  	  (sign_extend:DI (match_operand:SI 1 "register_operand" " r"))
+			  (sign_extend:DI (match_operand:SI 2 "register_operand" " r")))]
+		       UNSPEC_ROUND)
+	    (const_int 32))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "smmul.u\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "HI")])
+
+(define_insn "smulv2si3_highpart"
+  [(set (match_operand:V2SI 0 "register_operand" "=r")
+	(truncate:V2SI
+	  (lshiftrt:V2DI
+	    (mult:V2DI (sign_extend:V2DI (match_operand:V2SI 1 "register_operand" " r"))
+		       (sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r")))
+	    (const_int 32))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "smmul\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "V2SI")])
+
+(define_insn "smmulv2si3_round"
+  [(set (match_operand:V2SI 0 "register_operand" "=r")
+	(truncate:V2SI
+	  (lshiftrt:V2DI
+	    (unspec:V2DI [(mult:V2DI
+			    (sign_extend:V2DI (match_operand:V2SI 1 "register_operand" " r"))
+			    (sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r")))]
+			  UNSPEC_ROUND)
+	    (const_int 32))))]
+  "TARGET_DSP  && TARGET_64BIT"
+  "smmul.u\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "DI")])
+
+(define_insn "kmmac"
+  [(set (match_operand:SI 0 "register_operand"                         "=r")
+	(ss_plus:SI (match_operand:SI 1 "register_operand"             " 0")
+	  (truncate:SI
+	    (lshiftrt:DI
+	      (mult:DI
+		(sign_extend:DI (match_operand:SI 2 "register_operand" " r"))
+		(sign_extend:DI (match_operand:SI 3 "register_operand" " r")))
+	      (const_int 32)))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmmac\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmac_64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_plus:V2SI (match_operand:V2SI 1 "register_operand"             " 0")
+	  (truncate:V2SI
+	    (lshiftrt:V2DI
+	      (mult:V2DI
+		(sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r"))
+		(sign_extend:V2DI (match_operand:V2SI 3 "register_operand" " r")))
+	      (const_int 32)))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmmac\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmac_round"
+  [(set (match_operand:SI 0 "register_operand"                                     "=r")
+	(ss_plus:SI (match_operand:SI 1 "register_operand"                         " 0")
+	  (truncate:SI
+	    (lshiftrt:DI
+	      (unspec:DI [(mult:DI
+			    (sign_extend:DI (match_operand:SI 2 "register_operand" " r"))
+			    (sign_extend:DI (match_operand:SI 3 "register_operand" " r")))]
+			 UNSPEC_ROUND)
+	      (const_int 32)))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmmac.u\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmac64_round"
+  [(set (match_operand:V2SI 0 "register_operand"                                     "=r")
+	(ss_plus:V2SI (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (truncate:V2SI
+	    (lshiftrt:V2DI
+	      (unspec:V2DI [(mult:V2DI
+			    (sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r"))
+			    (sign_extend:V2DI (match_operand:V2SI 3 "register_operand" " r")))]
+			 UNSPEC_ROUND)
+	      (const_int 32)))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmmac.u\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmsb"
+  [(set (match_operand:SI 0 "register_operand"                         "=r")
+	(ss_minus:SI (match_operand:SI 1 "register_operand"            " 0")
+	  (truncate:SI
+	    (lshiftrt:DI
+	      (mult:DI
+		(sign_extend:DI (match_operand:SI 2 "register_operand" " r"))
+		(sign_extend:DI (match_operand:SI 3 "register_operand" " r")))
+	      (const_int 32)))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmmsb\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmsb_64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_minus:V2SI (match_operand:V2SI 1 "register_operand"             " 0")
+	  (truncate:V2SI
+	    (lshiftrt:V2DI
+	      (mult:V2DI
+		(sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r"))
+		(sign_extend:V2DI (match_operand:V2SI 3 "register_operand" " r")))
+	      (const_int 32)))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmmsb\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmsb_round"
+  [(set (match_operand:SI 0 "register_operand"                                     "=r")
+	(ss_minus:SI (match_operand:SI 1 "register_operand"                        " 0")
+	  (truncate:SI
+	    (lshiftrt:DI
+	      (unspec:DI [(mult:DI
+			    (sign_extend:DI (match_operand:SI 2 "register_operand" " r"))
+			    (sign_extend:DI (match_operand:SI 3 "register_operand" " r")))]
+			 UNSPEC_ROUND)
+	      (const_int 32)))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmmsb.u\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmmsb64_round"
+  [(set (match_operand:V2SI 0 "register_operand"                                     "=r")
+	(ss_minus:V2SI (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (truncate:V2SI
+	    (lshiftrt:V2DI
+	      (unspec:V2DI [(mult:V2DI
+			    (sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r"))
+			    (sign_extend:V2DI (match_operand:V2SI 3 "register_operand" " r")))]
+			 UNSPEC_ROUND)
+	      (const_int 32)))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmmsb.u\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kwmmul"
+  [(set (match_operand:SI 0 "register_operand"                       "=r")
+	(truncate:SI
+	  (lshiftrt:DI
+	    (ss_mult:DI
+	      (mult:DI (sign_extend:DI (match_operand:SI 1 "register_operand" " r")) (const_int 2))
+	      (mult:DI (sign_extend:DI (match_operand:SI 2 "register_operand" " r")) (const_int 2)))
+	    (const_int 32))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kwmmul\t%0, %1, %2"
+  [(set_attr "type" "dmul")])
+
+(define_insn "kwmmul_64"
+  [(set (match_operand:V2SI 0 "register_operand"                       "=r")
+	(truncate:V2SI
+	  (lshiftrt:V2DI
+	    (ss_mult:V2DI
+	      (mult:V2DI (sign_extend:V2DI (match_operand:V2SI 1 "register_operand" " r")) (const_int 2))
+	      (mult:V2DI (sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r")) (const_int 2)))
+	    (const_int 32))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kwmmul\t%0, %1, %2"
+  [(set_attr "type" "dmul")])
+
+(define_insn "kwmmul_round"
+  [(set (match_operand:SI 0 "register_operand"                       "=r")
+	(truncate:SI
+	  (lshiftrt:DI
+	    (unspec:DI [
+	      (ss_mult:DI
+		(mult:DI (sign_extend:DI (match_operand:SI 1 "register_operand" " r")) (const_int 2))
+		(mult:DI (sign_extend:DI (match_operand:SI 2 "register_operand" " r")) (const_int 2)))]
+	      UNSPEC_ROUND)
+	    (const_int 32))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kwmmul.u\t%0, %1, %2"
+  [(set_attr "type" "dmul")])
+
+(define_insn "kwmmul64_round"
+  [(set (match_operand:V2SI 0 "register_operand"                       "=r")
+	(truncate:V2SI
+	  (lshiftrt:V2DI
+	    (unspec:V2DI [
+	      (ss_mult:V2DI
+		(mult:V2DI (sign_extend:V2DI (match_operand:V2SI 1 "register_operand" " r")) (const_int 2))
+		(mult:V2DI (sign_extend:V2DI (match_operand:V2SI 2 "register_operand" " r")) (const_int 2)))]
+	      UNSPEC_ROUND)
+	    (const_int 32))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kwmmul.u\t%0, %1, %2"
+  [(set_attr "type" "dmul")])

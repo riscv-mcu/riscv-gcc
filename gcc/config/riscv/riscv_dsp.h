@@ -366,6 +366,19 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__pktt16(a, b) __builtin_riscv_pkttv2hi(a, b)
 #define __rv__v_pktt16(a, b) __builtin_riscv_v_pkttv2hi(a, b)
 
+#define __rv__smmul(a, b) __builtin_riscv_smulsi(a, b)
+
+#define __rv__smmul_u(a, b) __builtin_riscv_smmulsi(a, b)
+
+#define __rv__kmmac(a, b, c) __builtin_riscv_kmmac(a, b, c)
+#define __rv__kmmac_u(a, b, c) __builtin_riscv_kmmac_round(a, b, c)
+
+#define __rv__kmmsb(a, b, c) __builtin_riscv_kmmsb(a, b, c)
+#define __rv__kmmsb_u(a, b, c) __builtin_riscv_kmmsb_round(a, b, c)
+
+#define __rv__kwmmul(a, b) __builtin_riscv_kwmmul(a, b)
+#define __rv__kwmmul_u(a, b) __builtin_riscv_kwmmul_round(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -652,6 +665,26 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__pktt16(a, b) __builtin_riscv_pkttv4hi(a, b)
 #define __rv__v_pktt16(a, b) __builtin_riscv_v_pkttv4hi(a, b)
+
+#define __rv__smmul(a, b) __builtin_riscv_smulv2si(a, b)
+#define __rv__v_smmul(a, b) __builtin_riscv_v_smulv2si(a, b)
+#define __rv__smmul_u(a, b) __builtin_riscv_smmulv2si(a, b)
+#define __rv__v_smmul_u(a, b) __builtin_riscv_v_smmulv2si(a, b)
+
+#define __rv__kmmac(a, b, c) __builtin_riscv_kmmac_64(a, b, c)
+#define __rv__v_kmmac(a, b, c) __builtin_riscv_v_kmmac_64(a, b, c)
+#define __rv__kmmac_u(a, b, c) __builtin_riscv_kmmac64_round(a, b, c)
+#define __rv__v_kmmac_u(a, b, c) __builtin_riscv_v_kmmac64_round(a, b, c)
+
+#define __rv__kmmsb(a, b, c) __builtin_riscv_kmmsb_64(a, b, c)
+#define __rv__v_kmmsb(a, b, c) __builtin_riscv_v_kmmsb_64(a, b, c)
+#define __rv__kmmsb_u(a, b, c) __builtin_riscv_kmmsb64_round(a, b, c)
+#define __rv__v_kmmsb_u(a, b, c) __builtin_riscv_v_kmmsb64_round(a, b, c)
+
+#define __rv__kwmmul(a, b) __builtin_riscv_kwmmul_64(a, b)
+#define __rv__v_kwmmul(a, b) __builtin_riscv_v_kwmmul_64(a, b)
+#define __rv__kwmmul_u(a, b) __builtin_riscv_kwmmul64_round(a, b)
+#define __rv__v_kwmmul_u(a, b) __builtin_riscv_v_kwmmul64_round(a, b)
 
 #else
 #error "unknown xlen"
