@@ -3506,6 +3506,42 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
   DIRECT_NAMED (zunpkd832, v_zunpkd832_32,
 		RISCV_FTYPE_NAME1 (UV2HI, UV4QI), dsp),
+
+  DIRECT_NAMED (pkbbv2hi, pkbbv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pkbbv2hi, v_pkbbv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (pkbbv4hi, pkbbv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pkbbv4hi, v_pkbbv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
+  DIRECT_NAMED (pkbtv2hi, pkbtv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pkbtv2hi, v_pkbtv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (pkbtv4hi, pkbtv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pkbtv4hi, v_pkbtv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
+  DIRECT_NAMED (pktbv2hi, pktbv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pktbv2hi, v_pktbv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (pktbv4hi, pktbv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pktbv4hi, v_pktbv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
+
+  DIRECT_NAMED (pkttv2hi, pkttv2hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pkttv2hi, v_pkttv2hi,
+		RISCV_FTYPE_NAME2 (UV2HI, UV2HI, UV2HI), dsp),
+  DIRECT_NAMED (pkttv4hi, pkttv4hi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (pkttv4hi, v_pkttv4hi,
+		RISCV_FTYPE_NAME2 (UV4HI, UV4HI, UV4HI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the

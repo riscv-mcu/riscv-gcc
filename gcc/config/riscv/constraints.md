@@ -204,3 +204,44 @@
   "Unsigned immediate 8-bit value"
   (and (match_code "const_int")
        (match_test "ival < (1 << 8) && ival >= 0")))
+
+(define_constraint "w00"
+  "Constant value 0"
+  (and (match_code "const_int")
+       (match_test "ival == 0")))
+
+(define_constraint "w01"
+  "Constant value 1"
+  (and (match_code "const_int")
+       (match_test "ival == 1")))
+
+(define_constraint "w02"
+  "Constant value 2"
+  (and (match_code "const_int")
+       (match_test "ival == 2")))
+
+(define_constraint "w03"
+  "Constant value 3"
+  (and (match_code "const_int")
+       (match_test "ival == 3")))
+
+(define_constraint "w04"
+  "Constant value 4"
+  (and (match_code "const_int")
+       (match_test "ival == 4")))
+
+(define_constraint "w08"
+  "Constant value 8"
+  (and (match_code "const_int")
+       (match_test "ival == 8")))
+
+(define_constraint "w15"
+  "Constant value 15"
+  (and (match_code "const_int")
+       (match_test "ival == 15")))
+
+(define_constraint "w16"
+  "Constant value 16"
+  (and (match_code "const_int")
+       (match_test "ival == 16")))
+

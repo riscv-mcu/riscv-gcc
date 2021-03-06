@@ -354,6 +354,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__zunpkd832(a) __builtin_riscv_zunpkd832_32(a)
 #define __rv__v_zunpkd832(a) __builtin_riscv_v_zunpkd832_32(a)
 
+#define __rv__pkbb16(a, b) __builtin_riscv_pkbbv2hi(a, b)
+#define __rv__v_pkbb16(a, b) __builtin_riscv_v_pkbbv2hi(a, b)
+
+#define __rv__pkbt16(a, b) __builtin_riscv_pkbtv2hi(a, b)
+#define __rv__v_pkbt16(a, b) __builtin_riscv_v_pkbtv2hi(a, b)
+
+#define __rv__pktb16(a, b) __builtin_riscv_pktbv2hi(a, b)
+#define __rv__v_pktb16(a, b) __builtin_riscv_v_pktbv2hi(a, b)
+
+#define __rv__pktt16(a, b) __builtin_riscv_pkttv2hi(a, b)
+#define __rv__v_pktt16(a, b) __builtin_riscv_v_pkttv2hi(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -628,6 +640,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__clo8(a) __builtin_riscv_clov8qi(a)
 #define __rv__v_clo8(a) __builtin_riscv_v_clov8qi(a)
+
+#define __rv__pkbb16(a, b) __builtin_riscv_pkbbv4hi(a, b)
+#define __rv__v_pkbb16(a, b) __builtin_riscv_v_pkbbv4hi(a, b)
+
+#define __rv__pkbt16(a, b) __builtin_riscv_pkbtv4hi(a, b)
+#define __rv__v_pkbt16(a, b) __builtin_riscv_v_pkbtv4hi(a, b)
+
+#define __rv__pktb16(a, b) __builtin_riscv_pktbv4hi(a, b)
+#define __rv__v_pktb16(a, b) __builtin_riscv_v_pktbv4hi(a, b)
+
+#define __rv__pktt16(a, b) __builtin_riscv_pkttv4hi(a, b)
+#define __rv__v_pktt16(a, b) __builtin_riscv_v_pkttv4hi(a, b)
 
 #else
 #error "unknown xlen"

@@ -347,3 +347,25 @@
 (define_predicate "rimm6u_operand"
   (ior (match_operand 0 "register_operand")
        (match_operand 0 "imm6u_operand")))
+
+(define_predicate "imm_0_1_operand"
+  (and (match_operand 0 "const_int_operand")
+       (ior (match_test "satisfies_constraint_w00 (op)")
+	    (match_test "satisfies_constraint_w01 (op)"))))
+
+(define_predicate "imm_1_2_operand"
+  (and (match_operand 0 "const_int_operand")
+       (ior (match_test "satisfies_constraint_w01 (op)")
+	    (match_test "satisfies_constraint_w02 (op)"))))
+
+(define_predicate "imm_2_3_operand"
+  (and (match_operand 0 "const_int_operand")
+       (ior (match_test "satisfies_constraint_w02 (op)")
+	    (match_test "satisfies_constraint_w03 (op)"))))
+
+(define_predicate "imm_1_2_4_8_operand"
+  (and (match_operand 0 "const_int_operand")
+       (ior (ior (match_test "satisfies_constraint_w01 (op)")
+		 (match_test "satisfies_constraint_w02 (op)"))
+	    (ior (match_test "satisfies_constraint_w04 (op)")
+		 (match_test "satisfies_constraint_w08 (op)")))))
