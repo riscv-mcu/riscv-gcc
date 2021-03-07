@@ -3597,6 +3597,42 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, intXLEN), dsp),
   DIRECT_NAMED (kwmmul64_round, v_kwmmul64_round,
 		RISCV_FTYPE_NAME2 (V2SI, V2SI, V2SI), dsp),
+
+  DIRECT_NAMED (smmwb, smmwb,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwb, v_smmwb,
+		RISCV_FTYPE_NAME2 (SI, SI, V2HI), dsp),
+  DIRECT_NAMED (smmwb64, smmwb64,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwb64, v_smmwb64,
+		RISCV_FTYPE_NAME2 (V2SI, V2SI, V4HI), dsp),
+
+  DIRECT_NAMED (smmwt, smmwt,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwt, v_smmwt,
+		RISCV_FTYPE_NAME2 (SI, SI, V2HI), dsp),
+  DIRECT_NAMED (smmwt64, smmwt64,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwt64, v_smmwt64,
+		RISCV_FTYPE_NAME2 (V2SI, V2SI, V4HI), dsp),
+
+  DIRECT_NAMED (smmwb_round, smmwb_round,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwb_round, v_smmwb_round,
+		RISCV_FTYPE_NAME2 (SI, SI, V2HI), dsp),
+  DIRECT_NAMED (smmwb64_round, smmwb_round64,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwb64_round, v_smmwb_round64,
+		RISCV_FTYPE_NAME2 (V2SI, V2SI, V4HI), dsp),
+
+  DIRECT_NAMED (smmwt_round, smmwt_round,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwt_round, v_smmwt_round,
+		RISCV_FTYPE_NAME2 (SI, SI, V2HI), dsp),
+  DIRECT_NAMED (smmwt64_round, smmwt_round64,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smmwt64_round, v_smmwt_round64,
+		RISCV_FTYPE_NAME2 (V2SI, V2SI, V4HI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the

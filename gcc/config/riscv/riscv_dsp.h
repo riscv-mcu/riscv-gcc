@@ -379,6 +379,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__kwmmul(a, b) __builtin_riscv_kwmmul(a, b)
 #define __rv__kwmmul_u(a, b) __builtin_riscv_kwmmul_round(a, b)
 
+#define __rv__smmwb(a, b) __builtin_riscv_smmwb(a, b)
+#define __rv__v_smmwb(a, b) __builtin_riscv_v_smmwb(a, b)
+
+#define __rv__smmwt(a, b) __builtin_riscv_smmwt(a, b)
+#define __rv__v_smmwt(a, b) __builtin_riscv_v_smmwt(a, b)
+
+#define __rv__smmwb_u(a, b) __builtin_riscv_smmwb_round(a, b)
+#define __rv__v_smmwb_u(a, b) __builtin_riscv_v_smmwb_round(a, b)
+
+#define __rv__smmwt_u(a, b) __builtin_riscv_smmwt_round(a, b)
+#define __rv__v_smmwt_u(a, b) __builtin_riscv_v_smmwt_round(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -685,6 +697,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__v_kwmmul(a, b) __builtin_riscv_v_kwmmul_64(a, b)
 #define __rv__kwmmul_u(a, b) __builtin_riscv_kwmmul64_round(a, b)
 #define __rv__v_kwmmul_u(a, b) __builtin_riscv_v_kwmmul64_round(a, b)
+
+#define __rv__smmwb(a, b) __builtin_riscv_smmwb64(a, b)
+#define __rv__v_smmwb(a, b) __builtin_riscv_v_smmwb64(a, b)
+
+#define __rv__smmwb_u(a, b) __builtin_riscv_smmwb_round64(a, b)
+#define __rv__v_smmwb_u(a, b) __builtin_riscv_v_smmwb_round64(a, b)
+
+#define __rv__smmwt(a, b) __builtin_riscv_smmwt64(a, b)
+#define __rv__v_smmwt(a, b) __builtin_riscv_v_smmwt64(a, b)
+
+#define __rv__smmwt_u(a, b) __builtin_riscv_smmwt_round64(a, b)
+#define __rv__v_smmwt_u(a, b) __builtin_riscv_v_smmwt_round64(a, b)
 
 #else
 #error "unknown xlen"
