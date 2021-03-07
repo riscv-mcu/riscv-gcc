@@ -391,6 +391,21 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__smmwt_u(a, b) __builtin_riscv_smmwt_round(a, b)
 #define __rv__v_smmwt_u(a, b) __builtin_riscv_v_smmwt_round(a, b)
 
+#define __rv__smslda(a, b, c) __builtin_riscv_smslda(a, b, c)
+#define __rv__v_smslda(a, b, c) __builtin_riscv_v_smslda(a, b, c)
+
+#define __rv__smslxda(a, b, c) __builtin_riscv_smslxda(a, b, c)
+#define __rv__v_smslxda(a, b, c) __builtin_riscv_v_smslxda(a, b, c)
+
+#define __rv__smbb16(a, b) __builtin_riscv_smbbv2hi(a, b)
+#define __rv__v_smbb16(a, b) __builtin_riscv_v_smbbv2hi(a, b)
+
+#define __rv__smbt16(a, b) __builtin_riscv_smbtv2hi(a, b)
+#define __rv__v_smbt16(a, b) __builtin_riscv_v_smbtv2hi(a, b)
+
+#define __rv__smtt16(a, b) __builtin_riscv_smttv2hi(a, b)
+#define __rv__v_smtt16(a, b) __builtin_riscv_v_smttv2hi(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -709,6 +724,21 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__smmwt_u(a, b) __builtin_riscv_smmwt_round64(a, b)
 #define __rv__v_smmwt_u(a, b) __builtin_riscv_v_smmwt_round64(a, b)
+
+#define __rv__smslda(a, b, c) __builtin_riscv_smslda64(a, b, c)
+#define __rv__v_smslda(a, b, c) __builtin_riscv_v_smslda64(a, b, c)
+
+#define __rv__smslxda(a, b, c) __builtin_riscv_smslxda64(a, b, c)
+#define __rv__v_smslxda(a, b, c) __builtin_riscv_v_smslxda64(a, b, c)
+
+#define __rv__smbb16(a, b) __builtin_riscv_smbbv4hi(a, b)
+#define __rv__v_smbb16(a, b) __builtin_riscv_v_smbbv4hi(a, b)
+
+#define __rv__smbt16(a, b) __builtin_riscv_smbtv4hi(a, b)
+#define __rv__v_smbt16(a, b) __builtin_riscv_v_smbtv4hi(a, b)
+
+#define __rv__smtt16(a, b) __builtin_riscv_smttv4hi(a, b)
+#define __rv__v_smtt16(a, b) __builtin_riscv_v_smttv4hi(a, b)
 
 #else
 #error "unknown xlen"

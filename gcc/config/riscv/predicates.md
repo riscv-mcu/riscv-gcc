@@ -369,3 +369,25 @@
 		 (match_test "satisfies_constraint_w02 (op)"))
 	    (ior (match_test "satisfies_constraint_w04 (op)")
 		 (match_test "satisfies_constraint_w08 (op)")))))
+
+(define_predicate "register_even_operand"
+  (match_operand 0 "register_operand")
+{
+  if (GET_CODE (op) == SUBREG)
+    op = SUBREG_REG (op); /* Possibly a MEM */
+
+  if (!REG_P (op))
+    return false;
+
+  if (REGNO (op) >= FIRST_PSEUDO_REGISTER)
+    return true;
+
+  return ((!TARGET_64BIT
+	   && GP_REG_P (REGNO (op))
+	   && (REGNO (op) & 1) == 0)
+	  || (TARGET_64BIT && GP_REG_P (REGNO (op))));
+})
+
+(define_predicate "reg_even_or_0_operand"
+  (ior (match_operand 0 "const_0_operand")
+       (match_operand 0 "register_even_operand")))
