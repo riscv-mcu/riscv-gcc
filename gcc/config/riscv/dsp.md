@@ -3350,3 +3350,541 @@
    smtt16\t%0, %1, %2"
   [(set_attr "type"   "dmul")
    (set_attr "mode"   "DI")])
+
+(define_insn "kmda"
+  [(set (match_operand:SI 0 "register_operand"                         "=r")
+	(ss_plus:SI
+	  (mult:SI
+	    (sign_extend:SI (vec_select:HI
+			      (match_operand:V2HI 1 "register_operand" "r")
+			      (parallel [(const_int 1)])))
+	    (sign_extend:SI (vec_select:HI
+			      (match_operand:V2HI 2 "register_operand" "r")
+			      (parallel [(const_int 1)]))))
+	  (mult:SI
+	    (sign_extend:SI (vec_select:HI
+			      (match_dup 1)
+			      (parallel [(const_int 0)])))
+	    (sign_extend:SI (vec_select:HI
+			      (match_dup 2)
+			      (parallel [(const_int 0)]))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmda\t%0, %1, %2"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmda64"
+  [(set (match_operand:V2SI 0 "register_operand"                      "=r")
+	(ss_plus:V2SI
+	  (mult:V2SI
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 1 "register_operand" "r")
+				(parallel [(const_int 1) (const_int 3)])))
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" "r")
+				(parallel [(const_int 1) (const_int 3)]))))
+	  (mult:V2SI
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 1)
+				(parallel [(const_int 0) (const_int 2)])))
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)]))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmda\t%0, %1, %2"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmxda"
+  [(set (match_operand:SI 0 "register_operand"                        "=r")
+	(ss_plus:SI
+	  (mult:SI
+	    (sign_extend:SI (vec_select:HI
+			      (match_operand:V2HI 1 "register_operand" "r")
+			      (parallel [(const_int 1)])))
+	    (sign_extend:SI (vec_select:HI
+			      (match_operand:V2HI 2 "register_operand" "r")
+			      (parallel [(const_int 0)]))))
+	  (mult:SI
+	    (sign_extend:SI (vec_select:HI
+			      (match_dup 1)
+			      (parallel [(const_int 0)])))
+	    (sign_extend:SI (vec_select:HI
+			      (match_dup 2)
+			      (parallel [(const_int 1)]))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmxda\t%0, %1, %2"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmxda64"
+  [(set (match_operand:V2SI 0 "register_operand"                      "=r")
+	(ss_plus:V2SI
+	  (mult:V2SI
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 1 "register_operand" "r")
+				(parallel [(const_int 1) (const_int 3)])))
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" "r")
+				(parallel [(const_int 0) (const_int 2)]))))
+	  (mult:V2SI
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 1)
+				(parallel [(const_int 0) (const_int 2)])))
+	    (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 1) (const_int 3)]))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmxda\t%0, %1, %2"
+  [(set_attr "type" "dmac")])
+
+(define_expand "kmabb"
+  [(match_operand:SI 0 "register_operand" "")
+   (match_operand:SI 1 "register_operand" "")
+   (match_operand:V2HI 2 "register_operand" "")
+   (match_operand:V2HI 3 "register_operand" "")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_kma_internal (operands[0], operands[2], operands[3],
+			       GEN_INT (0), GEN_INT (0),
+			       operands[1]));
+  DONE;
+}
+[(set_attr "type" "dmac")])
+
+(define_expand "kmabt"
+  [(match_operand:SI 0 "register_operand" "")
+   (match_operand:SI 1 "register_operand" "")
+   (match_operand:V2HI 2 "register_operand" "")
+   (match_operand:V2HI 3 "register_operand" "")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_kma_internal (operands[0], operands[2], operands[3],
+			       GEN_INT (0), GEN_INT (1),
+			       operands[1]));
+  DONE;
+}
+[(set_attr "type" "dmac")])
+
+(define_expand "kmatt"
+  [(match_operand:SI 0 "register_operand" "")
+   (match_operand:SI 1 "register_operand" "")
+   (match_operand:V2HI 2 "register_operand" "")
+   (match_operand:V2HI 3 "register_operand" "")]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  emit_insn (gen_kma_internal (operands[0], operands[2], operands[3],
+			       GEN_INT (1), GEN_INT (1),
+			       operands[1]));
+  DONE;
+}
+[(set_attr "type" "dmac")])
+
+(define_insn "kma_internal"
+  [(set (match_operand:SI 0 "register_operand"                   "=   r,   r,   r,   r")
+	(ss_plus:SI
+	  (mult:SI
+	    (sign_extend:SI
+	      (vec_select:HI
+		(match_operand:V2HI 1 "register_operand"         "   r,   r,   r,   r")
+	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " v00, v00, v01, v01")])))
+	    (sign_extend:SI
+	      (vec_select:HI
+	        (match_operand:V2HI 2 "register_operand"         "   r,   r,   r,   r")
+	        (parallel [(match_operand:SI 4 "imm_0_1_operand" " v00, v01, v01, v00")]))))
+	  (match_operand:SI 5 "register_operand"                 "   0,   0,   0,   0")))]
+  "TARGET_DSP && !TARGET_64BIT"
+{
+  const char *pats[] = { "kmabb\t%0, %1, %2",
+			 "kmabt\t%0, %1, %2",
+			 "kmatt\t%0, %1, %2",
+			 "kmabt\t%0, %2, %1" };
+  return pats[which_alternative];
+}
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "SI")])
+
+(define_expand "kmabb64"
+  [(match_operand:V2SI 0 "register_operand" "")
+   (match_operand:V2SI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")
+   (match_operand:V4HI 3 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_kma64_internal (operands[0], operands[2], operands[3],
+				 GEN_INT (0), GEN_INT (2), GEN_INT (0),
+				 GEN_INT (2), operands[1]));
+  DONE;
+}
+[(set_attr "type" "dmac")])
+
+(define_expand "kmabt64"
+  [(match_operand:V2SI 0 "register_operand" "")
+   (match_operand:V2SI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")
+   (match_operand:V4HI 3 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_kma64_internal (operands[0], operands[2], operands[3],
+				 GEN_INT (0), GEN_INT (2), GEN_INT (1),
+				 GEN_INT (3), operands[1]));
+  DONE;
+}
+[(set_attr "type" "dmac")])
+
+(define_expand "kmatt64"
+  [(match_operand:V2SI 0 "register_operand" "")
+   (match_operand:V2SI 1 "register_operand" "")
+   (match_operand:V4HI 2 "register_operand" "")
+   (match_operand:V4HI 3 "register_operand" "")]
+  "TARGET_DSP && TARGET_64BIT"
+{
+  emit_insn (gen_kma64_internal (operands[0], operands[2], operands[3],
+				 GEN_INT (1), GEN_INT (3), GEN_INT (1),
+				 GEN_INT (3), operands[1]));
+  DONE;
+}
+[(set_attr "type" "dmac")])
+
+(define_insn "kma64_internal"
+  [(set (match_operand:V2SI 0 "register_operand"                 "=   r,   r,   r,   r")
+	(ss_plus:V2SI
+	  (mult:V2SI
+	    (sign_extend:V2SI
+	      (vec_select:V2HI
+		(match_operand:V4HI 1 "register_operand"         "   r,   r,   r,   r")
+	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " v00, v00, v01, v01")
+			   (match_operand:SI 4 "imm_2_3_operand" " v02, v02, v03, v03")])))
+	    (sign_extend:V2SI
+	      (vec_select:V2HI
+	        (match_operand:V4HI 2 "register_operand"         "   r,   r,   r,   r")
+	        (parallel [(match_operand:SI 5 "imm_0_1_operand" " v00, v01, v01, v00")
+			   (match_operand:SI 6 "imm_2_3_operand" " v02, v03, v03, v02")]))))
+	  (match_operand:V2SI 7 "register_operand"               "   0,   0,   0,   0")))]
+  "TARGET_DSP && TARGET_64BIT"
+  "@
+  kmabb\t%0, %1, %2
+  kmabt\t%0, %1, %2
+  kmatt\t%0, %1, %2
+  kmabt\t%0, %2, %1"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "V2SI")])
+
+(define_insn "kmaxda"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_plus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_plus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 0)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 1)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmaxda\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmaxda64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_plus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_plus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 0) (const_int 2)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 1) (const_int 3)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmaxda\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmads"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_plus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_minus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 1)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 0)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmads\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmads64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_plus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_minus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 0) (const_int 2)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmads\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmadrs"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_plus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_minus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 0)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 1)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmadrs\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmadrs64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_plus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_minus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 0) (const_int 2)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 1) (const_int 3)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmadrs\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmaxds"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_plus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_minus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 0)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 1)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmaxds\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmaxds64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_plus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_minus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 0) (const_int 2)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 1) (const_int 3)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmaxds\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmsda"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_minus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_minus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 1)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 0)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmsda\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmsda64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_minus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_minus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 0) (const_int 2)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmsda\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmsxda"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_minus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_minus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 0)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 1)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmsxda\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmsxda64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_minus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_minus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 0) (const_int 2)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 1) (const_int 3)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmsxda\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmada"
+  [(set (match_operand:SI 0 "register_operand"                           "=r")
+	(ss_plus:SI
+	  (match_operand:SI 1 "register_operand"                         " 0")
+	  (ss_plus:SI
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 2 "register_operand" " r")
+				(parallel [(const_int 1)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_operand:V2HI 3 "register_operand" " r")
+				(parallel [(const_int 1)]))))
+	    (mult:SI
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 2)
+				(parallel [(const_int 0)])))
+	      (sign_extend:SI (vec_select:HI
+				(match_dup 3)
+				(parallel [(const_int 0)])))))))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "kmada\t%0, %2, %3"
+  [(set_attr "type" "dmac")])
+
+(define_insn "kmada64"
+  [(set (match_operand:V2SI 0 "register_operand"                         "=r")
+	(ss_plus:V2SI
+	  (match_operand:V2SI 1 "register_operand"                       " 0")
+	  (ss_plus:V2SI
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 2 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_operand:V4HI 3 "register_operand" " r")
+				(parallel [(const_int 1) (const_int 3)]))))
+	    (mult:V2SI
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 2)
+				(parallel [(const_int 0) (const_int 2)])))
+	      (sign_extend:V2SI (vec_select:V2HI
+				(match_dup 3)
+				(parallel [(const_int 0) (const_int 2)])))))))]
+  "TARGET_DSP && TARGET_64BIT"
+  "kmada\t%0, %2, %3"
+  [(set_attr "type" "dmac")])

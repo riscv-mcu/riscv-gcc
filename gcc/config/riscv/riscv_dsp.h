@@ -406,6 +406,42 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__smtt16(a, b) __builtin_riscv_smttv2hi(a, b)
 #define __rv__v_smtt16(a, b) __builtin_riscv_v_smttv2hi(a, b)
 
+#define __rv__kmda(a, b) __builtin_riscv_kmdav2hi(a, b)
+#define __rv__v_kmda(a, b) __builtin_riscv_v_kmdav2hi(a, b)
+
+#define __rv__kmxda(a, b) __builtin_riscv_kmxdav2hi(a, b)
+#define __rv__v_kmxda(a, b) __builtin_riscv_v_kmxdav2hi(a, b)
+
+#define __rv__kmabb(a, b, c) __builtin_riscv_kmabb(a, b, c)
+#define __rv__v_kmabb(a, b, c) __builtin_riscv_v_kmabb(a, b, c)
+
+#define __rv__kmabt(a, b, c) __builtin_riscv_kmabt(a, b, c)
+#define __rv__v_kmabt(a, b, c) __builtin_riscv_v_kmabt(a, b, c)
+
+#define __rv__kmatt(a, b, c) __builtin_riscv_kmatt(a, b, c)
+#define __rv__v_kmatt(a, b, c) __builtin_riscv_v_kmatt(a, b, c)
+
+#define __rv__kmada(a, b, c) __builtin_riscv_kmada(a, b, c)
+#define __rv__v_kmada(a, b, c) __builtin_riscv_v_kmada(a, b, c)
+
+#define __rv__kmaxda(a, b, c) __builtin_riscv_kmaxda(a, b, c)
+#define __rv__v_kmaxda(a, b, c) __builtin_riscv_v_kmaxda(a, b, c)
+
+#define __rv__kmads(a, b, c) __builtin_riscv_kmads(a, b, c)
+#define __rv__v_kmads(a, b, c) __builtin_riscv_v_kmads(a, b, c)
+
+#define __rv__kmadrs(a, b, c) __builtin_riscv_kmadrs(a, b, c)
+#define __rv__v_kmadrs(a, b, c) __builtin_riscv_v_kmadrs(a, b, c)
+
+#define __rv__kmaxds(a, b, c) __builtin_riscv_kmaxds(a, b, c)
+#define __rv__v_kmaxds(a, b, c) __builtin_riscv_v_kmaxds(a, b, c)
+
+#define __rv__kmsda(a, b, c) __builtin_riscv_kmsda(a, b, c)
+#define __rv__v_kmsda(a, b, c) __builtin_riscv_v_kmsda(a, b, c)
+
+#define __rv__kmsxda(a, b, c) __builtin_riscv_kmsxda(a, b, c)
+#define __rv__v_kmsxda(a, b, c) __builtin_riscv_v_kmsxda(a, b, c)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -739,6 +775,43 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__smtt16(a, b) __builtin_riscv_smttv4hi(a, b)
 #define __rv__v_smtt16(a, b) __builtin_riscv_v_smttv4hi(a, b)
+
+#define __rv__kmda(a, b) __builtin_riscv_kmdav4hi(a, b)
+#define __rv__v_kmda(a, b) __builtin_riscv_v_kmdav4hi(a, b)
+
+#define __rv__kmxda(a, b) __builtin_riscv_kmxdav4hi(a, b)
+#define __rv__v_kmxda(a, b) __builtin_riscv_v_kmxdav4hi(a, b)
+
+#define __rv__kmabb(a, b, c) __builtin_riscv_kmabb64(a, b, c)
+#define __rv__v_kmabb(a, b, c) __builtin_riscv_v_kmabb64(a, b, c)
+
+#define __rv__kmabt(a, b, c) __builtin_riscv_kmabt64(a, b, c)
+#define __rv__v_kmabt(a, b, c) __builtin_riscv_v_kmabt64(a, b, c)
+
+#define __rv__kmatt(a, b, c) __builtin_riscv_kmatt64(a, b, c)
+#define __rv__v_kmatt(a, b, c) __builtin_riscv_v_kmatt64(a, b, c)
+
+#define __rv__kmada(a, b, c) __builtin_riscv_kmada64(a, b, c)
+#define __rv__v_kmada(a, b, c) __builtin_riscv_v_kmada64(a, b, c)
+
+#define __rv__kmaxda(a, b, c) __builtin_riscv_kmaxda64(a, b, c)
+#define __rv__v_kmaxda(a, b, c) __builtin_riscv_v_kmaxda64(a, b, c)
+
+#define __rv__kmads(a, b, c) __builtin_riscv_kmads64(a, b, c)
+#define __rv__v_kmads(a, b, c) __builtin_riscv_v_kmads64(a, b, c)
+
+#define __rv__kmadrs(a, b, c) __builtin_riscv_kmadrs64(a, b, c)
+#define __rv__v_kmadrs(a, b, c) __builtin_riscv_v_kmadrs64(a, b, c)
+
+#define __rv__kmaxds(a, b, c) __builtin_riscv_kmaxds64(a, b, c)
+#define __rv__v_kmaxds(a, b, c) __builtin_riscv_v_kmaxds64(a, b, c)
+
+#define __rv__kmsda(a, b, c) __builtin_riscv_kmsda64(a, b, c)
+#define __rv__v_kmsda(a, b, c) __builtin_riscv_v_kmsda64(a, b, c)
+
+#define __rv__kmsxda(a, b, c) __builtin_riscv_kmsxda64(a, b, c)
+#define __rv__v_kmsxda(a, b, c) __builtin_riscv_v_kmsxda64(a, b, c)
+
 
 #else
 #error "unknown xlen"
