@@ -442,6 +442,13 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__kmsxda(a, b, c) __builtin_riscv_kmsxda(a, b, c)
 #define __rv__v_kmsxda(a, b, c) __builtin_riscv_v_kmsxda(a, b, c)
 
+#define __rv__sclip32(a, b) __builtin_riscv_sclip32(a, b)
+#define __rv__uclip32(a, b) __builtin_riscv_uclip32(a, b)
+
+#define __rv__clrs32(a) __builtin_riscv_clrssi(a)
+#define __rv__clo32(a) __builtin_riscv_closi(a)
+#define __rv__clz32(a) __builtin_riscv_clzsi(a)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -812,6 +819,20 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__kmsxda(a, b, c) __builtin_riscv_kmsxda64(a, b, c)
 #define __rv__v_kmsxda(a, b, c) __builtin_riscv_v_kmsxda64(a, b, c)
 
+#define __rv__sclip32(a, b) __builtin_riscv_sclip32v2si(a, b)
+#define __rv__v_sclip32(a, b) __builtin_riscv_v_sclip32v2si(a, b)
+
+#define __rv__uclip32(a, b) __builtin_riscv_uclip32v2si(a, b)
+#define __rv__v_uclip32(a, b) __builtin_riscv_v_uclip32v2si(a, b)
+
+#define __rv__clrs32(a) __builtin_riscv_clrsv2si(a)
+#define __rv__v_clrs32(a) __builtin_riscv_v_clrsv2si(a)
+
+#define __rv__clo32(a) __builtin_riscv_clov2si(a)
+#define __rv__v_clo32(a) __builtin_riscv_v_clov2si(a)
+
+#define __rv__clz32(a) __builtin_riscv_clzv2si(a)
+#define __rv__v_clz32(a) __builtin_riscv_v_clzv2si(a)
 
 #else
 #error "unknown xlen"

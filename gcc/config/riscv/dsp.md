@@ -15,6 +15,8 @@
 
 (define_mode_iterator VQI [(V4QI "!TARGET_64BIT") (V8QI "TARGET_64BIT")])
 
+(define_mode_iterator VD_SI [(SI "!TARGET_64BIT") (V2SI "TARGET_64BIT")])
+
 (define_mode_iterator VHI [(V2HI "!TARGET_64BIT") (V4HI "TARGET_64BIT")])
 
 (define_mode_attr VNHALF [(V2SI "SI") (V2HI "HI")])
@@ -2153,6 +2155,15 @@
   [(set_attr "type" "dalu")
    (set_attr "mode" "<MODE>")])
 
+(define_insn "clrssi2"
+  [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+		      UNSPEC_CLRS))]
+  "TARGET_DSP"
+  "clrs32\t%0, %1"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "SI")])
+
 (define_insn "clz<mode>2"
   [(set (match_operand:VECI 0 "register_operand"               "=r")
 	(unspec:VECI [(match_operand:VECI 1 "register_operand" " r")]
@@ -2162,6 +2173,15 @@
   [(set_attr "type" "dalu")
    (set_attr "mode" "<MODE>")])
 
+(define_insn "clzsi2"
+  [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+		      UNSPEC_CLZ))]
+  "TARGET_DSP"
+  "clz32\t%0, %1"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "SI")])
+
 (define_insn "clo<mode>2"
   [(set (match_operand:VECI 0 "register_operand"               "=r")
 	(unspec:VECI [(match_operand:VECI 1 "register_operand" " r")]
@@ -2170,6 +2190,15 @@
   "clo<bits>\t%0, %1"
   [(set_attr "type" "dalu")
    (set_attr "mode" "<MODE>")])
+
+(define_insn "closi2"
+  [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+		      UNSPEC_CLO))]
+  "TARGET_DSP"
+  "clo32\t%0, %1"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "SI")])
 
 (define_expand "vec_unpacks_lo_v4qi"
   [(match_operand:V2HI 0 "register_operand" "=r")
@@ -3888,3 +3917,21 @@
   "TARGET_DSP && TARGET_64BIT"
   "kmada\t%0, %2, %3"
   [(set_attr "type" "dmac")])
+
+(define_insn "sclip32<VD_SI:mode><X:mode>"
+  [(set (match_operand:VD_SI 0 "register_operand" "=r")
+	(unspec:VD_SI [(match_operand:VD_SI 1 "register_operand" "r")
+		       (match_operand:X 2 "immediate_operand" "i")] UNSPEC_CLIPS_OV))]
+  "TARGET_DSP"
+  "sclip32\t%0, %1, %2"
+  [(set_attr "type"   "dclip")
+   (set_attr "mode" "<VD_SI:MODE>")])
+
+(define_insn "uclip32<VD_SI:mode><X:mode>"
+  [(set (match_operand:VD_SI 0 "register_operand" "=r")
+	(unspec:VD_SI [(match_operand:VD_SI 1 "register_operand" "r")
+		       (match_operand:X 2 "immediate_operand" "i")] UNSPEC_CLIP_OV))]
+  "TARGET_DSP"
+  "uclip32\t%0, %1, %2"
+  [(set_attr "type"   "dclip")
+   (set_attr "mode" "<VD_SI:MODE>")])

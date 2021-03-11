@@ -3786,6 +3786,41 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, uintXLEN, uintXLEN), dsp),
   DIRECT_NAMED (kmsxda64, v_kmsxda64,
 		RISCV_FTYPE_NAME3 (V2SI, V2SI, V4HI, V4HI), dsp),
+
+  DIRECT_NAMED (sclip32sisi, sclip32,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, USI), dsp),
+  DIRECT_NAMED (sclip32v2sidi, sclip32v2si,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, USI), dsp),
+  DIRECT_NAMED (sclip32v2sidi, v_sclip32v2si,
+		RISCV_FTYPE_NAME2 (V2SI, V2SI, USI), dsp),
+
+  DIRECT_NAMED (uclip32sisi, uclip32,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, USI), dsp),
+  DIRECT_NAMED (uclip32v2sidi, uclip32v2si,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, USI), dsp),
+  DIRECT_NAMED (uclip32v2sidi, v_uclip32v2si,
+		RISCV_FTYPE_NAME2 (UV2SI, UV2SI, USI), dsp),
+
+  DIRECT_NAMED (clrssi2, clrssi,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (clrsv2si2, clrsv2si,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (clrsv2si2, v_clrsv2si,
+		RISCV_FTYPE_NAME1 (UV2SI, V2SI), dsp),
+
+  DIRECT_NAMED (clzsi2, clzsi,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (clzv2si2, clzv2si,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (clzv2si2, v_clzv2si,
+		RISCV_FTYPE_NAME1 (UV2SI, V2SI), dsp),
+
+  DIRECT_NAMED (closi2, closi,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (clov2si2, clov2si,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (clov2si2, v_clov2si,
+		RISCV_FTYPE_NAME1 (UV2SI, V2SI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the
