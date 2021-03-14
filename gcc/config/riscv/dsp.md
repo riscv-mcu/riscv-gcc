@@ -3935,3 +3935,22 @@
   "uclip32\t%0, %1, %2"
   [(set_attr "type"   "dclip")
    (set_attr "mode" "<VD_SI:MODE>")])
+
+(define_insn "pbsad<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_PBSAD))]
+  "TARGET_DSP"
+  "pbsad\t%0, %1, %2"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "pbsada<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_PBSADA))]
+  ""
+  "pbsada\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
