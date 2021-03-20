@@ -3954,3 +3954,33 @@
   "pbsada\t%0, %2, %3"
   [(set_attr "type" "dmac")
    (set_attr "mode" "<MODE>")])
+
+(define_insn "smaqa<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_SMAQA))]
+  ""
+  "smaqa\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "umaqa<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_UMAQA))]
+  ""
+  "umaqa\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "smaqasu<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_SMAQASU))]
+  ""
+  "smaqa.su\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])

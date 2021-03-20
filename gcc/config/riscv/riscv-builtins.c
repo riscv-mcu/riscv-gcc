@@ -3831,6 +3831,21 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME3 (uintXLEN, uintXLEN, uintXLEN, uintXLEN), dsp),
   DIRECT_NAMED (pbsadadi, pbsadadi,
 		RISCV_FTYPE_NAME3 (uintXLEN, uintXLEN, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smaqasi, smaqasi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smaqadi, smaqadi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (umaqasi, umaqasi,
+		RISCV_FTYPE_NAME3 (uintXLEN, uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (umaqadi, umaqadi,
+		RISCV_FTYPE_NAME3 (uintXLEN, uintXLEN, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smaqasusi, smaqasusi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smaqasudi, smaqasudi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, uintXLEN, uintXLEN), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the

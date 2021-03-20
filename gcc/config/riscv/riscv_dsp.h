@@ -453,6 +453,10 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__pbsada(a, b, c) __builtin_riscv_pbsadasi(a, b, c)
 
+#define __rv__smaqa(a, b, c) __builtin_riscv_smaqasi(a, b, c)
+#define __rv__umaqa(a, b, c) __builtin_riscv_umaqasi(a, b, c)
+#define __rv__smaqa_su(a, b, c) __builtin_riscv_smaqasusi(a, b, c)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -841,6 +845,10 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__pbsad(a, b) __builtin_riscv_pbsaddi(a, b)
 
 #define __rv__pbsada(a, b, c) __builtin_riscv_pbsadadi(a, b, c)
+
+#define __rv__smaqa(a, b, c) __builtin_riscv_smaqadi(a, b, c)
+#define __rv__umaqa(a, b, c) __builtin_riscv_umaqadi(a, b, c)
+#define __rv__smaqa_su(a, b, c) __builtin_riscv_smaqasudi(a, b, c)
 
 #else
 #error "unknown xlen"
