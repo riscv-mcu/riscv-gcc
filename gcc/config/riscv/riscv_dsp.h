@@ -457,6 +457,20 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__umaqa(a, b, c) __builtin_riscv_umaqasi(a, b, c)
 #define __rv__smaqa_su(a, b, c) __builtin_riscv_smaqasusi(a, b, c)
 
+#define __rv__kaddh(a, b) __builtin_riscv_kaddhsi(a, b)
+
+#define __rv__ksubh(a, b) __builtin_riscv_ksubhsi(a, b)
+
+#define __rv__khmbb(a, b) __builtin_riscv_khmbbsi(a, b)
+
+#define __rv__khmbt(a, b) __builtin_riscv_khmbtsi(a, b)
+
+#define __rv__khmtt(a, b) __builtin_riscv_khmttsi(a, b)
+
+#define __rv__ukaddh(a, b) __builtin_riscv_ukaddhsi(a, b)
+
+#define __rv__uksubh(a, b) __builtin_riscv_uksubhsi(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -849,6 +863,20 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__smaqa(a, b, c) __builtin_riscv_smaqadi(a, b, c)
 #define __rv__umaqa(a, b, c) __builtin_riscv_umaqadi(a, b, c)
 #define __rv__smaqa_su(a, b, c) __builtin_riscv_smaqasudi(a, b, c)
+
+#define __rv__kaddh(a, b) __builtin_riscv_kaddhdi(a, b)
+
+#define __rv__ksubh(a, b) __builtin_riscv_ksubhdi(a, b)
+
+#define __rv__khmbb(a, b) __builtin_riscv_khmbbdi(a, b)
+
+#define __rv__khmbt(a, b) __builtin_riscv_khmbtdi(a, b)
+
+#define __rv__khmtt(a, b) __builtin_riscv_khmttdi(a, b)
+
+#define __rv__ukaddh(a, b) __builtin_riscv_ukaddhdi(a, b)
+
+#define __rv__uksubh(a, b) __builtin_riscv_uksubhdi(a, b)
 
 #else
 #error "unknown xlen"

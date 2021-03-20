@@ -3984,3 +3984,59 @@
   "smaqa.su\t%0, %2, %3"
   [(set_attr "type" "dmac")
    (set_attr "mode" "<MODE>")])
+
+(define_insn "kaddh<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KADDH))]
+  ""
+  "kaddh\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ksubh<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KSUBH))]
+  ""
+  "ksubh\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "khmbb<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KHMBB))]
+  ""
+  "khmbb\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "khmbt<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KHMBT))]
+  ""
+  "khmbt\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "khmtt<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KHMTT))]
+  ""
+  "khmtt\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ukaddh<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_UKADDH))]
+  ""
+  "ukaddh\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "uksubh<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_UKSUBH))]
+  ""
+  "uksubh\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
