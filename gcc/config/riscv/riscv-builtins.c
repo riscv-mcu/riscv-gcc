@@ -3881,6 +3881,81 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME2 (uintXLEN, USI, USI), dsp),
   DIRECT_NAMED (uksubhdi, uksubhdi,
 		RISCV_FTYPE_NAME2 (uintXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kaddwsi, kaddwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (kaddwdi, kaddwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, DI, DI), dsp),
+
+  DIRECT_NAMED (ukaddwsi, ukaddwsi,
+		RISCV_FTYPE_NAME2 (uintXLEN, USI, USI), dsp),
+  DIRECT_NAMED (ukaddwdi, ukaddwdi,
+		RISCV_FTYPE_NAME2 (uintXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (ksubwsi, ksubwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (ksubwdi, ksubwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, DI, DI), dsp),
+
+  DIRECT_NAMED (uksubwsi, uksubwsi,
+		RISCV_FTYPE_NAME2 (uintXLEN, USI, USI), dsp),
+  DIRECT_NAMED (uksubwdi, uksubwdi,
+		RISCV_FTYPE_NAME2 (uintXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kdmbbsi, kdmbbsi,
+		RISCV_FTYPE_NAME2 (intXLEN, USI, USI), dsp),
+  DIRECT_NAMED (kdmbbdi, kdmbbdi,
+		RISCV_FTYPE_NAME2 (intXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kdmbtsi, kdmbtsi,
+		RISCV_FTYPE_NAME2 (intXLEN, USI, USI), dsp),
+  DIRECT_NAMED (kdmbtdi, kdmbtdi,
+		RISCV_FTYPE_NAME2 (intXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kdmttsi, kdmttsi,
+		RISCV_FTYPE_NAME2 (intXLEN, USI, USI), dsp),
+  DIRECT_NAMED (kdmttdi, kdmttdi,
+		RISCV_FTYPE_NAME2 (intXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kslrawsi, kslrawsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (kslrawdi, kslrawdi,
+		RISCV_FTYPE_NAME2 (intXLEN, DI, DI), dsp),
+
+  DIRECT_NAMED (kslrawusi, kslrawusi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (kslrawudi, kslrawudi,
+		RISCV_FTYPE_NAME2 (intXLEN, DI, DI), dsp),
+
+  DIRECT_NAMED (ksllwsi, ksllwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, USI), dsp),
+  DIRECT_NAMED (ksllwdi, ksllwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, UDI), dsp),
+
+  DIRECT_NAMED (kslliwsi, kslliwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, USI), dsp),
+  DIRECT_NAMED (kslliwdi, kslliwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, UDI), dsp),
+
+  DIRECT_NAMED (kdmabbsi, kdmabbsi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, USI, USI), dsp),
+  DIRECT_NAMED (kdmabbdi, kdmabbdi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kdmabtsi, kdmabtsi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, USI, USI), dsp),
+  DIRECT_NAMED (kdmabtdi, kdmabtdi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kdmattsi, kdmattsi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, USI, USI), dsp),
+  DIRECT_NAMED (kdmattdi, kdmattdi,
+		RISCV_FTYPE_NAME3 (intXLEN, intXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (kabswsi, kabswsi,
+		RISCV_FTYPE_NAME1 (uintXLEN, intXLEN), dsp),
+  DIRECT_NAMED (kabswdi, kabswdi,
+		RISCV_FTYPE_NAME1 (uintXLEN, intXLEN), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the

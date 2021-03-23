@@ -471,6 +471,28 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__uksubh(a, b) __builtin_riscv_uksubhsi(a, b)
 
+#define __rv__kaddw(a, b) __builtin_riscv_kaddwsi(a, b)
+#define __rv__ukaddw(a, b) __builtin_riscv_ukaddwsi(a, b)
+
+#define __rv__ksubw(a, b) __builtin_riscv_ksubwsi(a, b)
+#define __rv__uksubw(a, b) __builtin_riscv_uksubwsi(a, b)
+
+#define __rv__kdmbb(a, b) __builtin_riscv_kdmbbsi(a, b)
+#define __rv__kdmbt(a, b) __builtin_riscv_kdmbtsi(a, b)
+#define __rv__kdmtt(a, b) __builtin_riscv_kdmttsi(a, b)
+
+#define __rv__kslraw(a, b) __builtin_riscv_kslrawsi(a, b)
+#define __rv__kslraw_u(a, b) __builtin_riscv_kslrawusi(a, b)
+
+#define __rv__ksllw(a, b) __builtin_riscv_ksllwsi(a, b)
+#define __rv__kslliw(a, b) __builtin_riscv_kslliwsi(a, b)
+
+#define __rv__kdmabb(a, b, c) __builtin_riscv_kdmabbsi(a, b, c)
+#define __rv__kdmabt(a, b, c) __builtin_riscv_kdmabtsi(a, b, c)
+#define __rv__kdmatt(a, b, c) __builtin_riscv_kdmattsi(a, b, c)
+
+#define __rv__kabsw(a) __builtin_riscv_kabswsi(a)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -878,6 +900,27 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__uksubh(a, b) __builtin_riscv_uksubhdi(a, b)
 
+#define __rv__kaddw(a, b) __builtin_riscv_kaddwdi(a, b)
+#define __rv__ukaddw(a, b) __builtin_riscv_ukaddwdi(a, b)
+
+#define __rv__ksubw(a, b) __builtin_riscv_ksubwdi(a, b)
+#define __rv__uksubw(a, b) __builtin_riscv_uksubwdi(a, b)
+
+#define __rv__kdmbb(a, b) __builtin_riscv_kdmbbdi(a, b)
+#define __rv__kdmbt(a, b) __builtin_riscv_kdmbtdi(a, b)
+#define __rv__kdmtt(a, b) __builtin_riscv_kdmttdi(a, b)
+
+#define __rv__kslraw(a, b) __builtin_riscv_kslrawdi(a, b)
+#define __rv__kslraw_u(a, b) __builtin_riscv_kslrawudi(a, b)
+
+#define __rv__ksllw(a, b) __builtin_riscv_ksllwdi(a, b)
+#define __rv__kslliw(a, b) __builtin_riscv_kslliwdi(a, b)
+
+#define __rv__kdmabb(a, b, c) __builtin_riscv_kdmabbdi(a, b, c)
+#define __rv__kdmabt(a, b, c) __builtin_riscv_kdmabtdi(a, b, c)
+#define __rv__kdmatt(a, b, c) __builtin_riscv_kdmattdi(a, b, c)
+
+#define __rv__kabsw(a) __builtin_riscv_kabswsi(a)
 #else
 #error "unknown xlen"
 #endif

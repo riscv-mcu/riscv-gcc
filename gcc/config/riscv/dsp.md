@@ -4040,3 +4040,126 @@
   ""
   "uksubh\t%0, %1, %2"
   [(set_attr "mode" "<MODE>")])
+
+(define_insn "kaddw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KADDW))]
+  ""
+  "kaddw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ukaddw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_UKADDW))]
+  ""
+  "ukaddw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ksubw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KSUBW))]
+  ""
+  "ksubw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "uksubw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_UKSUBW))]
+  ""
+  "uksubw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kdmbb<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KDMBB))]
+  ""
+  "kdmbb\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kdmbt<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KDMBT))]
+  ""
+  "kdmbt\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kdmtt<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KDMTT))]
+  ""
+  "kdmtt\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kslraw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KSLRAW))]
+  ""
+  "kslraw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kslrawu<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KSLRAWU))]
+  ""
+  "kslraw.u\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ksllw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_KSLLW))]
+  ""
+  "ksllw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kslliw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "rimm5u_operand" "")] UNSPEC_KSLLIW))]
+  ""
+  "kslliw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+
+(define_insn "kdmabb<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_KDMABB))]
+  ""
+  "kdmabb\t%0, %2, %3"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kdmabt<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_KDMABT))]
+  ""
+  "kdmabt\t%0, %2, %3"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kdmatt<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_KDMATT))]
+  ""
+  "kdmatt\t%0, %2, %3"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "kabsw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")] UNSPEC_KABSW))]
+  ""
+  "kabsw\t%0, %1"
+  [(set_attr "mode" "<MODE>")])
