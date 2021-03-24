@@ -3956,6 +3956,36 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME1 (uintXLEN, intXLEN), dsp),
   DIRECT_NAMED (kabswdi, kabswdi,
 		RISCV_FTYPE_NAME1 (uintXLEN, intXLEN), dsp),
+
+  DIRECT_NAMED (raddwsi, raddwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (raddwdi, raddwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, DI, DI), dsp),
+
+  DIRECT_NAMED (uraddwsi, uraddwsi,
+		RISCV_FTYPE_NAME2 (uintXLEN, USI, USI), dsp),
+  DIRECT_NAMED (uraddwdi, uraddwdi,
+		RISCV_FTYPE_NAME2 (uintXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (rsubwsi, rsubwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (rsubwdi, rsubwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, DI, DI), dsp),
+
+  DIRECT_NAMED (ursubwsi, ursubwsi,
+		RISCV_FTYPE_NAME2 (uintXLEN, USI, USI), dsp),
+  DIRECT_NAMED (ursubwdi, ursubwdi,
+		RISCV_FTYPE_NAME2 (uintXLEN, UDI, UDI), dsp),
+
+  DIRECT_NAMED (avesi, avesi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, intXLEN), dsp),
+  DIRECT_NAMED (avedi, avedi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, intXLEN), dsp),
+
+  DIRECT_NAMED (sraiu, sraiusi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, USI), dsp),
+  DIRECT_NAMED (sraiu64, sraiudi,
+		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, UDI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the

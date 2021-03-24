@@ -4163,3 +4163,67 @@
   ""
   "kabsw\t%0, %1"
   [(set_attr "mode" "<MODE>")])
+
+(define_insn "raddw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_RADDW))]
+  ""
+  "raddw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "uraddw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_URADDW))]
+  ""
+  "uraddw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "rsubw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_RSUBW))]
+  ""
+  "rsubw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ursubw<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_URSUBW))]
+  ""
+  "ursubw\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "ave<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_AVE))]
+  ""
+  "ave\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "sraiu"
+  [(set (match_operand:SI 0 "register_operand"                          "=  r, r")
+	(unspec:SI [(ashiftrt:SI (match_operand:SI 1 "register_operand" "   r, r")
+				 (match_operand:SI 2 "rimm5u_operand"   " u05, r"))]
+		    UNSPEC_ROUND))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "@
+   srai.u\t%0, %1, %2
+   sra.u\t%0, %1, %2"
+  [(set_attr "type"   "daluround")
+   (set_attr "mode"   "SI")])
+
+(define_insn "sraiu64"
+  [(set (match_operand:DI 0 "register_operand"                          "=  r, r")
+	(unspec:DI [(ashiftrt:DI (match_operand:DI 1 "register_operand" "   r, r")
+				 (match_operand:DI 2 "rimm6u_operand"   " u06, r"))]
+		    UNSPEC_ROUND))]
+  "TARGET_DSP && TARGET_64BIT"
+  "@
+   srai.u\t%0, %1, %2
+   sra.u\t%0, %1, %2"
+  [(set_attr "type"   "daluround")
+   (set_attr "mode"   "DI")])
