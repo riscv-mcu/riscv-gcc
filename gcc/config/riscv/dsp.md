@@ -4227,3 +4227,89 @@
    sra.u\t%0, %1, %2"
   [(set_attr "type"   "daluround")
    (set_attr "mode"   "DI")])
+
+(define_insn "bitrev"
+  [(set (match_operand:SI 0 "register_operand"             "=r,   r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r,   r")
+		    (match_operand:SI 2 "rimm5u_operand"   " r, u05")]
+		   UNSPEC_BITREV))]
+  "TARGET_DSP && !TARGET_64BIT"
+  "@
+   bitrev\t%0, %1, %2
+   bitrevi\t%0, %1, %2"
+  [(set_attr "type"   "dalu")
+   (set_attr "mode"   "SI")])
+
+(define_insn "bitrev64"
+  [(set (match_operand:DI 0 "register_operand"             "=r,   r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r,   r")
+		    (match_operand:SI 2 "rimm6u_operand"   " r, u06")]
+		   UNSPEC_BITREV))]
+  "TARGET_DSP && TARGET_64BIT"
+  "@
+   bitrev\t%0, %1, %2
+   bitrevi\t%0, %1, %2"
+  [(set_attr "type"   "dalu")
+   (set_attr "mode"   "SI")])
+
+(define_insn "bpick1<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_BPICK))]
+  "TARGET_DSP"
+  "bpick\t%0, %1, %2, %3"
+  [(set_attr "type"   "dbpick")
+   (set_attr "mode"   "<MODE>")])
+
+(define_insn "maddr32<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_MADDR32))]
+  ""
+  "maddr32\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "smaxsi3"
+  [(set (match_operand:SI 0 "register_operand"          "=r")
+	(smax:SI (match_operand:SI 1 "register_operand" " r")
+		 (match_operand:SI 2 "register_operand" " r")))]
+  "TARGET_DSP"
+  "maxw\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "SI")])
+
+(define_insn "sminsi3"
+  [(set (match_operand:SI 0 "register_operand"          "=r")
+	(smin:SI (match_operand:SI 1 "register_operand" " r")
+		 (match_operand:SI 2 "register_operand" " r")))]
+  "TARGET_DSP"
+  "minw\t%0, %1, %2"
+  [(set_attr "type" "dalu")
+   (set_attr "mode" "SI")])
+
+(define_insn "msubr32<mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")
+		     (match_operand:GPR 2 "register_operand" "r")] UNSPEC_MSUBR32))]
+  ""
+  "msubr32\t%0, %1, %2"
+  [(set_attr "mode" "<MODE>")])
+
+(define_insn "dsp_mulsidi3"
+  [(set (match_operand:DI 0 "register_operand"                          "=r")
+	(mult:DI (sign_extend:DI (match_operand:SI 1 "register_operand" " r"))
+		 (sign_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
+  "TARGET_DSP"
+  "mulsr64\t%0, %1, %2"
+  [(set_attr "type"   "dmul")
+   (set_attr "mode"   "DI")])
+
+(define_insn "dsp_umulsidi3"
+  [(set (match_operand:DI 0 "register_operand"                          "=r")
+	(mult:DI (zero_extend:DI (match_operand:SI 1 "register_operand" " r"))
+		 (zero_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
+  "TARGET_DSP"
+  "mulr64\t%0, %1, %2"
+  [(set_attr "type"   "dmul")
+   (set_attr "mode"   "DI")])

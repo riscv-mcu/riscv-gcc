@@ -3986,6 +3986,51 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, USI), dsp),
   DIRECT_NAMED (sraiu64, sraiudi,
 		RISCV_FTYPE_NAME2 (intXLEN, intXLEN, UDI), dsp),
+
+  DIRECT_NAMED (bitrev, bitrevsi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (bitrev64, bitrevdi,
+		RISCV_FTYPE_NAME2 (uintXLEN, uintXLEN, uintXLEN), dsp),
+
+//   DIRECT_NAMED (wext, wextsi,
+// 		RISCV_FTYPE_NAME2 (uintXLEN, DI, USI), dsp),
+//   DIRECT_NAMED (wext64, wextdi,
+// 		RISCV_FTYPE_NAME2 (uintXLEN, DI, UDI), dsp),
+
+  DIRECT_NAMED (bpick1si, bpicksi,
+		RISCV_FTYPE_NAME3 (uintXLEN, uintXLEN, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (bpick1di, bpickdi,
+		RISCV_FTYPE_NAME3 (uintXLEN, uintXLEN, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (maddr32si, maddr32si,
+		RISCV_FTYPE_NAME2 (SI, SI, SI), dsp),
+  DIRECT_NAMED (maddr32di, maddr32di,
+		RISCV_FTYPE_NAME2 (SI, SI, SI), dsp),
+
+  DIRECT_NAMED (smaxsi3, maxwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (smaxsi3, maxwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+
+  DIRECT_NAMED (sminsi3, minwsi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+  DIRECT_NAMED (sminsi3, minwdi,
+		RISCV_FTYPE_NAME2 (intXLEN, SI, SI), dsp),
+
+  DIRECT_NAMED (msubr32si, msubr32si,
+		RISCV_FTYPE_NAME2 (SI, SI, SI), dsp),
+  DIRECT_NAMED (msubr32di, msubr32di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+
+  DIRECT_NAMED (dsp_umulsidi3, mulr64si,
+		RISCV_FTYPE_NAME2 (UDI, USI, USI), dsp),
+  DIRECT_NAMED (dsp_umulsidi3, mulr64di,
+		RISCV_FTYPE_NAME2 (UDI, USI, USI), dsp),
+
+  DIRECT_NAMED (dsp_mulsidi3, mulsr64si,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+  DIRECT_NAMED (dsp_mulsidi3, mulsr64di,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the

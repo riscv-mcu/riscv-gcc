@@ -503,6 +503,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 
 #define __rv__sra_u(a, b) __builtin_riscv_sraiusi(a, b)
 
+#define __rv__bitrev(a, b) __builtin_riscv_bitrevsi(a, b)
+#define __rv__wext(a, b) __builtin_riscv_wextsi(a, b)
+
+#define __rv__bpick(a, b, c) __builtin_riscv_bpicksi(a, b, c)
+#define __rv__maddr32(a, b) __builtin_riscv_maddr32si(a, b)
+#define __rv__maxw(a, b) __builtin_riscv_maxwsi(a, b)
+#define __rv__minw(a, b) __builtin_riscv_minwsi(a, b)
+
+#define __rv__msubr32(a, b) __builtin_riscv_msubr32si(a, b)
+#define __rv__mulr64(a, b) __builtin_riscv_mulr64si(a, b)
+#define __rv__mulsr64(a, b) __builtin_riscv_mulsr64si(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -941,6 +953,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__ave(a, b) __builtin_riscv_avedi(a, b)
 
 #define __rv__sra_u(a, b) __builtin_riscv_sraiudi(a, b)
+
+#define __rv__bitrev(a, b) __builtin_riscv_bitrevdi(a, b)
+#define __rv__wext(a, b) __builtin_riscv_wextdi(a, b)
+
+#define __rv__bpick(a, b, c) __builtin_riscv_bpickdi(a, b, c)
+#define __rv__maddr32(a, b) __builtin_riscv_maddr32di(a, b)
+#define __rv__maxw(a, b) __builtin_riscv_maxwdi(a, b)
+#define __rv__minw(a, b) __builtin_riscv_minwdi(a, b)
+
+#define __rv__msubr32(a, b) __builtin_riscv_msubr32di(a, b)
+#define __rv__mulr64(a, b) __builtin_riscv_mulr64di(a, b)
+#define __rv__mulsr64(a, b) __builtin_riscv_mulsr64di(a, b)
 
 #else
 #error "unknown xlen"
