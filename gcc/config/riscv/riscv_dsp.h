@@ -515,6 +515,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__mulr64(a, b) __builtin_riscv_mulr64si(a, b)
 #define __rv__mulsr64(a, b) __builtin_riscv_mulsr64si(a, b)
 
+#define __rv__smal(a, b) __builtin_riscv_smalsi(a, b)
+
+#define __rv__smalbb(a, b, c) __builtin_riscv_smalbbsi(a, b, c)
+#define __rv__smalbt(a, b, c) __builtin_riscv_smalbtsi(a, b, c)
+#define __rv__smaltt(a, b, c) __builtin_riscv_smalttsi(a, b, c)
+
+#define __rv__smalda(a, b, c) __builtin_riscv_smaldasi(a, b, c)
+#define __rv__smalxda(a, b, c) __builtin_riscv_smalxdasi(a, b, c)
+#define __rv__smalds(a, b, c) __builtin_riscv_smaldssi(a, b, c)
+#define __rv__smaldrs(a, b, c) __builtin_riscv_smaldrssi(a, b, c)
+#define __rv__smalxds(a, b, c) __builtin_riscv_smalxdssi(a, b, c)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -965,6 +977,18 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__msubr32(a, b) __builtin_riscv_msubr32di(a, b)
 #define __rv__mulr64(a, b) __builtin_riscv_mulr64di(a, b)
 #define __rv__mulsr64(a, b) __builtin_riscv_mulsr64di(a, b)
+
+#define __rv__smal(a, b) __builtin_riscv_smaldi(a, b)
+
+#define __rv__smalbb(a, b, c) __builtin_riscv_smalbbdi(a, b, c)
+#define __rv__smalbt(a, b, c) __builtin_riscv_smalbtdi(a, b, c)
+#define __rv__smaltt(a, b, c) __builtin_riscv_smalttdi(a, b, c)
+
+#define __rv__smalda(a, b, c) __builtin_riscv_smaldadi(a, b, c)
+#define __rv__smalxda(a, b, c) __builtin_riscv_smalxdadi(a, b, c)
+#define __rv__smalds(a, b, c) __builtin_riscv_smaldsdi(a, b, c)
+#define __rv__smaldrs(a, b, c) __builtin_riscv_smaldrsdi(a, b, c)
+#define __rv__smalxds(a, b, c) __builtin_riscv_smalxdsdi(a, b, c)
 
 #else
 #error "unknown xlen"

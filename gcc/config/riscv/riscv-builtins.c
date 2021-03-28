@@ -4031,6 +4031,51 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
   DIRECT_NAMED (dsp_mulsidi3, mulsr64di,
 		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+
+  DIRECT_NAMED (smal, smalsi,
+		RISCV_FTYPE_NAME2 (DI, DI, uintXLEN), dsp),
+  DIRECT_NAMED (smal, smaldi,
+		RISCV_FTYPE_NAME2 (DI, DI, uintXLEN), dsp),
+
+  DIRECT_NAMED (smalbb, smalbbsi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smalbb64, smalbbdi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smalbt, smalbtsi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smalbt64, smalbtdi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smaltt, smalttsi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smaltt64, smalttdi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smalda, smaldasi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smalda64, smaldadi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smalxda, smalxdasi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smalxda64, smalxdadi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smalds, smaldssi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smalds64, smaldsdi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smaldrs, smaldrssi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smaldrs64, smaldrsdi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smalxds, smalxdssi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (smalxds64, smalxdsdi,
+		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the
