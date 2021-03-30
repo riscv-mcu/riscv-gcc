@@ -536,6 +536,13 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__ukmsr64(a, b, c) __builtin_riscv_ukmsr64si(a, b, c)
 #define __rv__ukmar64(a, b, c) __builtin_riscv_ukmar64si(a, b, c)
 
+#define __rv__swap8(a) __builtin_riscv_swap8si(a)
+#define __rv__swap16(a) __builtin_riscv_swap16si(a)
+#define __rv__umul8(a, b) __builtin_riscv_umul8si(a, b)
+#define __rv__umulx8(a, b) __builtin_riscv_umulx8si(a, b)
+#define __rv__umul16(a, b) __builtin_riscv_umul16si(a, b)
+#define __rv__umulx16(a, b) __builtin_riscv_umulx16si(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -1007,6 +1014,13 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__kmsr64(a, b, c) __builtin_riscv_kmsr64di(a, b, c)
 #define __rv__ukmsr64(a, b, c) __builtin_riscv_ukmsr64di(a, b, c)
 #define __rv__ukmar64(a, b, c) __builtin_riscv_ukmar64di(a, b, c)
+
+#define __rv__swap8(a) __builtin_riscv_swap8di(a)
+#define __rv__swap16(a) __builtin_riscv_swap16di(a)
+#define __rv__umul8(a, b) __builtin_riscv_umul8di(a, b)
+#define __rv__umulx8(a, b) __builtin_riscv_umulx8di(a, b)
+#define __rv__umul16(a, b) __builtin_riscv_umul16di(a, b)
+#define __rv__umulx16(a, b) __builtin_riscv_umulx16di(a, b)
 
 #else
 #error "unknown xlen"

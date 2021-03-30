@@ -1946,16 +1946,6 @@
   [(set_attr "type" "dmul")
    (set_attr "mode" "DI")])
 
-(define_insn "umul16_64"
-  [(set (match_operand:DI 0 "register_operand"             "=r")
-	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
-		    (match_operand:SI 2 "register_operand" " r")]
-		    UNSPEC_UMUL16))]
-  "TARGET_DSP && TARGET_64BIT"
-  "umul16\t%0, %1, %2"
-  [(set_attr "type" "dmul")
-   (set_attr "mode" "DI")])
-
 (define_insn "smul8"
   [(set (match_operand:DI 0 "register_operand"             "=r")
 	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
@@ -2015,16 +2005,6 @@
   [(set_attr "type" "dmul")
    (set_attr "mode" "DI")])
 
-(define_insn "umulx16_64"
-  [(set (match_operand:DI 0 "register_operand"             "=r")
-	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
-		    (match_operand:SI 2 "register_operand" " r")]
-		    UNSPEC_UMULX16))]
-  "TARGET_DSP && TARGET_64BIT"
-  "umulx16\t%0, %1, %2"
-  [(set_attr "type" "dmul")
-   (set_attr "mode" "DI")])
-
 (define_insn "smulx8"
   [(set (match_operand:DI 0 "register_operand"             "=r")
 	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
@@ -2032,16 +2012,6 @@
 		    UNSPEC_SMULX8))]
   "TARGET_DSP"
   "smulx8\t%0, %1, %2"
-  [(set_attr "type" "dmul")
-   (set_attr "mode" "V4HI")])
-
-(define_insn "umulx8"
-  [(set (match_operand:DI 0 "register_operand"             "=r")
-	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
-		    (match_operand:SI 2 "register_operand" " r")]
-		    UNSPEC_UMULX8))]
-  "TARGET_DSP"
-  "umulx8\t%0, %1, %2"
   [(set_attr "type" "dmul")
    (set_attr "mode" "V4HI")])
 
@@ -4819,3 +4789,65 @@
   "ukmsr64\t%0, %2, %3"
   [(set_attr "type" "dmac")
    (set_attr "mode" "<MODE>")])
+
+(define_insn "unspec_bswap8"
+  [(set (match_operand:V4QI 0 "register_operand" "=r")
+	(unspec:V4QI [(match_operand:V4QI 1 "register_operand" "r")] UNSPEC_BSWAP))]
+  "TARGET_DSP"
+  "swap8\t%0, %1"
+  [(set_attr "type"  "dalu")
+   (set_attr "mode"  "V4QI")])
+
+(define_insn "unspec_bswap8_64"
+  [(set (match_operand:V8QI 0 "register_operand" "=r")
+	(unspec:V8QI [(match_operand:V8QI 1 "register_operand" "r")] UNSPEC_BSWAP))]
+  "TARGET_DSP"
+  "swap8\t%0, %1"
+  [(set_attr "type"  "dalu")
+   (set_attr "mode"  "V8QI")])
+
+(define_insn "unspec_bswap16"
+  [(set (match_operand:V2HI 0 "register_operand" "=r")
+	(unspec:V2HI [(match_operand:V2HI 1 "register_operand" "r")] UNSPEC_BSWAP))]
+  "TARGET_DSP"
+  "swap16\t%0, %1"
+  [(set_attr "type"  "dalu")
+   (set_attr "mode"  "V2HI")])
+
+(define_insn "unspec_bswap16_64"
+  [(set (match_operand:V4HI 0 "register_operand" "=r")
+	(unspec:V4HI [(match_operand:V4HI 1 "register_operand" "r")] UNSPEC_BSWAP))]
+  "TARGET_DSP"
+  "swap16\t%0, %1"
+  [(set_attr "type"  "dalu")
+   (set_attr "mode"  "V4HI")])
+
+(define_insn "umulx8"
+  [(set (match_operand:DI 0 "register_operand"             "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		    (match_operand:SI 2 "register_operand" " r")]
+		    UNSPEC_UMULX8))]
+  "TARGET_DSP"
+  "umulx8\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "V4HI")])
+
+(define_insn "umul16_64"
+  [(set (match_operand:DI 0 "register_operand"             "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		    (match_operand:SI 2 "register_operand" " r")]
+		    UNSPEC_UMUL16))]
+  "TARGET_DSP && TARGET_64BIT"
+  "umul16\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "DI")])
+
+(define_insn "umulx16_64"
+  [(set (match_operand:DI 0 "register_operand"             "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		    (match_operand:SI 2 "register_operand" " r")]
+		    UNSPEC_UMULX16))]
+  "TARGET_DSP && TARGET_64BIT"
+  "umulx16\t%0, %1, %2"
+  [(set_attr "type" "dmul")
+   (set_attr "mode" "DI")])

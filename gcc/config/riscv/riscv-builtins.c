@@ -4116,6 +4116,37 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
   DIRECT_NAMED (ukmar64di, ukmar64di,
 		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (unspec_bswap8, swap8si,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (unspec_bswap8_64, swap8di,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (unspec_bswap16, swap16si,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (unspec_bswap16_64, swap16di,
+		RISCV_FTYPE_NAME1 (uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (umul8, umul8si,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+  DIRECT_NAMED (umul8, umul8di,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+
+  DIRECT_NAMED (umulx8, umulx8si,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+  DIRECT_NAMED (umulx8, umulx8di,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+
+  DIRECT_NAMED (umul16, umul16si,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+  DIRECT_NAMED (umul16_64, umul16di,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+
+  DIRECT_NAMED (umulx16, umulx16si,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+  DIRECT_NAMED (umulx16_64, umulx16di,
+		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
+
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the
