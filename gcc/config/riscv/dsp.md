@@ -4739,3 +4739,83 @@
   "TARGET_DSP && TARGET_64BIT"
   "smalxd<add_sub>\t%0, %2, %3"
   [(set_attr "type" "dmac")])
+
+(define_insn "smar64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_SMAR64))]
+  ""
+  "smar64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "smsr64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_SMSR64))]
+  ""
+  "smsr64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "umar64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_UMAR64))]
+  ""
+  "umar64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "umsr64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_UMSR64))]
+  ""
+  "umsr64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "kmar64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_KMAR64))]
+  ""
+  "kmar64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "kmsr64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_KMSR64))]
+  ""
+  "kmsr64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "ukmar64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_UKMAR64))]
+  ""
+  "ukmar64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "ukmsr64<mode>"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "0")
+		     (match_operand:GPR 2 "register_operand" "r")
+		     (match_operand:GPR 3 "register_operand" "r")] UNSPEC_UKMSR64))]
+  ""
+  "ukmsr64\t%0, %2, %3"
+  [(set_attr "type" "dmac")
+   (set_attr "mode" "<MODE>")])

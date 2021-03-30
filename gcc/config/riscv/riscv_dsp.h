@@ -527,6 +527,15 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__smaldrs(a, b, c) __builtin_riscv_smaldrssi(a, b, c)
 #define __rv__smalxds(a, b, c) __builtin_riscv_smalxdssi(a, b, c)
 
+#define __rv__smar64(a, b, c) __builtin_riscv_smar64si(a, b, c)
+#define __rv__smsr64(a, b, c) __builtin_riscv_smsr64si(a, b, c)
+#define __rv__umar64(a, b, c) __builtin_riscv_umar64si(a, b, c)
+#define __rv__umsr64(a, b, c) __builtin_riscv_umsr64si(a, b, c)
+#define __rv__kmar64(a, b, c) __builtin_riscv_kmar64si(a, b, c)
+#define __rv__kmsr64(a, b, c) __builtin_riscv_kmsr64si(a, b, c)
+#define __rv__ukmsr64(a, b, c) __builtin_riscv_ukmsr64si(a, b, c)
+#define __rv__ukmar64(a, b, c) __builtin_riscv_ukmar64si(a, b, c)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -989,6 +998,15 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__smalds(a, b, c) __builtin_riscv_smaldsdi(a, b, c)
 #define __rv__smaldrs(a, b, c) __builtin_riscv_smaldrsdi(a, b, c)
 #define __rv__smalxds(a, b, c) __builtin_riscv_smalxdsdi(a, b, c)
+
+#define __rv__smar64(a, b, c) __builtin_riscv_smar64di(a, b, c)
+#define __rv__smsr64(a, b, c) __builtin_riscv_smsr64di(a, b, c)
+#define __rv__umar64(a, b, c) __builtin_riscv_umar64di(a, b, c)
+#define __rv__umsr64(a, b, c) __builtin_riscv_umsr64di(a, b, c)
+#define __rv__kmar64(a, b, c) __builtin_riscv_kmar64di(a, b, c)
+#define __rv__kmsr64(a, b, c) __builtin_riscv_kmsr64di(a, b, c)
+#define __rv__ukmsr64(a, b, c) __builtin_riscv_ukmsr64di(a, b, c)
+#define __rv__ukmar64(a, b, c) __builtin_riscv_ukmar64di(a, b, c)
 
 #else
 #error "unknown xlen"

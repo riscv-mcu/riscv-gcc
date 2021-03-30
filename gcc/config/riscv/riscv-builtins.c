@@ -4076,6 +4076,46 @@ static const struct riscv_builtin_description riscv_builtins[] = {
 		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
   DIRECT_NAMED (smalxds64, smalxdsdi,
 		RISCV_FTYPE_NAME3 (DI, DI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (smar64si, smar64si,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+  DIRECT_NAMED (smar64di, smar64di,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+
+  DIRECT_NAMED (smsr64si, smsr64si,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+  DIRECT_NAMED (smsr64di, smsr64di,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+
+  DIRECT_NAMED (umar64si, umar64si,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (umar64di, umar64di,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (umsr64si, umsr64si,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (umsr64di, umsr64di,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (kmar64si, kmar64si,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+  DIRECT_NAMED (kmar64di, kmar64di,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+
+  DIRECT_NAMED (kmsr64si, kmsr64si,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+  DIRECT_NAMED (kmsr64di, kmsr64di,
+		RISCV_FTYPE_NAME3 (DI, DI, intXLEN, intXLEN), dsp),
+
+  DIRECT_NAMED (ukmsr64si, ukmsr64si,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ukmsr64di, ukmsr64di,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+
+  DIRECT_NAMED (ukmar64si, ukmar64si,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
+  DIRECT_NAMED (ukmar64di, ukmar64di,
+		RISCV_FTYPE_NAME3 (UDI, UDI, uintXLEN, uintXLEN), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the
