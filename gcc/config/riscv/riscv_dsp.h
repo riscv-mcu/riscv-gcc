@@ -543,6 +543,20 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__umul16(a, b) __builtin_riscv_umul16si(a, b)
 #define __rv__umulx16(a, b) __builtin_riscv_umulx16si(a, b)
 
+#define __rv__sadd64(a, b) __builtin_riscv_sadd64si(a, b)
+#define __rv__uadd64(a, b) __builtin_riscv_uadd64si(a, b)
+#define __rv__radd64(a, b) __builtin_riscv_radd64si(a, b)
+#define __rv__uradd64(a, b) __builtin_riscv_uradd64si(a, b)
+#define __rv__kadd64(a, b) __builtin_riscv_kadd64si(a, b)
+#define __rv__ukadd64(a, b) __builtin_riscv_ukadd64si(a, b)
+
+#define __rv__ssub64(a, b) __builtin_riscv_ssub64si(a, b)
+#define __rv__usub64(a, b) __builtin_riscv_usub64si(a, b)
+#define __rv__rsub64(a, b) __builtin_riscv_rsub64si(a, b)
+#define __rv__ursub64(a, b) __builtin_riscv_ursub64si(a, b)
+#define __rv__ksub64(a, b) __builtin_riscv_ksub64si(a, b)
+#define __rv__uksub64(a, b) __builtin_riscv_uksub64si(a, b)
+
 #elif __riscv_xlen == 64
 /* 16-bit Add/Subtract */
 #define __rv__add16(a, b) __builtin_riscv_addv4hi(a, b)
@@ -1021,6 +1035,20 @@ typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
 #define __rv__umulx8(a, b) __builtin_riscv_umulx8di(a, b)
 #define __rv__umul16(a, b) __builtin_riscv_umul16di(a, b)
 #define __rv__umulx16(a, b) __builtin_riscv_umulx16di(a, b)
+
+#define __rv__sadd64(a, b) __builtin_riscv_sadd64di(a, b)
+#define __rv__uadd64(a, b) __builtin_riscv_uadd64di(a, b)
+#define __rv__radd64(a, b) __builtin_riscv_radd64di(a, b)
+#define __rv__uradd64(a, b) __builtin_riscv_uradd64di(a, b)
+#define __rv__kadd64(a, b) __builtin_riscv_kadd64di(a, b)
+#define __rv__ukadd64(a, b) __builtin_riscv_ukadd64di(a, b)
+
+#define __rv__ssub64(a, b) __builtin_riscv_ssub64di(a, b)
+#define __rv__usub64(a, b) __builtin_riscv_usub64di(a, b)
+#define __rv__rsub64(a, b) __builtin_riscv_rsub64di(a, b)
+#define __rv__ursub64(a, b) __builtin_riscv_ursub64di(a, b)
+#define __rv__ksub64(a, b) __builtin_riscv_ksub64di(a, b)
+#define __rv__uksub64(a, b) __builtin_riscv_uksub64di(a, b)
 
 #else
 #error "unknown xlen"

@@ -4851,3 +4851,69 @@
   "umulx16\t%0, %1, %2"
   [(set_attr "type" "dmul")
    (set_attr "mode" "DI")])
+
+(define_insn "dsp_<uk>adddi3"
+  [(set (match_operand:DI 0 "register_even_operand"              "=r")
+	(all_plus:DI (match_operand:DI 1 "register_even_operand" " r")
+		     (match_operand:DI 2 "register_even_operand" " r")))]
+  "TARGET_DSP"
+  "<uk>add64 %0, %1, %2"
+  [(set_attr "type" "dalu64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_radddi3"
+  [(set (match_operand:DI 0 "register_even_operand" "=r")
+	(truncate:DI
+	  (ashiftrt:TI
+	    (plus:TI (sign_extend:TI (match_operand:DI 1 "register_even_operand" " r"))
+		     (sign_extend:TI (match_operand:DI 2 "register_even_operand" " r")))
+	  (const_int 1))))]
+  "TARGET_DSP"
+  "radd64\t%0, %1, %2"
+  [(set_attr "type" "dalu64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_uradddi3"
+  [(set (match_operand:DI 0 "register_even_operand" "=r")
+	(truncate:DI
+	  (lshiftrt:TI
+	    (plus:TI (zero_extend:TI (match_operand:DI 1 "register_even_operand" " r"))
+		     (zero_extend:TI (match_operand:DI 2 "register_even_operand" " r")))
+	  (const_int 1))))]
+  "TARGET_DSP"
+  "uradd64\t%0, %1, %2"
+  [(set_attr "type" "dalu64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_<uk>subdi3"
+  [(set (match_operand:DI 0 "register_even_operand"               "=r")
+	(all_minus:DI (match_operand:DI 1 "register_even_operand" " r")
+		      (match_operand:DI 2 "register_even_operand" " r")))]
+  "TARGET_DSP"
+  "<uk>sub64 %0, %1, %2"
+  [(set_attr "type" "dalu64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_rsubdi3"
+  [(set (match_operand:DI 0 "register_even_operand"                   "=r")
+	(truncate:DI
+	  (ashiftrt:TI
+	    (minus:TI (sign_extend:TI (match_operand:DI 1 "register_even_operand" " r"))
+		      (sign_extend:TI (match_operand:DI 2 "register_even_operand" " r")))
+	  (const_int 1))))]
+  "TARGET_DSP"
+  "rsub64\t%0, %1, %2"
+  [(set_attr "type" "dalu64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_ursubdi3"
+  [(set (match_operand:DI 0 "register_even_operand"                   "=r")
+	(truncate:DI
+	  (lshiftrt:TI
+	    (minus:TI (zero_extend:TI (match_operand:DI 1 "register_even_operand" " r"))
+		      (zero_extend:TI (match_operand:DI 2 "register_even_operand" " r")))
+	  (const_int 1))))]
+  "TARGET_DSP"
+  "ursub64\t%0, %1, %2"
+  [(set_attr "type" "dalu64")
+   (set_attr "mode" "DI")])

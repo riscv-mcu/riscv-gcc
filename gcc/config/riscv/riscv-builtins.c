@@ -4147,6 +4147,63 @@ static const struct riscv_builtin_description riscv_builtins[] = {
   DIRECT_NAMED (umulx16_64, umulx16di,
 		RISCV_FTYPE_NAME2 (DI, SI, SI), dsp),
 
+  DIRECT_NAMED (dsp_adddi3, sadd64si,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_adddi3, sadd64di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_adddi3, uadd64si,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+  DIRECT_NAMED (dsp_adddi3, uadd64di,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+
+  DIRECT_NAMED (dsp_subdi3, ssub64si,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_subdi3, ssub64di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_subdi3, usub64si,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+  DIRECT_NAMED (dsp_subdi3, usub64di,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+
+  DIRECT_NAMED (dsp_kadddi3, kadd64si,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_kadddi3, kadd64di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+
+  DIRECT_NAMED (dsp_ksubdi3, ksub64si,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_ksubdi3, ksub64di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+
+  DIRECT_NAMED (dsp_ukadddi3, ukadd64si,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+  DIRECT_NAMED (dsp_ukadddi3, ukadd64di,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+
+  DIRECT_NAMED (dsp_uksubdi3, uksub64si,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+  DIRECT_NAMED (dsp_uksubdi3, uksub64di,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+
+  DIRECT_NAMED (dsp_radddi3, radd64si,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_radddi3, radd64di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+
+  DIRECT_NAMED (dsp_rsubdi3, rsub64si,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+  DIRECT_NAMED (dsp_rsubdi3, rsub64di,
+		RISCV_FTYPE_NAME2 (DI, DI, DI), dsp),
+
+  DIRECT_NAMED (dsp_uradddi3, uradd64si,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+  DIRECT_NAMED (dsp_uradddi3, uradd64di,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+
+  DIRECT_NAMED (dsp_ursubdi3, ursub64si,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
+  DIRECT_NAMED (dsp_ursubdi3, ursub64di,
+		RISCV_FTYPE_NAME2 (UDI, UDI, UDI), dsp),
 };
 
 /* Index I is the function declaration for riscv_builtins[I], or null if the
