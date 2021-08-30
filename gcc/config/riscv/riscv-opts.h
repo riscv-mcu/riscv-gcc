@@ -80,6 +80,11 @@ enum riscv_align_data {
 #define MASK_ZKSH     (1 << 8)
 #define MASK_ZKT      (1 << 9)
 
+/* P extension subset */
+#define MASK_ZPN (1 << 0)
+#define MASK_ZPRV (1 << 1)
+#define MASK_ZPSF (1 << 2)
+
 #define TARGET_ZICSR    ((riscv_zi_subext & MASK_ZICSR) != 0)
 #define TARGET_ZIFENCEI ((riscv_zi_subext & MASK_ZIFENCEI) != 0)
 
@@ -98,5 +103,9 @@ enum riscv_align_data {
 #define TARGET_ZKSED ((riscv_crypto_subext & MASK_ZKSED) != 0)
 #define TARGET_ZKSH  ((riscv_crypto_subext & MASK_ZKSH) != 0)
 #define TARGET_ZKT   ((riscv_crypto_subext & MASK_ZKT) != 0)
+
+#define TARGET_ZPN ((riscv_rvp_subext & MASK_ZPN) != 0)
+#define TARGET_ZPRV ((riscv_rvp_subext & MASK_ZPRV) != 0)
+#define TARGET_ZPSF ((riscv_rvp_subext & MASK_ZPSF) != 0)
 
 #endif /* ! GCC_RISCV_OPTS_H */

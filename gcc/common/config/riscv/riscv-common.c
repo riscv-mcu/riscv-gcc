@@ -1007,6 +1007,10 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"zksh",  &gcc_options::x_riscv_crypto_subext, MASK_ZKSH},
   {"zkt",   &gcc_options::x_riscv_crypto_subext, MASK_ZKT},
 
+  {"zpn",  &gcc_options::x_riscv_rvp_subext, MASK_ZPN},
+  {"zprv", &gcc_options::x_riscv_rvp_subext, MASK_ZPRV},
+  {"zpsf", &gcc_options::x_riscv_rvp_subext, MASK_ZPSF},
+
   {NULL, NULL, 0}
 };
 
