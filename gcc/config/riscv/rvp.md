@@ -357,10 +357,10 @@
   [(set_attr "type" "simd")
    (set_attr "mode" "<MODE>")])
 
-(define_insn "<rvp_optab>si2"
+(define_insn "p<rvp_optab>si2"
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unop:SI (match_operand:SI 1 "register_operand" "r")))]
-  "TARGET_ZPN && !TARGET_64BIT"
+  "TARGET_ZPN && !(TARGET_64BIT || TARGET_ZBB)"
   "<rvp_insn>32\t%0, %1"
   [(set_attr "type" "simd")
    (set_attr "mode" "SI")])
@@ -3131,20 +3131,20 @@
    (set_attr "mode"   "SI")])
 
 ;; MAXW, MINW
-(define_insn "smaxsi3"
+(define_insn "psmaxsi3"
   [(set (match_operand:SI 0 "register_operand"          "=r")
 	(smax:SI (match_operand:SI 1 "register_operand" " r")
 		 (match_operand:SI 2 "register_operand" " r")))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && !TARGET_ZBB"
   "maxw\t%0, %1, %2"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
 
-(define_insn "sminsi3"
+(define_insn "psminsi3"
   [(set (match_operand:SI 0 "register_operand"          "=r")
 	(smin:SI (match_operand:SI 1 "register_operand" " r")
 		 (match_operand:SI 2 "register_operand" " r")))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && !TARGET_ZBB"
   "minw\t%0, %1, %2"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
