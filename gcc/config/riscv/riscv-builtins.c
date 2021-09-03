@@ -114,9 +114,6 @@ AVAIL (crypto_zksh64, TARGET_ZKSH && TARGET_64BIT)
 AVAIL (crypto_zksed32, TARGET_ZKSED && !TARGET_64BIT)
 AVAIL (crypto_zksed64, TARGET_ZKSED && TARGET_64BIT)
 
-AVAIL (crypto_zkr32, TARGET_ZKR && !TARGET_64BIT)
-AVAIL (crypto_zkr64, TARGET_ZKR && TARGET_64BIT)
-
 /* p ext */
 AVAIL (zpn, TARGET_ZPN)
 AVAIL (zpn64, TARGET_ZPN && TARGET_64BIT)
@@ -363,7 +360,7 @@ riscv_prepare_builtin_arg (struct expand_operand *op, tree exp, unsigned argno,
 	  arg_rtx = tmp_rtx;
 	}
     }
-  create_input_operand (op, arg_rtx, GET_MODE (arg_rtx));
+  create_input_operand (op, arg_rtx, mode);
 }
 
 /* Expand instruction ICODE as part of a built-in function sequence.
@@ -399,8 +396,23 @@ riscv_expand_builtin_direct (enum insn_code icode, rtx target, tree exp,
 
   /* Map any target to operand 0.  */
   int opno = 0;
+  enum machine_mode insn_return_mode = insn_data[icode].operand[opno].mode;
+  enum machine_mode mode = TYPE_MODE (TREE_TYPE (exp));
+
   if (has_target_p)
-    create_output_operand (&ops[opno++], target, TYPE_MODE (TREE_TYPE (exp)));
+    {
+      /* p extension vector and scalar mode convension */
+      if (TARGET_ZPN &&
+          (!target
+          || GET_MODE (target) != insn_return_mode
+          || ! (*insn_data[icode].operand[opno].predicate) (target, insn_return_mode)))
+  {
+    mode = insn_return_mode;
+    target = gen_reg_rtx (mode);
+  }
+
+      create_output_operand (&ops[opno++], target, mode);
+    }
 
   /* Map the arguments to the other operands.  */
   gcc_assert (opno + call_expr_nargs (exp)
