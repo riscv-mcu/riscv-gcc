@@ -54,6 +54,36 @@
   (and (match_code "const_int")
        (match_test "LUI_OPERAND (ival)")))
 
+(define_constraint "Wsa"
+  "Integer one."
+  (and (match_code "const_int")
+       (match_test "ival == 1")))
+
+(define_constraint "Wsb"
+  "A constraint that matches an immediate shift constant in QImode."
+  (and (match_code "const_int")
+       (match_test "ival == 8")))
+
+(define_constraint "Wsh"
+  "A constraint that matches an immediate shift constant in HImode."
+  (and (match_code "const_int")
+       (match_test "ival == 16")))
+
+(define_constraint "Wsw"
+  "A constraint that matches an immediate shift constant in SImode."
+  (and (match_code "const_int")
+       (match_test "ival == 32")))
+
+(define_constraint "Wsd"
+  "A constraint that matches an immediate shift constant in DImode."
+  (and (match_code "const_int")
+       (match_test "ival == 64")))
+
+(define_constraint "Ws5"
+  "Signed immediate 5-bit value"
+  (and (match_code "const_int")
+       (match_test "IN_RANGE (INTVAL (op), -16, 15)")))
+
 ;; Floating-point constant +0.0, used for FCVT-based moves when FMV is
 ;; not available in RV32.
 (define_constraint "G"
@@ -81,6 +111,59 @@
    A constant @code{move_operand}."
   (and (match_operand 0 "move_operand")
        (match_test "CONSTANT_P (op)")))
+
+;; Vector constraints.
+
+(define_register_constraint "vr" "TARGET_VECTOR ? VECTOR_REGS : NO_REGS"
+  "A vector register (if available).")
+
+;; TODO: This could be wrong if vector mask can use other than v0.
+(define_register_constraint "vd" "TARGET_VECTOR ? VECTOR_NO_MASK_REGS : NO_REGS"
+  "A vector register except mask register (if available).")
+
+;; ??? Not used yet.
+(define_register_constraint "vm" "TARGET_VECTOR ? VECTOR_MASK_REGS : NO_REGS"
+  "A vector mask register (if available).")
+
+(define_register_constraint "vt" "TARGET_VECTOR ? VTYPE_REGS : NO_REGS"
+  "VTYPE register (if available).")
+
+(define_constraint "vc"
+  "Any vector duplicate constant."
+  (and (match_code "const_vector")
+       (match_test "const_vec_duplicate_p (op)")))
+
+(define_constraint "vi"
+  "A vector 5-bit signed immediate."
+  (and (match_code "const_vector")
+       (match_test "riscv_const_vec_all_same_in_range_p (op, -16, 15)")))
+
+(define_constraint "vj"
+  "A vector negated 5-bit signed immediate."
+  (and (match_code "const_vector")
+       (match_test "riscv_const_vec_all_same_in_range_p (op, -15, 16)")))
+
+(define_constraint "vk"
+  "A vector 5-bit unsigned immediate."
+  (and (match_code "const_vector")
+       (match_test "riscv_const_vec_all_same_in_range_p (op, 0, 31)")))
+
+(define_constraint "v0"
+  "A vector with constant zero."
+  (and (match_code "const_vector")
+       (match_test "riscv_const_vec_all_same_in_range_p (op, 0, 0)")))
+
+(define_constraint "v1"
+  "A vector with constant all bit set."
+  (and (match_code "const_vector")
+       (match_test "riscv_const_vec_all_same_in_range_p (op, 1, 1)")))
+
+(define_constraint "vp"
+  "POLY_INT"
+  (and (match_code "const_poly_int")
+       (match_test "CONST_POLY_INT_COEFFS (op)[0] == UNITS_PER_V_REG.coeffs[0]")))
+
+;; DSP constraint
 
 (define_constraint "u02"
   "Unsigned immediate 2-bit value"

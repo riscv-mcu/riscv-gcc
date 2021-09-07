@@ -60,20 +60,15 @@ riscv_implied_info_t riscv_implied_info[] =
   {"d", "f"},
   {"f", "zicsr"},
   {"d", "zicsr"},
-  {"zk", "zkn"},
-  {"zk", "zkr"},
-  {"zk", "zkt"},
-  {"zkn", "zbkb"},
-  {"zkn", "zbkc"},
-  {"zkn", "zbkx"},
-  {"zkn", "zkne"},
-  {"zkn", "zknd"},
-  {"zkn", "zknh"},
-  {"zks", "zbkb"},
-  {"zks", "zbkc"},
-  {"zks", "zbkx"},
-  {"zks", "zksed"},
-  {"zks", "zksh"},
+  /* XXX: Work-around, zvbase + zvamo + zvlsseg, but zvbase not defined yet.  */
+  {"v", "zvamo"},
+  {"v", "zvlsseg"},
+
+  /* XXX: Work-around, zvqmac need v, and v implied zvamo and zvlsseg.  */
+  {"zvqmac", "v"},
+  {"zvqmac", "zvamo"},
+  {"zvqmac", "zvlsseg"},
+
   {NULL, NULL}
 };
 
@@ -119,6 +114,8 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"c", ISA_SPEC_CLASS_20190608, 2, 0},
   {"c", ISA_SPEC_CLASS_2P2,      2, 0},
 
+  {"v", ISA_SPEC_CLASS_NONE, 1, 0},
+
   {"zicsr", ISA_SPEC_CLASS_20191213, 2, 0},
   {"zicsr", ISA_SPEC_CLASS_20190608, 2, 0},
 
@@ -140,6 +137,10 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"zksed", ISA_SPEC_CLASS_NONE, 1, 0},
   {"zksh",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zkt",   ISA_SPEC_CLASS_NONE, 1, 0},
+
+  {"zvamo",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zvlsseg", ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zvqmac",  ISA_SPEC_CLASS_NONE, 1, 0},
 
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}

@@ -124,6 +124,32 @@ Target Bool Var(riscv_mrelax) Init(1)
 Take advantage of linker relaxations to reduce the number of instructions
 required to materialize symbol addresses.
 
+Enum
+Name(rvv_vector_bits) Type(enum riscv_rvv_vector_bits_enum)
+The possible RVV vector lengths:
+
+EnumValue
+Enum(rvv_vector_bits) String(scalable) Value(RVV_SCALABLE)
+
+EnumValue
+Enum(rvv_vector_bits) String(64) Value(RVV_64)
+
+EnumValue
+Enum(rvv_vector_bits) String(128) Value(RVV_128)
+
+EnumValue
+Enum(rvv_vector_bits) String(256) Value(RVV_256)
+
+EnumValue
+Enum(rvv_vector_bits) String(512) Value(RVV_512)
+
+EnumValue
+Enum(rvv_vector_bits) String(1024) Value(RVV_1024)
+
+mrvv-vector-bits=
+Target RejectNegative Joined Enum(rvv_vector_bits) Var(riscv_rvv_vector_bits) Init(RVV_SCALABLE)
+-mrvv-vector-bits=<number>	Set the number of bits in an RVV vector register to N.
+
 Mask(64BIT)
 
 Mask(MUL)
@@ -141,6 +167,10 @@ Mask(RVE)
 Mask(BITMANIP)
 
 Mask(RVP)
+
+Mask(VECTOR)
+
+Mask(RVZFH)
 
 mriscv-attribute
 Target Report Var(riscv_emit_attribute_p) Init(-1)
@@ -168,6 +198,9 @@ int riscv_bitmanip_subext
 
 TargetVariable
 int riscv_rvp_subext
+
+TargetVariable
+int riscv_rvv_subext
 
 TargetVariable
 int riscv_zi_subext

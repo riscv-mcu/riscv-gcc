@@ -102,7 +102,8 @@ ASM_MISA_SPEC
 
 /* The mapping from gcc register number to DWARF 2 CFA column number.  */
 #define DWARF_FRAME_REGNUM(REGNO) \
-  (GP_REG_P (REGNO) || FP_REG_P (REGNO) ? REGNO : INVALID_REGNUM)
+  (GP_REG_P (REGNO) || FP_REG_P (REGNO) || VECT_REG_P (REGNO)	\
+   ? REGNO : INVALID_REGNUM)
 
 /* The DWARF 2 CFA column which tracks the return address.  */
 #define DWARF_FRAME_RETURN_COLUMN RETURN_ADDR_REGNUM
@@ -130,6 +131,9 @@ ASM_MISA_SPEC
 
 /* The `Q' extension is not yet supported.  */
 #define UNITS_PER_FP_REG (TARGET_DOUBLE_FLOAT ? 8 : 4)
+
+/* The `V' extension is not yet supported.  */
+#define UNITS_PER_V_REG (GET_MODE_SIZE (VNx2DImode))
 
 /* The largest type that can be passed in floating-point registers.  */
 #define UNITS_PER_FP_ARG						\
@@ -264,7 +268,11 @@ ASM_MISA_SPEC
    - 32 floating point registers
    - 2 fake registers:
 	- ARG_POINTER_REGNUM
-	- FRAME_POINTER_REGNUM */
+	- FRAME_POINTER_REGNUM
+  - VECTOR_LENGTH_REGNUM
+	- VECTOR_TYPE_REGNUM
+   - 30 unused registers for future expansion
+   - 32 vector registers */
 
 #define FIRST_PSEUDO_REGISTER 66
 
@@ -278,7 +286,11 @@ ASM_MISA_SPEC
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
   /* Others.  */							\
-  1, 1									\
+  1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
+  /* Vector registers.  */						\
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,			\
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0			\
 }
 
 /* a0-a7, t0-t6, fa0-fa7, and ft0-ft11 are volatile across calls.
@@ -292,7 +304,11 @@ ASM_MISA_SPEC
   1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1,			\
   1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,			\
   /* Others.  */							\
-  1, 1									\
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
+  /* Vector registers.  */						\
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,			\
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1			\
 }
 
 /* Select a register mode required for caller save of hard regno REGNO.
@@ -312,6 +328,10 @@ ASM_MISA_SPEC
 #define FP_REG_LAST  63
 #define FP_REG_NUM   (FP_REG_LAST - FP_REG_FIRST + 1)
 
+#define VECT_REG_FIRST 96
+#define VECT_REG_LAST  127
+#define VECT_REG_NUM   (VECT_REG_LAST - VECT_REG_FIRST + 1)
+
 /* The DWARF 2 CFA column which tracks the return address from a
    signal handler context.  This means that to maintain backwards
    compatibility, no hard register can be assigned this column if it
@@ -322,6 +342,8 @@ ASM_MISA_SPEC
   ((unsigned int) ((int) (REGNO) - GP_REG_FIRST) < GP_REG_NUM)
 #define FP_REG_P(REGNO)  \
   ((unsigned int) ((int) (REGNO) - FP_REG_FIRST) < FP_REG_NUM)
+#define VECT_REG_P(REGNO) \
+  ((unsigned int) ((int) (REGNO) - VECT_REG_FIRST) < VECT_REG_NUM)
 
 /* True when REGNO is in SIBCALL_REGS set.  */
 #define SIBCALL_REG_P(REGNO)	\
@@ -339,6 +361,11 @@ ASM_MISA_SPEC
 #define ARG_POINTER_REGNUM 64
 #define FRAME_POINTER_REGNUM 65
 
+/* These two registers don't really exist: they are used for vector
+   operations.  */
+#define VECTOR_LENGTH_REGNUM 66
+#define VECTOR_TYPE_REGNUM 67
+
 /* Register in which static-chain is passed to a function.  */
 #define STATIC_CHAIN_REGNUM (GP_TEMP_FIRST + 2)
 
@@ -351,6 +378,8 @@ ASM_MISA_SPEC
 
 #define RISCV_PROLOGUE_TEMP_REGNUM (GP_TEMP_FIRST + 1)
 #define RISCV_PROLOGUE_TEMP(MODE) gen_rtx_REG (MODE, RISCV_PROLOGUE_TEMP_REGNUM)
+#define RISCV_PROLOGUE_TEMP2_REGNUM (GP_TEMP_FIRST + 2)
+#define RISCV_PROLOGUE_TEMP2(MODE) gen_rtx_REG (MODE, RISCV_PROLOGUE_TEMP2_REGNUM)
 
 #define MCOUNT_NAME "_mcount"
 
@@ -401,6 +430,10 @@ enum reg_class
   GR_REGS,			/* integer registers */
   FP_REGS,			/* floating-point registers */
   FRAME_REGS,			/* arg pointer and frame pointer */
+  VECTOR_MASK_REGS,		/* vector mask registers */
+  VECTOR_NO_MASK_REGS,		/* vector registers except mask registers */
+  VECTOR_REGS,			/* vector registers */
+  VTYPE_REGS,			/* vype register */
   ALL_REGS,			/* all registers */
   LIM_REG_CLASSES		/* max value + 1 */
 };
@@ -421,6 +454,10 @@ enum reg_class
   "GR_REGS",								\
   "FP_REGS",								\
   "FRAME_REGS",								\
+  "VECTOR_MASK_REGS", 							\
+  "VECTOR_NO_MASK_REGS", 						\
+  "VECTOR_REGS", 							\
+  "VTYPE_REGS", 							\
   "ALL_REGS"								\
 }
 
@@ -437,13 +474,17 @@ enum reg_class
 
 #define REG_CLASS_CONTENTS						\
 {									\
-  { 0x00000000, 0x00000000, 0x00000000 },	/* NO_REGS */		\
-  { 0xf003fcc0, 0x00000000, 0x00000000 },	/* SIBCALL_REGS */	\
-  { 0xffffffc0, 0x00000000, 0x00000000 },	/* JALR_REGS */		\
-  { 0xffffffff, 0x00000000, 0x00000000 },	/* GR_REGS */		\
-  { 0x00000000, 0xffffffff, 0x00000000 },	/* FP_REGS */		\
-  { 0x00000000, 0x00000000, 0x00000003 },	/* FRAME_REGS */	\
-  { 0xffffffff, 0xffffffff, 0x00000003 }	/* ALL_REGS */		\
+  { 0x00000000, 0x00000000, 0x00000000, 0x00000000 },	/* NO_REGS */		\
+  { 0xf003fcc0, 0x00000000, 0x00000000, 0x00000000 },	/* SIBCALL_REGS */	\
+  { 0xffffffc0, 0x00000000, 0x00000000, 0x00000000 },	/* JALR_REGS */		\
+  { 0xffffffff, 0x00000000, 0x00000000, 0x00000000 },	/* GR_REGS */		\
+  { 0x00000000, 0xffffffff, 0x00000000, 0x00000000 },	/* FP_REGS */		\
+  { 0x00000000, 0x00000000, 0x00000003, 0x00000000 },	/* FRAME_REGS */	\
+  { 0x00000000, 0x00000000, 0x00000000, 0x00000001 },	/* VECTOR_MASK_REGS */\
+  { 0x00000000, 0x00000000, 0x00000000, 0xfffffffe },	/* VECTOR_REGS */\
+  { 0x00000000, 0x00000000, 0x00000000, 0xffffffff },	/* VECTOR_REGS */\
+  { 0x00000000, 0x00000000, 0x00000008, 0x00000000 },	/* VTYPE_REGS */\
+  { 0xffffffff, 0xffffffff, 0x0000000f, 0xffffffff }	/* ALL_REGS */		\
 }
 
 /* A C expression whose value is a register class containing hard
@@ -483,15 +524,25 @@ enum reg_class
   60, 61, 62, 63,							\
   /* Call-saved FPRs.  */						\
   40, 41, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,			\
+  /* Call-clobbered vector registers.  */				\
+  97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110,	\
+  111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123,	\
+  124, 125, 126, 127,							\
+  /* The vector mask register.  */					\
+  96,									\
   /* None of the remaining classes have defined call-saved		\
      registers.  */							\
-  64, 65								\
+  64, 65, 66, 67								\
 }
 
 /* True if VALUE is a signed 12-bit number.  */
 
 #define SMALL_OPERAND(VALUE) \
   ((unsigned HOST_WIDE_INT) (VALUE) + IMM_REACH/2 < IMM_REACH)
+
+#define POLY_SMALL_OPERAND_P(POLY_VALUE)		\
+  (POLY_VALUE.is_constant () ?				\
+     SMALL_OPERAND (POLY_VALUE.to_constant ()) : false)
 
 /* True if VALUE can be loaded into a register using LUI.  */
 
@@ -763,7 +814,15 @@ typedef struct {
   "fs0", "fs1", "fa0", "fa1", "fa2", "fa3", "fa4", "fa5",	\
   "fa6", "fa7", "fs2", "fs3", "fs4", "fs5", "fs6", "fs7",	\
   "fs8", "fs9", "fs10","fs11","ft8", "ft9", "ft10","ft11",	\
-  "arg", "frame", }
+  "arg", "frame","vl","vtype","N/A", "N/A", "N/A", "N/A",	\
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", 	\
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", 	\
+  "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", 	\
+  "v0",  "v1",  "v2",  "v3",  "v4",  "v5",  "v6",  "v7",	\
+  "v8",  "v9",  "v10", "v11", "v12", "v13", "v14", "v15",	\
+  "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23",	\
+  "v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31" 	\
+}
 
 #define ADDITIONAL_REGISTER_NAMES					\
 {									\
@@ -986,5 +1045,25 @@ extern unsigned riscv_stack_boundary;
 extern void riscv_remove_unneeded_save_restore_calls (void);
 
 #define HARD_REGNO_RENAME_OK(FROM, TO) riscv_hard_regno_rename_ok (FROM, TO)
+
+#define TARGET_FP16 TARGET_RVZFH
+
+#ifndef USED_FOR_TARGET
+extern poly_uint16 riscv_rvv_chunks;
+
+/* The number of bits and bytes in a RVV vector.  */
+#define BITS_PER_RVV_VECTOR (poly_uint16 (riscv_rvv_chunks * 64))
+#define BYTES_PER_RVV_VECTOR (poly_uint16 (riscv_rvv_chunks * 8))
+#endif
+
+/* Minimal value of VLEN in bytes.  */
+#define MIN_VLENB \
+  (MAX (UNITS_PER_WORD, UNITS_PER_FP_REG))
+
+#define TARGET_SUPPORTS_WIDE_INT 1
+
+#define REGMODE_NATURAL_SIZE(MODE) riscv_regmode_natural_size (MODE)
+
+#define RISCV_DWARF_VLEN (4096 + 0xc22)
 
 #endif /* ! GCC_RISCV_H */

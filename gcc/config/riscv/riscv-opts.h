@@ -61,6 +61,17 @@ enum riscv_align_data {
   riscv_align_data_type_natural
 };
 
+/* RVV vector register sizes.  */
+enum riscv_rvv_vector_bits_enum {
+  RVV_SCALABLE,
+  RVV_NOT_IMPLEMENTED = RVV_SCALABLE,
+  RVV_64 = 64,
+  RVV_128 = 128,
+  RVV_256 = 256,
+  RVV_512 = 512,
+  RVV_1024 = 1024
+};
+
 #define MASK_ZICSR    (1 << 0)
 #define MASK_ZIFENCEI (1 << 1)
 
@@ -85,6 +96,11 @@ enum riscv_align_data {
 #define MASK_ZPRV (1 << 1)
 #define MASK_ZPSF (1 << 2)
 
+/* V extension subset */
+#define MASK_ZVAMO  (1 << 0)
+#define MASK_ZVLSSEG (1 << 1)
+#define MASK_ZVQMAC (1 << 2)
+
 #define TARGET_ZICSR    ((riscv_zi_subext & MASK_ZICSR) != 0)
 #define TARGET_ZIFENCEI ((riscv_zi_subext & MASK_ZIFENCEI) != 0)
 
@@ -107,5 +123,9 @@ enum riscv_align_data {
 #define TARGET_ZPN ((riscv_rvp_subext & MASK_ZPN) != 0)
 #define TARGET_ZPRV ((riscv_rvp_subext & MASK_ZPRV) != 0)
 #define TARGET_ZPSF ((riscv_rvp_subext & MASK_ZPSF) != 0)
+
+#define TARGET_ZVAMO   ((riscv_rvv_subext & MASK_ZVAMO) != 0)
+#define TARGET_ZVLSSEG ((riscv_rvv_subext & MASK_ZVLSSEG) != 0)
+#define TARGET_ZVQMAC  ((riscv_rvv_subext & MASK_ZVQMAC) != 0)
 
 #endif /* ! GCC_RISCV_OPTS_H */

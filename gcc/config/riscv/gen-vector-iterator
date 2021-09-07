@@ -1,0 +1,1930 @@
+#!/usr/bin/env python3
+
+from __future__ import print_function
+import sys
+import os
+import subprocess
+# -------------------------------------------------
+#   Prepare datas
+# -------------------------------------------------
+base_scale = 128
+# mode name -> width
+base_modes = [
+  ("QI", 8), ("HI", 16), ("SI", 32), ("DI", 64),
+  ("HF", 16), ("SF", 32), ("DF", 64)
+]
+base_int_modes = {
+  8: "QI",
+  16: "HI",
+  32: "SI",
+  64: "DI",
+  128: "TI",
+}
+
+base_fp_modes = {
+  16: "HF",
+  32: "SF",
+  64: "DF",
+}
+
+SEWS = [8, 16, 32, 64]
+SEW_MAX = SEWS[-1]
+
+SEW_LETTERS = {
+   8 : 'b',
+  16 : 'h',
+  32 : 'w',
+  64 : 'd',
+ 128 : 't',
+}
+
+class VectorTypeInfo:
+  def __repr__(self):
+    return "%s (%s)" %(self.ft_vtype, self.mode)
+  def __str__(self):
+    return "%s (%s)" %(self.ft_vtype, self.mode)
+
+  def __init__(self, sew, lmul, int_p, nf = 1,
+               eew=None, elmul=None, check=False, eew_reinterpret=False):
+    assert (elmul is None) or eew_reinterpret
+    self.sew = sew
+    self.sew_letter = SEW_LETTERS[sew]
+    self.lmul = lmul
+    self.nf = nf
+    self.int_p = int_p
+
+    if int_p:
+      self.scalar_mode = base_int_modes[sew]
+      self.scalar_ctype = "int%d_t" % sew
+    else:
+      self.scalar_mode = base_fp_modes[sew]
+      self.scalar_ctype = "__float%d_t" % sew
+
+    self.scalar_int_mode = base_int_modes[sew]
+    self.scalar_int_ctype = "int%d_t" % sew
+
+    self.scalar_uint_mode = "U" + base_int_modes[sew]
+    if sew in base_fp_modes:
+      self.scalar_float_mode = base_fp_modes[sew]
+    else:
+      self.scalar_float_mode = None
+
+    self.scale = int((base_scale // sew) * lmul)
+    self.mask_mode = "VNx%sBI" % (self.scale)
+    self._base_vector_mode = "VNx%s%s" % (self.scale, mode)
+
+    if self.nf == 1:
+      mode_name = "VNx%s%s" % (self.scale, self.scalar_mode)
+    else:
+      mode_name = "VNx%sx%s%s" % (self.nf, self.scale, self.scalar_mode)
+    self.mode = mode_name
+
+    self.int_vector_mode = mode_name[:-1] + 'I'
+    self.float_vector_mode = mode_name[:-1] + 'F'
+    self.mlen = int(self.sew / self.lmul)
+
+    if self.int_p:
+      self.ft_vtype = "VI%sM%s" % (self.sew, self.xlmul())
+      self.ft_m1_vtype = "VI%sM1" % (self.sew)
+      self.ft_vt_type = "VI%sM%sX%s" % (self.sew, self.xlmul(), self.nf)
+    else:
+      self.ft_vtype = "VF%sM%s" % (self.sew, self.xlmul())
+      self.ft_m1_vtype = "VF%sM1" % (self.sew)
+      self.ft_vt_type = "VF%sM%sX%s" % (self.sew, self.xlmul(), self.nf)
+
+    self.ft_vftype = "VF%sM%s" % (self.sew, self.xlmul())
+    self.ft_vitype = "VI%sM%s" % (self.sew, self.xlmul())
+    self.ft_vutype = "VUI%sM%s" % (self.sew, self.xlmul())
+
+    self.ft_vt_itype = "VI%sM%sX%s" % (self.sew, self.xlmul(), self.nf)
+    self.ft_vt_utype = "VUI%sM%sX%s" % (self.sew, self.xlmul(), self.nf)
+    self.ft_vt_ftype = "VF%sM%sX%s" % (self.sew, self.xlmul(), self.nf)
+
+    self.ft_m1_vftype = "VF%sM1" % (self.sew)
+    self.ft_m1_vitype = "VI%sM1" % (self.sew)
+    self.ft_m1_vutype = "VUI%sM1" % (self.sew)
+
+    self.ft_vmasktype = "VB%s" % (self.mlen)
+
+    self.arg_map = {
+      'SEW'    : self.sew,
+      'SEW_LETTER':self.sew_letter,
+      'LMUL'   : self.xlmul(),
+      'MODE'   : self.mode.lower(),
+      'IMODE': self.int_vector_mode.lower(),
+      'FMODE': self.float_vector_mode.lower(),
+      'NF'     : self.nf,
+      'SUBMODE'  : self.scalar_mode,
+      'ISUBMODE' : self.scalar_int_mode,
+      'FSUBMODE' : self.scalar_float_mode,
+      'CTYPE'  : self.scalar_ctype,
+      'ICTYPE' : self.scalar_int_ctype,
+      'MLEN'   : self.mlen,
+      'SUBMODE_PREFIX_UPPER': self.scalar_mode[0].upper(),
+      'SUBMODE_PREFIX_LOWER': self.scalar_mode[0].lower(),
+      'MODE_PREFIX_UPPER' : self.mode[:-1],
+      'MODE_PREFIX_LOWER' : self.mode[:-1].lower(),
+
+      'FT_MASK'  : self.ft_vmasktype,
+      'FT_VEC'  : self.ft_vtype,
+      'FT_F_VEC' : self.ft_vftype,
+      'FT_I_VEC' : self.ft_vitype,
+      'FT_U_VEC' : self.ft_vutype,
+
+      'FT_VEC_TUPLE'  : self.ft_vt_type,
+      'FT_F_VEC_TUPLE' : self.ft_vt_ftype,
+      'FT_I_VEC_TUPLE' : self.ft_vt_itype,
+      'FT_U_VEC_TUPLE' : self.ft_vt_utype,
+
+      'FT_VEC_M1'  : self.ft_m1_vtype,
+      'FT_VEC_M1_F' : self.ft_m1_vftype,
+      'FT_VEC_M1_I' : self.ft_m1_vitype,
+      'FT_VEC_M1_U' : self.ft_m1_vutype,
+
+      'FT_SCALAR' : self.scalar_mode,
+      'FT_F_SCALAR' : self.scalar_float_mode,
+      'FT_I_SCALAR' : self.scalar_int_mode,
+      'FT_U_SCALAR' : self.scalar_uint_mode,
+    }
+
+    if eew:
+      if eew_reinterpret:
+        if elmul is None:
+          elmul = self.lmul
+        self.eew_type = VectorTypeInfo(sew=eew, lmul=elmul, int_p=self.int_p)
+        eew_type = self.eew_type
+        self.arg_map["EEW"] = eew_type.sew
+        self.arg_map["EMUL"] = eew_type.xlmul()
+        self.arg_map["EEW_MODE"] = eew_type.mode.lower()
+        self.arg_map["EEW_IMODE"] = eew_type.int_vector_mode.lower()
+        self.arg_map['FT_I_XVEC'] = eew_type.ft_vitype
+        self.arg_map['FT_U_XVEC'] = eew_type.ft_vutype
+        self.arg_map['FT_XVEC'] = eew_type.ft_vtype
+      else:
+        assert (self.valid_eew_p(eew))
+        self.eew_type = VectorTypeInfo(sew=eew, lmul=self.emul(eew), int_p=True)
+        eew_type = self.eew_type
+
+        self.arg_map["EEW"] = eew_type.sew
+        self.arg_map["EMUL"] = eew_type.xlmul()
+        self.arg_map["EEW_MODE"] = eew_type.mode.lower()
+        self.arg_map["EEW_IMODE"] = eew_type.int_vector_mode.lower()
+        self.arg_map["EEW_SUBMODE"] = eew_type.scalar_mode
+        self.arg_map["EEW_ISUBMODE"] = eew_type.scalar_int_mode
+
+        self.arg_map["FT_INDEX"] = "VUI%sM%s" %(eew_type.sew, eew_type.xlmul())
+
+  def __getitem__(self, item):
+    if item[0] == 'W':
+      if item[1] == '1':
+        return self.widen_lmul_1_type[item[2:]]
+      elif item[1] == '2':
+        return self.widen_lmul_2[item[2:]]
+      elif item[1] == '4':
+        return self.widen_lmul_4[item[2:]]
+      elif item[1] == '8':
+        return self.widen_lmul_8[item[2:]]
+      else:
+        return self.widen_type[item[1:]]
+    elif item[0] == 'Q':
+      return self.quad_widen_type[item[1:]]
+    elif item[0] == 'E' and not (item.startswith("EEW") or item == "EMUL"):
+      return self.eightfold_widen_type[item[1:]]
+    return self.arg_map[item]
+
+  def __str__(self):
+    return self.mode
+
+  def has_eightfold_widen_type(self):
+    if not self.has_quad_widen_type():
+      return False
+
+    return self.quad_widen_type.has_widen_type()
+
+  def has_quad_widen_type(self):
+    if not self.has_widen_type():
+      return False
+
+    return self.widen_type.has_widen_type()
+
+  def has_widen_type(self):
+    if self.sew == 64:
+      return False
+
+    if self.lmul == 8:
+      return False
+
+    return True
+
+  def has_widen_lmulx(self, x):
+    if self.lmul < 1:
+      return False
+    if self.lmul * x > 8:
+      return False
+
+    return True
+
+  def xlmul(self, ceil = False):
+    fractional = {
+      0.125 : "f8",
+      0.25  : "f4",
+      0.5   : "f2"
+    }
+    lmul = self.lmul
+
+    if lmul in fractional.keys():
+      lmul = (ceil and 1) or fractional[lmul]
+    else:
+      lmul = int(lmul)
+
+    return str(lmul)
+
+  @property
+  def int_type(self):
+    if self.int_p:
+      return self
+    return VectorTypeInfo(sew=self.sew, lmul=self.lmul, nf=self.nf,
+                          int_p=True)
+
+  @property
+  def widen_type(self):
+    assert self.nf == 1 and (self.has_widen_type())
+    return VectorTypeInfo(sew=(self.sew * 2), lmul=(self.lmul * 2),
+                          int_p=self.int_p)
+
+  @property
+  def widen_float_type(self):
+    assert self.nf == 1 and (self.has_widen_type())
+    return VectorTypeInfo(sew=(self.sew * 2), lmul=(self.lmul * 2),
+                          int_p=False)
+
+
+  @property
+  def xwiden_type(self):
+    assert self.nf == 1
+    return VectorTypeInfo(sew=(self.sew * 2), lmul=(self.lmul * 2),
+                          int_p=self.int_p, check=False)
+
+  @property
+  def quad_widen_type(self):
+    assert self.nf == 1 and (self.has_quad_widen_type())
+    return self.widen_type.widen_type
+
+  @property
+  def eightfold_widen_type(self):
+    assert self.nf == 1 and (self.has_eightfold_widen_type())
+    return self.quad_widen_type.widen_type
+
+  @property
+  def lmul_1_type(self):
+    return VectorTypeInfo(sew=self.sew, lmul=1,
+                          int_p=self.int_p)
+
+  @property
+  def base_vector_type(self):
+    assert self.nf >= 1
+    return VectorTypeInfo(sew=self.sew, lmul=self.lmul, nf=1,
+                          int_p=self.int_p)
+
+  @property
+  def base_vector_mode(self):
+    assert self.nf >= 1
+    return self._base_vector_mode
+
+  def has_widen_lmul_1_type(self):
+    return self.sew != 64
+
+  @property
+  def widen_lmul_1_type(self):
+    assert self.nf == 1 and (self.has_widen_lmul_1_type())
+    return VectorTypeInfo(sew=(self.sew * 2), lmul=1,
+                          int_p=self.int_p)
+
+  @property
+  def widen_lmul_2(self):
+    assert self.nf == 1
+    return VectorTypeInfo(sew=self.sew, lmul=(self.lmul * 2),
+                          int_p=self.int_p, check=False)
+  @property
+  def widen_lmul_4(self):
+    assert self.nf == 1
+    return VectorTypeInfo(sew=self.sew, lmul=(self.lmul * 4),
+                          int_p=self.int_p, check=False)
+  @property
+  def widen_lmul_8(self):
+    assert self.nf == 1
+    return VectorTypeInfo(sew=self.sew, lmul=(self.lmul * 8),
+                          int_p=self.int_p, check=False)
+
+  @property
+  def index_mode(self):
+    if self.nf >= 1:
+      return self.base_vector_type.int_vector_mode
+    else:
+      return self.int_vector_mode
+
+  def emul(self, eew):
+    return (eew / self.sew) * self.lmul
+
+  def valid_eew_p(self, eew):
+    if eew == self.sew:
+      return True
+    emul = self.emul(eew)
+    # TODO: Tuple Not consider fractional LMUL yet.
+    if self.nf != 1:
+      return emul <= 8 and emul >= 1
+    return emul <= 8 and emul >= float(eew) / SEW_MAX
+
+LMULs = [0.125, 0.25, 0.5, 1, 2, 4, 8]
+NF = range(2, 9) # 2~8
+# Construct all vector and vector tuple modes.
+vector_modes = []
+for mode, width in base_modes:
+  for lmul in LMULs:
+    if not (lmul >= float(width) / SEW_MAX):
+      continue
+    vt = VectorTypeInfo(sew=width, lmul=lmul, int_p=mode.endswith("I"))
+    vector_modes.append(vt)
+
+int_vector_modes = list(filter(lambda x : x.int_p, vector_modes))
+float_vector_modes = list(filter(lambda x : not x.int_p, vector_modes))
+
+vector_tuple_modes = []
+for mode, width in base_modes:
+  for lmul in LMULs:
+    # TODO: Tuple Not consider fractional LMUL yet.
+    if lmul < 1:
+      continue
+    for nf in NF:
+      if nf * lmul > 8:
+        continue
+      vt = VectorTypeInfo(sew=width, lmul=lmul, int_p=mode.endswith("I"), nf=nf)
+      vector_tuple_modes.append(vt)
+
+int_vector_tuple_modes = list(filter(lambda x : x.int_p, vector_tuple_modes))
+float_vector_tuple_modes = list(filter(lambda x : not x.int_p, vector_tuple_modes))
+
+vector_masking_modes = []
+for n in range(7):
+  scale = 2 << n
+  mode_name = "VNx%sBI" % scale
+  vector_masking_modes.append(mode_name)
+
+# -------------------------------------------------
+#    Util functions
+# -------------------------------------------------
+def dump_md_iterator(name, comment, vals):
+  print ("")
+  print (";; %s" % comment.replace("\n", "\n;; "))
+  print ("(define_mode_iterator %s [" % name)
+  first_col = True
+  n = 0;
+  for val in vals:
+    if first_col:
+      first_col = False
+      print (" ", end='')
+    print (" %s" % val, end='')
+    n += 1;
+    if n == 4:
+      print ("")
+      first_col = True
+      n = 0
+  print ("])")
+
+def dump_md_attr(name, comment, indexes, val_func,
+                 lower_version_p = False, lower_p=False):
+  print ("")
+  print (";; %s" % comment.replace("\n", "\n;; "))
+  print ("(define_mode_attr %s [" % (name))
+  first_col = True
+  n = 0;
+  for index in indexes:
+    val = val_func(index)
+    if lower_p:
+      val = str(val).lower()
+    if first_col:
+      first_col = False
+      print (" ", end='')
+    print (" (%s \"%s\")" % (index, val), end='')
+    n += 1;
+    if n == 4:
+      print ("")
+      first_col = True
+      n = 0
+  print ("])")
+
+  if lower_version_p:
+    dump_md_attr(name.lower(), comment, indexes, val_func, lower_p=True)
+
+
+def get_vlmode(typeinfo):
+  global vector_modes
+  if isinstance (typeinfo, VectorTypeInfo):
+    if typeinfo.nf == 1:
+      return typeinfo.int_vector_mode
+    else:
+      return typeinfo.base_vector_type.int_vector_mode
+
+  # It must be a mask type.
+  # Try to find first compatible mode for masking mode,
+  # Should find better way in future.
+  all_vmodes = list(map(lambda x: str(x), vector_modes))
+  for try_mode in ["QI", "HI", "SI", "DI"]:
+    eqv_vmode = typeinfo.replace("BI", try_mode)
+    if eqv_vmode in all_vmodes:
+      return eqv_vmode
+
+  assert False
+
+def _dump_c_iterator(name, comment, arg_list_template, vals, extra_arg_p=True, tailline=True):
+  if name:
+    if (extra_arg_p):
+      print ("#define %s_ARG(MACRO, ...) \\" % name)
+    else:
+      print ("#define %s(MACRO) \\" % name)
+  for val in vals:
+    print ("  MACRO (", end='')
+    print (arg_list_template.format_map(val), end='')
+    if extra_arg_p:
+      print (", __VA_ARGS__", end='')
+    print (") \\")
+  if tailline:
+    print ("")
+
+def expand_eew_types(vals, eew_index=False, eew_reinterpret=False):
+  assert not (eew_index and eew_reinterpret)
+  if eew_index:
+    new_vals = []
+    for val in vals:
+      for eew in SEWS:
+        if val.valid_eew_p(eew):
+          new_vals.append(VectorTypeInfo(val.sew, val.lmul, val.int_p,
+                                         val.nf, eew=eew))
+    vals = new_vals
+
+  if eew_reinterpret:
+    new_vals = []
+    for val in vals:
+      if val.int_p:
+        for eew in SEWS:
+          if eew != val.sew and (val.lmul >= float(eew) / SEW_MAX):
+            new_vals.append(VectorTypeInfo(val.sew, val.lmul, val.int_p,
+                                           val.nf, eew=eew, eew_reinterpret=True))
+      for elmul in LMULs:
+        if elmul != val.lmul and (elmul >= float(val.sew) / SEW_MAX):
+          new_vals.append(VectorTypeInfo(val.sew, val.lmul, val.int_p,
+                                         val.nf, eew=val.sew, elmul=elmul, eew_reinterpret=True))
+    vals = new_vals
+  return vals
+
+def dump_c_iterator(name = None, comment = None, arg_list_template = None, vals = None,
+                    gen_arg_version_p=True, eew_index=False, eew_reinterpret=False, tailline = True):
+  vals = expand_eew_types(vals, eew_index, eew_reinterpret)
+  if comment:
+    print (comment)
+  _dump_c_iterator(name, comment, arg_list_template, vals, False, tailline)
+  if gen_arg_version_p:
+    print ("/* Same as above but with an extra argument.  */")
+    _dump_c_iterator(name, comment, arg_list_template, vals, True, tailline)
+
+# -------------------------------------------------
+#  Generation for vector-iterator.md
+# -------------------------------------------------
+def gen_md():
+  global vector_modes, int_vector_modes, float_vector_modes
+  global vector_tuple_modes, vector_masking_modes
+  print (";; DO NOT EDIT, please edit generator instead.")
+  print (";; This file was generated by gen-vector-iterator with the command:")
+  print (";; $ ./gen-vector-iterator -md > vector-iterator.md")
+
+  dump_md_iterator(
+    name = "VMODES",
+    comment = "All vector modes supported.",
+    vals = vector_modes
+  )
+
+  dump_md_iterator(
+    name = "VIMODES",
+    comment = "All vector modes supported for integer load/store/alu.",
+    vals = int_vector_modes
+  )
+
+  dump_md_iterator(
+    name = "VIMODES2",
+    comment = "Same as VIMODES, used for combination.",
+    vals = int_vector_modes
+  )
+
+  dump_md_iterator(
+    name = "VWIMODES",
+    comment = "All vector modes supported for widening integer alu.",
+    vals = filter(lambda x : x.has_widen_type(), int_vector_modes)
+  )
+
+  dump_md_iterator(
+    name = "VWRED_IMODES",
+    comment = "All vector modes supported for widening integer point reduction operation.",
+    vals = filter(lambda x : x.has_widen_lmul_1_type(), int_vector_modes)
+  )
+
+
+  dump_md_iterator(
+    name = "FCVT_VWIMODES",
+    comment = "All vector modes supported for FP type-convert.",
+    vals = filter(lambda x : x.has_widen_type(), int_vector_modes)
+  )
+
+  dump_md_iterator(
+    name = "VQWIMODES",
+    comment = "All vector modes supported for quad-widening integer alu.",
+    vals = filter(lambda x : x.has_quad_widen_type(), int_vector_modes)
+  )
+
+  dump_md_iterator(
+    name = "VEWIMODES",
+    comment = "All vector modes supported for eight-widening integer alu.",
+    vals = filter(lambda x : x.has_eightfold_widen_type(), int_vector_modes)
+  )
+
+  dump_md_iterator(
+    name = "VFMODES",
+    comment = "All vector modes supported for FP load/store/alu.",
+    vals = float_vector_modes
+  )
+
+  dump_md_iterator(
+    name = "VFMODES2",
+    comment = "Same as VFMODES, used for combination.",
+    vals = float_vector_modes
+  )
+
+  dump_md_iterator(
+    name = "VWFMODES",
+    comment = "All vector modes supported for widening floating point alu.",
+    vals = filter(lambda x : x.has_widen_type(), float_vector_modes)
+  )
+
+  dump_md_iterator(
+    name = "VWRED_FMODES",
+    comment = "All vector modes supported for widening floating point reduction operation.",
+    vals = filter(lambda x : x.has_widen_lmul_1_type(), float_vector_modes)
+  )
+
+  dump_md_iterator(
+    name = "VTMODES",
+    comment = "All vector tuple modes supported.",
+    vals = vector_tuple_modes
+  )
+
+  dump_md_iterator(
+    name = "VMASKMODES",
+    comment = "All vector masking modes.",
+    vals = vector_masking_modes
+  )
+
+  for nf in NF:
+    dump_md_iterator(
+      name = "VTNF%sMODES" % nf,
+      comment = "All vector tuple modes with NF=%s." % nf,
+      vals = filter(lambda x : x.nf == nf ,vector_tuple_modes)
+    )
+
+  VINTEQUIV_MODES = \
+    list(filter(lambda x : not x.int_p, vector_modes))
+
+  dump_md_attr(
+    name = "VINTEQUIV",
+    comment = "Map a vector float mode to a vector int mode of the same size.",
+    indexes = VINTEQUIV_MODES,
+    val_func = lambda x: x.int_vector_mode,
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VWMODE",
+    comment = "Map a vector int or float mode to widening vector mode.",
+    indexes = list(filter(lambda x : x.has_widen_type(), vector_modes)),
+    val_func = lambda x: x.widen_type,
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VWFMODE",
+    comment = "Map a vector int or float mode to widening vector mode.",
+    indexes = list(filter(lambda x : x.has_widen_type(), vector_modes)),
+    val_func = lambda x: x.widen_float_type,
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VQWMODE",
+    comment = "Map a vector int or float mode to quad-widening vector mode.",
+    indexes = list(filter(lambda x : x.has_quad_widen_type(), vector_modes)),
+    val_func = lambda x: x.quad_widen_type,
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VEWMODE",
+    comment = "Map a vector int or float mode to eight-widening vector mode.",
+    indexes = list(filter(lambda x : x.has_eightfold_widen_type(), vector_modes)),
+    val_func = lambda x: x.eightfold_widen_type,
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "EXT_VIMODES",
+    comment = "Map a vector int or float mode to widening vector mode.",
+    indexes = int_vector_modes,
+    val_func = lambda x: x.xwiden_type,
+    lower_version_p = False,
+  )
+
+  dump_md_attr(
+    name = "VCMPEQUIV",
+    comment = "Map a vector int or float mode to a vector compare mode.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.mask_mode,
+    lower_version_p = False,
+  )
+
+  dump_md_attr(
+    name = "vmaskmode",
+    comment = "Map a vector int or float mode to a vector compare mode.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.mask_mode.lower(),
+    lower_version_p = False,
+  )
+
+  dump_md_attr(
+    name = "VSUBMODE",
+    comment = "Map a vector mode to its element mode.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.scalar_mode,
+    lower_version_p = False,
+  )
+
+  dump_md_attr(
+    name = "VTSUBMODE",
+    comment = "Map a vector tuple mode to its vector mode.",
+    indexes = vector_tuple_modes,
+    val_func = lambda x: x.base_vector_mode,
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "V1MODES",
+    comment = "Map a vector mode to its LMUL==1 equivalent.\n"
+              "This is for reductions which use scalars in vector registers.",
+    indexes = vector_modes,
+    val_func =  lambda x: x.lmul_1_type,
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "VW1MODES",
+    comment = "Map a vector mode to its LMUL==1 widen vector type.\n"
+              "This is for widening reductions which use scalars in vector registers.",
+    indexes = filter(lambda x : x.has_widen_lmul_1_type(), vector_modes),
+    val_func =  lambda x: x.widen_lmul_1_type,
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "NF",
+    comment = "Map a vector tuple mode to its NF value.",
+    indexes = vector_tuple_modes,
+    val_func =  lambda x: x.nf,
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "VLMODE",
+    comment = "Map a vector mode to its VSETVLI mode, which for now is always the integer\n"
+              "vector mode, as the integer vemode/vmmode is a superset of the float ones.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = get_vlmode,
+    lower_version_p = True
+  )
+
+  dump_md_attr(
+    name = "VWVLMODE",
+    comment = "Map a vector mode to its VSETVLI mode of widening vector mode\n"
+              ", which for now is always the integer\n"
+              "vector mode, as the integer vemode/vmmode is a superset of the float ones.",
+    indexes = list(filter(lambda x : x.has_widen_type(), vector_modes)),
+    val_func = lambda x: get_vlmode(x.widen_type),
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VQWVLMODE",
+    comment = "Map a vector mode to its VSETVLI mode of quad-widening vector mode\n"
+              ", which for now is always the integer\n"
+              "vector mode, as the integer vemode/vmmode is a superset of the float ones.",
+    indexes = list(filter(lambda x : x.has_quad_widen_type(), vector_modes)),
+    val_func = lambda x: get_vlmode(x.quad_widen_type),
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VEWVLMODE",
+    comment = "Map a vector mode to its VSETVLI mode of eight-widening vector mode\n"
+              ", which for now is always the integer\n"
+              "vector mode, as the integer vemode/vmmode is a superset of the float ones.",
+    indexes = list(filter(lambda x : x.has_eightfold_widen_type(), vector_modes)),
+    val_func = lambda x: get_vlmode(x.eightfold_widen_type),
+    lower_version_p = True,
+  )
+
+  dump_md_attr(
+    name = "VMEMINXMODE",
+    comment = "Map a vector mode to its index load mode",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.index_mode,
+    lower_version_p = True
+  )
+
+  dump_md_attr(
+    name = "VFWIMODE",
+    comment = "Map a vector float mode to vector widening int mode.",
+    indexes = list(filter(lambda x : x.has_widen_type(), float_vector_modes)),
+    val_func = lambda x: x.widen_type.int_vector_mode,
+    lower_version_p = True
+  )
+
+  dump_md_attr(
+    name = "VIWFMODE",
+    comment = "Map a vector int mode to vector widening float mode.",
+    indexes = list(map(lambda x: x.int_type,
+                       filter(lambda x : x.has_widen_type(),
+                              int_vector_modes))),
+    val_func = lambda x: x.widen_type.float_vector_mode,
+    lower_version_p = True
+  )
+
+  dump_md_attr(
+    name = "sew",
+    comment = "Map a vector mode to SEW",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.sew,
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "lmul",
+    comment = "Map a vector mode to its LMUL.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.xlmul(),
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "xlmul",
+    comment = "Map a vector mode to its REGs.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.xlmul(True),
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "vmsize",
+    comment = "Equivalent of \"size\" for a vector element.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.sew_letter,
+    lower_version_p = False
+  )
+
+  dump_md_attr(
+    name = "VSINGLE",
+    comment = "Map a vector mode to LMUL=1 vector mode.",
+    indexes = vector_modes + vector_tuple_modes,
+    val_func = lambda x: x.lmul_1_type.mode,
+    lower_version_p = True
+  )
+
+# -------------------------------------------------
+#  Generation for riscv_vector_itr.h
+# -------------------------------------------------
+def gen_usr_c():
+  print ("/* DO NOT EDIT, please edit generator instead.")
+  print ("   This file was generated by gen-vector-iterator with the command:")
+  print ("   $ ./gen-vector-iterator -usr-c > riscv_vector_itr.h  */")
+
+  print ("#ifndef _GCC_RISCV_VECTOR_H\n")
+  print ("#error \"Never included riscv_vector_itr.h, plz include riscv_vector.h\"\n")
+  print ("#endif\n")
+
+  dump_c_iterator(
+    name = "_RVV_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector and integer types.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = int_vector_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{WSEW}, {WLMUL}, {WCTYPE}",
+    vals = list(filter(lambda x: x.has_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WRED_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding widening vector type but with LMUL 1.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{W1SEW}, {W1LMUL}, {W1CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmul_1_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_QINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding quad widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{QSEW}, {QLMUL}, {QCTYPE}",
+    vals = list(filter(lambda x: x.has_quad_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_EINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer modes, and info for\n"
+              "   corresponding eightfold widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{ESEW}, {ELMUL}, {ECTYPE}",
+    vals = list(filter(lambda x: x.has_eightfold_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector and floating point modes.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = float_vector_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WFLOAT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating modes, and info for\n"
+              "   corresponding widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{WSEW}, {WLMUL}, {WCTYPE}",
+    vals = list(filter(lambda x: x.has_widen_type(), float_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WRED_FLOAT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating types, and info for\n"
+              "   corresponding widening vector type but with LMUL 1.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{W1SEW}, {W1LMUL}, {W1CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmul_1_type(), float_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, {ICTYPE}",
+    vals = float_vector_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{EEW}, {EMUL}",
+    vals = int_vector_modes,
+    eew_index=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point types, and info for\n"
+              "   corresponding floating point and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, "
+                        "{EEW}, {EMUL}",
+    vals = float_vector_modes,
+    eew_index=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_REINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, {EEW}, {EMUL}",
+    vals = int_vector_modes,
+    eew_reinterpret=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_REINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point types, and info for\n"
+              "   corresponding floating and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {CTYPE}, {EEW}, {EMUL}",
+    vals = float_vector_modes,
+    eew_reinterpret=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_WLMUL_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding widening vector LMUL.  */",
+    arg_list_template = "{SEW}, {W2LMUL}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), int_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W4LMUL}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), int_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W8LMUL}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), int_vector_modes)),
+    gen_arg_version_p = False
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_WLMUL_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, float types, and info for\n"
+              "   corresponding widening vector LMUL.  */",
+    arg_list_template = "{SEW}, {W2LMUL}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), float_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W4LMUL}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), float_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W8LMUL}, {LMUL}, {MLEN}, {CTYPE}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), float_vector_modes)),
+    gen_arg_version_p = False
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_TUPLE_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector tuple type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {CTYPE}",
+    vals = int_vector_tuple_modes,
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_TUPLE_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector tuple type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {CTYPE}, {EEW}, {EMUL}",
+    vals = int_vector_tuple_modes,
+    eew_index=True
+  )
+
+  for nf in range(2, 9):
+    dump_c_iterator(
+      name = "_RVV_INT_TUPLE_NF%d_ITERATOR" % nf,
+      comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+                "   along with its corresponding vector, floating point modes, and info for\n"
+                "   corresponding floating point and vector tuple type.  */",
+      arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {CTYPE}",
+      vals = list(filter(lambda x: x.nf == nf, int_vector_tuple_modes))
+    )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_TUPLE_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector tuple type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {CTYPE}",
+    vals = float_vector_tuple_modes,
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_TUPLE_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector tuple type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {CTYPE}, {EEW}, {EMUL}",
+    vals = float_vector_tuple_modes,
+    eew_index=True
+  )
+
+  for nf in range(2, 9):
+    dump_c_iterator(
+      name = "_RVV_FLOAT_TUPLE_NF%d_ITERATOR" % nf,
+      comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+                "   along with its corresponding vector, floating point modes, and info for\n"
+                "   corresponding floating point and vector tuple type.  */",
+      arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {CTYPE}",
+      vals = list(filter(lambda x: x.nf == nf, float_vector_tuple_modes))
+    )
+
+# -------------------------------------------------
+#  Generation for riscv-vector-iterator.h
+# -------------------------------------------------
+def gen_c():
+  global int_vector_modes, float_vector_modes
+  print ("/* DO NOT EDIT, please edit generator instead.")
+  print ("   This file was generated by gen-vector-iterator with the command:")
+  print ("   $ ./gen-vector-iterator -c > riscv-vector-iterator.h  */")
+
+  dump_c_iterator(
+    name = "_RVV_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector and integer modes.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}",
+    vals = int_vector_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer modes, and info for\n"
+              "   corresponding widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{WSEW}, {WLMUL}, {WMODE}, {WSUBMODE}",
+    vals = list(filter(lambda x: x.has_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WRED_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer modes, and info for\n"
+              "   corresponding widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{W1SEW}, {W1LMUL}, {W1MODE}, {W1SUBMODE}",
+    vals = list(filter(lambda x: x.has_widen_lmul_1_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_QINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer modes, and info for\n"
+              "   corresponding quad widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{QSEW}, {QLMUL}, {QMODE}, {QSUBMODE}",
+    vals = list(filter(lambda x: x.has_quad_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_EINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer modes, and info for\n"
+              "   corresponding eightfold widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{ESEW}, {ELMUL}, {EMODE}, {ESUBMODE}",
+    vals = list(filter(lambda x: x.has_eightfold_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer point modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{EEW}, {EMUL}, {EEW_MODE}, {EEW_SUBMODE}",
+    vals = int_vector_modes,
+    eew_index=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_INT_REINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer point modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{EEW}, {EMUL}, {EEW_MODE}",
+    vals = int_vector_modes,
+    eew_reinterpret=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector and floating point modes.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}",
+    vals = float_vector_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WFLOAT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating modes, and info for\n"
+              "   corresponding widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{WSEW}, {WLMUL}, {WMODE}, {WSUBMODE}",
+    vals = list(filter(lambda x: x.has_widen_type(), float_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WRED_FLOAT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating modes, and info for\n"
+              "   corresponding widening vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{W1SEW}, {W1LMUL}, {W1MODE}, {W1SUBMODE}",
+    vals = list(filter(lambda x: x.has_widen_lmul_1_type(), float_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, {IMODE}, {ISUBMODE}",
+    vals = float_vector_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_WINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{WSEW}, {WLMUL}, {WIMODE}, {WISUBMODE}",
+    vals = list(filter(lambda x: x.has_widen_type(), float_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WFLOAT_INT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {IMODE}, {ISUBMODE}, "
+                        "{WSEW}, {WLMUL}, {WFMODE}, {WFSUBMODE}",
+    vals = list(filter(lambda x: x.has_widen_type(), int_vector_modes))
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point point modes, and info for\n"
+              "   corresponding floating point and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{EEW}, {EMUL}, {EEW_IMODE}, {EEW_ISUBMODE}",
+    vals = float_vector_modes,
+    eew_index=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_FLOAT_REINT_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer point modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{EEW}, {EMUL}, {EEW_MODE}",
+    vals = float_vector_modes,
+    eew_reinterpret=True
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WLMUL",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer types, and info for\n"
+              "   corresponding widening vector LMUL.  */",
+    arg_list_template = "{SEW}, {W2LMUL}, {LMUL}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{W2MODE_PREFIX_UPPER}, {W2MODE_PREFIX_LOWER}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), int_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W4LMUL}, {LMUL}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{W4MODE_PREFIX_UPPER}, {W4MODE_PREFIX_LOWER}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), int_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W8LMUL}, {LMUL}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{W8MODE_PREFIX_UPPER}, {W8MODE_PREFIX_LOWER}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), int_vector_modes)),
+    gen_arg_version_p = False
+  )
+
+  dump_c_iterator(
+    name = "_RVV_WLMUL_NO_SEW8",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, float types, and info for\n"
+              "   corresponding widening vector LMUL.  */",
+    arg_list_template = "{SEW}, {W2LMUL}, {LMUL}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{W2MODE_PREFIX_UPPER}, {W2MODE_PREFIX_LOWER}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), float_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W4LMUL}, {LMUL}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{W4MODE_PREFIX_UPPER}, {W4MODE_PREFIX_LOWER}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), float_vector_modes)),
+    gen_arg_version_p = False,
+    tailline = False
+  )
+  dump_c_iterator(
+    arg_list_template = "{SEW}, {W8LMUL}, {LMUL}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{W8MODE_PREFIX_UPPER}, {W8MODE_PREFIX_LOWER}",
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), float_vector_modes)),
+    gen_arg_version_p = False
+  )
+
+  dump_c_iterator(
+    name = "_RVV_SEG",
+    comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector tuple type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{MODE_PREFIX_UPPER}, {MODE_PREFIX_LOWER}",
+    vals = int_vector_tuple_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_SEG_INT_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, integer tuple modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{EEW}, {EMUL}, {EEW_MODE}, {EEW_SUBMODE}",
+    vals = int_vector_tuple_modes,
+    eew_index=True
+  )
+
+  for nf in range(2, 9):
+    dump_c_iterator(
+      name = "_RVV_SEG_NF%d" % nf,
+      comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+                "   along with its corresponding vector, floating point modes, and info for\n"
+                "   corresponding floating point and vector tuple type.  */",
+      arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, "
+                          "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER}, "
+                          "{MODE_PREFIX_UPPER}, {MODE_PREFIX_LOWER}",
+      vals = list(filter(lambda x: x.nf == nf, int_vector_tuple_modes))
+    )
+
+  dump_c_iterator(
+    name = "_RVV_SEG_NO_SEW8",
+    comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, floating point modes, and info for\n"
+              "   corresponding floating point and vector tuple type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, "
+                        "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER},"
+                        "{MODE_PREFIX_UPPER}, {MODE_PREFIX_LOWER}",
+    vals = float_vector_tuple_modes
+  )
+
+  dump_c_iterator(
+    name = "_RVV_SEG_FLOAT_INDEX_ITERATOR",
+    comment = "/* An iterator to call a macro with every supported SEW, LMUL and MLEN value,\n"
+              "   along with its corresponding vector, float-point tuple modes, and info for\n"
+              "   corresponding integer and vector type.  */",
+    arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, {MODE}, {SUBMODE}, "
+                        "{EEW}, {EMUL}, {EEW_MODE}, {EEW_SUBMODE}",
+    vals = float_vector_tuple_modes,
+    eew_index=True
+  )
+
+  for nf in range(2, 9):
+    dump_c_iterator(
+      name = "_RVV_SEG_NF%d_NO_SEW8" % nf,
+      comment = "/* An iterator to call a macro with every supported NF, SEW, LMUL and MLEN value,\n"
+                "   along with its corresponding vector, floating point modes, and info for\n"
+                "   corresponding floating point and vector tuple type.  */",
+      arg_list_template = "{SEW}, {LMUL}, {NF}, {MLEN}, "
+                          "{SUBMODE_PREFIX_UPPER}, {SUBMODE_PREFIX_LOWER}, "
+                          "{MODE_PREFIX_UPPER}, {MODE_PREFIX_LOWER}",
+      vals = list(filter(lambda x: x.nf == nf, float_vector_tuple_modes))
+    )
+
+
+class FTtypes:
+  def __init__(self):
+    self.ftypes = set()
+
+  def add(self, arg_list_templates, vals, eew_index=False, eew_reinterpret=False):
+    vals = expand_eew_types(vals, eew_index, eew_reinterpret)
+
+    for arg_list_template in arg_list_templates:
+      unsigned_version = False
+      # We should repeat again if there is FT_VEC for unsigned
+      # interger vector types.
+      if '{FT_VEC}' in arg_list_template:
+        unsigned_version = True
+      if '{WFT_VEC}' in arg_list_template:
+        unsigned_version = True
+      if '{W1FT_VEC}' in arg_list_template:
+        unsigned_version = True
+      if '{QFT_VEC}' in arg_list_template:
+        unsigned_version = True
+      if '{EFT_VEC}' in arg_list_template:
+        unsigned_version = True
+      if '{FT_VEC_TUPLE}' in arg_list_template:
+        unsigned_version = True
+
+      for val in vals:
+        arg_list = []
+        for arg in arg_list_template:
+            arg = arg.format_map(val)
+            arg_list.append(arg)
+        self.ftypes.add(tuple(arg_list))
+
+        if unsigned_version and val.int_p:
+          arg_list = []
+          for arg in arg_list_template:
+	      # TODO: Clean up
+              if '{FT_VEC}' in arg:
+                arg = arg.replace("{FT_VEC}", "{FT_U_VEC}")
+              if '{WFT_VEC}' in arg:
+                arg = arg.replace("{WFT_VEC}", "{WFT_U_VEC}")
+              if '{W1FT_VEC}' in arg:
+                arg = arg.replace("{W1FT_VEC}", "{W1FT_U_VEC}")
+              if '{QFT_VEC}' in arg:
+                arg = arg.replace("{QFT_VEC}", "{QFT_U_VEC}")
+              if '{EFT_VEC}' in arg:
+                arg = arg.replace("{EFT_VEC}", "{EFT_U_VEC}")
+
+              if '{FT_VEC_M1}' in arg:
+                arg = arg.replace("{FT_VEC_M1}", "{FT_VEC_M1_U}")
+              if '{WFT_VEC_M1}' in arg:
+                arg = arg.replace("{WFT_VEC_M1}", "{WFT_VEC_M1_U}")
+
+              if '{FT_VEC_TUPLE}' in arg:
+                arg = arg.replace("{FT_VEC_TUPLE}", "{FT_U_VEC_TUPLE}")
+
+              if '{FT_SCALAR}' in arg:
+                arg = arg.replace("{FT_SCALAR}", "{FT_U_SCALAR}")
+
+              arg = arg.format_map(val)
+              arg_list.append(arg)
+          self.ftypes.add(tuple(arg_list))
+
+  def gen(self):
+    print ("/* DO NOT EDIT, please edit generator instead.\n"
+           "   This file was generated by gen-vector-iterator with the command:\n"
+           "   $ ./gen-vector-iterator -ftype > riscv-vector-ftypes.def  */\n")
+    ftypes = sorted(list(self.ftypes))
+    for ftype in ftypes:
+      arg_num = len(ftype) - 1
+      args = ", ".join(ftype)
+      print ("DEF_RISCV_FTYPE (%d, (%s))" % (arg_num, args))
+
+def gen_ftype():
+  ft = FTtypes()
+
+  # Prototype for vector modes, both for integer and floating point
+  ft.add(
+    arg_list_templates=[
+      # 0 args.
+      ('{FT_VEC}',),
+      # 1 args.
+      ('{FT_VEC}', 'C_{FT_SCALAR}_PTR'),
+
+      # 2 args.
+      # Vector Binary Operations.
+      ('{FT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      # Vector Binary Operations with scalar.
+      ('{FT_VEC}', '{FT_VEC}', '{FT_SCALAR}'),
+
+      ('{FT_VEC}', '{FT_VEC}', 'SIZE'),
+      ('{FT_MASK}', '{FT_VEC}', '{FT_VEC}'),
+      ('{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}'),
+
+      ('VOID', '{FT_VEC}', '{FT_SCALAR}_PTR'),
+
+      ('{FT_VEC}', 'C_{FT_SCALAR}_PTR', 'SI'),
+      ('{FT_VEC}', 'C_{FT_SCALAR}_PTR', 'DI'),
+
+      # 3 args.
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', 'C_{FT_SCALAR}_PTR'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', 'C_{FT_SCALAR}_PTR'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}'),
+
+      ('{FT_VEC}', '{FT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      ('{FT_VEC}', '{FT_VEC}', '{FT_SCALAR}', '{FT_VEC}'),
+      ('{FT_VEC}', '{FT_VEC}', '{FT_VEC}', 'SIZE'),
+
+      ('{FT_VEC_M1}', '{FT_VEC_M1}', '{FT_VEC_M1}', '{FT_VEC}'),
+
+      ('VOID', '{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}_PTR'),
+      ('VOID', '{FT_VEC}', '{FT_SCALAR}_PTR', 'SI'),
+      ('VOID', '{FT_VEC}', '{FT_SCALAR}_PTR', 'DI'),
+
+      # 4 args.
+      ('{FT_VEC_M1}', '{FT_MASK}', '{FT_VEC_M1}', '{FT_VEC_M1}', '{FT_VEC}'),
+
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}', '{FT_SCALAR}'),
+      ('{FT_MASK}', '{FT_MASK}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}'),
+      ('{FT_MASK}', '{FT_MASK}', '{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}', 'SIZE'),
+
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}', '{FT_VEC}'), # For masked mac
+
+      # Vector Strided Load.
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', 'C_{FT_SCALAR}_PTR', 'SI'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', 'C_{FT_SCALAR}_PTR', 'DI'),
+      # Vector Strided Store.
+      ('VOID', '{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}_PTR', 'SI'),
+      ('VOID', '{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}_PTR', 'DI'),
+    ],
+    vals=vector_modes)
+
+  # Same as above, but for widening vector.
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      ('{FT_VEC}', '{WFT_VEC}'),
+      ('{FT_VEC}', '{WFT_F_VEC}'),
+
+      # 2 args.
+      ('{WFT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      ('{WFT_VEC}', '{FT_VEC}', '{FT_SCALAR}'),
+
+      ('{WFT_VEC}', '{WFT_VEC}', '{FT_VEC}'),
+      ('{WFT_VEC}', '{WFT_VEC}', '{FT_SCALAR}'),
+
+      # 3 args.
+      ('{WFT_VEC}', '{WFT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      ('{WFT_VEC}', '{WFT_VEC}', '{FT_SCALAR}', '{FT_VEC}'),
+
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{WFT_VEC}'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{WFT_F_VEC}'),
+
+      # 4 args.
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{FT_VEC}', '{FT_SCALAR}'),
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{WFT_VEC}', '{FT_VEC}'),
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{WFT_VEC}', '{FT_SCALAR}'),
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{FT_SCALAR}', '{FT_VEC}'), # For maksed wmac.
+    ],
+    vals = list(filter(lambda x: x.has_widen_type(), vector_modes)))
+
+  # Same as above, but for widening vector with LMUL 1 (used for reduction
+  # operation).
+  ft.add(
+    arg_list_templates=[
+      # 2 args.
+      # Widening reduction vector operation.
+      ('{W1FT_VEC}', '{W1FT_VEC}', '{W1FT_VEC}', '{FT_VEC}'),
+
+      # 4 args.
+      # Masked widening reduction vector operation.
+      ('{W1FT_VEC}', '{FT_MASK}', '{W1FT_VEC}', '{W1FT_VEC}', '{FT_VEC}'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmul_1_type(), vector_modes)))
+
+  # Prototype for integer vector mode only
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      ('{FT_VEC}', '{FT_VEC}'),
+      ('{FT_VEC}', '{FT_SCALAR}'),
+      ('{FT_SCALAR}', '{FT_VEC}'),
+      ('{FT_VEC}', '{FT_MASK}'),
+      ('{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_U_VEC}', '{FT_I_VEC}'),
+      # 2 args.
+      ('{FT_VEC}', '{FT_VEC}', 'LONG'),
+      ('{FT_I_VEC}', '{FT_I_VEC}', 'UQI'),
+      ('{FT_I_VEC}', '{FT_I_VEC}', '{FT_U_SCALAR}'),
+      ('{FT_U_VEC}', '{FT_U_VEC}', 'UQI'),
+      ('{FT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_MASK}', '{FT_I_VEC}', 'UQI'),
+      ('{FT_MASK}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_MASK}', '{FT_I_VEC}', '{FT_MASK}'),
+
+      # Vector Element Index.
+      ('{FT_U_VEC}', '{FT_MASK}', '{FT_U_VEC}'), # For vid
+      # 3 args.
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_MASK}'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}'),
+
+      ('{FT_VEC}', '{FT_VEC}', '{FT_VEC}', '{FT_MASK}'),
+      ('{FT_MASK}', '{FT_VEC}', '{FT_VEC}', '{FT_MASK}'),
+      ('{FT_VEC}', '{FT_VEC}', '{FT_SCALAR}', '{FT_MASK}'),
+      ('{FT_MASK}', '{FT_VEC}', '{FT_SCALAR}', '{FT_MASK}'),
+
+      # 4 args.
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}', 'LONG'),
+
+      ('{FT_MASK}', '{FT_MASK}', '{FT_MASK}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_MASK}', '{FT_MASK}', '{FT_MASK}', '{FT_I_VEC}', 'UQI'),
+
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{FT_I_VEC}', 'UQI'),
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{FT_I_VEC}', '{FT_U_SCALAR}'), # For masked mulh.
+      # Masked Shift
+      ('{FT_U_VEC}', '{FT_MASK}', '{FT_U_VEC}', '{FT_U_VEC}', 'UQI'),
+    ],
+    vals=int_vector_modes)
+
+  # Same as above, but for widening vector.
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      # Vector Integer Extension
+      ('{WFT_VEC}', '{FT_VEC}'),
+      # 2 args.
+      ('{WFT_I_VEC}', '{FT_I_VEC}', '{FT_U_SCALAR}'),
+      ('{WFT_I_VEC}', '{WFT_I_VEC}', '{FT_U_SCALAR}'),
+      ('{WFT_I_VEC}', '{WFT_I_VEC}', '{FT_U_VEC}'),
+      ('{WFT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+
+      ('{FT_I_VEC}', '{WFT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_I_VEC}', '{WFT_I_VEC}', 'UQI'),
+
+      ('{FT_U_VEC}', '{WFT_U_VEC}', '{FT_U_VEC}'),
+      ('{FT_U_VEC}', '{WFT_U_VEC}', 'UQI'),
+
+      ('{WFT_F_VEC}', '{FT_VEC}'),
+
+      # 3 args.
+      ('{WFT_I_VEC}', '{WFT_I_VEC}', '{FT_U_SCALAR}', '{FT_I_VEC}'),
+      ('{WFT_I_VEC}', '{WFT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{WFT_I_VEC}', '{WFT_I_VEC}', '{FT_SCALAR}', '{FT_U_VEC}'),
+
+      # Maksed Vector Integer Extension
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{FT_VEC}'),
+      ('{WFT_F_VEC}', '{FT_MASK}', '{WFT_F_VEC}', '{FT_VEC}'),
+
+      # 4 args.
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{WFT_VEC}', '{FT_VEC}'),
+      ('{WFT_VEC}', '{FT_MASK}', '{WFT_VEC}', '{WFT_VEC}', '{FT_SCALAR}'),
+
+      ('{WFT_I_VEC}', '{FT_MASK}', '{WFT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{WFT_I_VEC}', '{FT_MASK}', '{WFT_I_VEC}', '{FT_I_VEC}', '{FT_U_SCALAR}'),
+
+      ('{WFT_I_VEC}', '{FT_MASK}', '{WFT_I_VEC}', '{FT_I_SCALAR}', '{FT_U_VEC}'), # For maksed wmac.
+      ('{WFT_I_VEC}', '{FT_MASK}', '{WFT_I_VEC}', '{FT_U_SCALAR}', '{FT_I_VEC}'), # For maksed wmac.
+
+      # Masked Narrowing Vector Arithmetic.
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{WFT_I_VEC}', '{FT_U_VEC}'),
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{WFT_I_VEC}', 'UQI'),
+
+      ('{FT_U_VEC}', '{FT_MASK}', '{FT_U_VEC}', '{WFT_U_VEC}', '{FT_U_VEC}'),
+      ('{FT_U_VEC}', '{FT_MASK}', '{FT_U_VEC}', '{WFT_U_VEC}', 'UQI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_type(), int_vector_modes)))
+
+  # Same as above, but for quad-widening vector.
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      # Vector Integer Extension
+      ('{QFT_VEC}', '{FT_VEC}'),
+      # 2 args.
+      ('{QFT_I_VEC}', '{FT_I_VEC}', '{FT_U_SCALAR}'),
+      ('{QFT_I_VEC}', '{QFT_I_VEC}', '{FT_U_SCALAR}'),
+      ('{QFT_I_VEC}', '{QFT_I_VEC}', '{FT_U_VEC}'),
+      ('{QFT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      # 3 args.
+      ('{QFT_VEC}', '{QFT_VEC}', '{FT_SCALAR}', '{FT_VEC}'),
+      ('{QFT_VEC}', '{QFT_VEC}', '{FT_VEC}', '{FT_VEC}'),
+      ('{QFT_I_VEC}', '{QFT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'),
+      ('{QFT_I_VEC}', '{QFT_I_VEC}', '{FT_I_SCALAR}', '{FT_U_VEC}'),
+      ('{QFT_I_VEC}', '{QFT_I_VEC}', '{FT_U_SCALAR}', '{FT_I_VEC}'),
+
+      # Maksed Vector Integer Extension
+      ('{QFT_VEC}', '{FT_MASK}', '{QFT_VEC}', '{FT_VEC}'),
+
+      # 4 args.
+      ('{QFT_VEC}', '{FT_MASK}', '{QFT_VEC}', '{FT_VEC}', '{FT_VEC}'), # For maksed qmac.
+      ('{QFT_VEC}', '{FT_MASK}', '{QFT_VEC}', '{FT_SCALAR}', '{FT_VEC}'), # For maksed qmac.
+      ('{QFT_I_VEC}', '{FT_MASK}', '{QFT_I_VEC}', '{FT_I_VEC}', '{FT_U_VEC}'), # For maksed qmac.
+      ('{QFT_I_VEC}', '{FT_MASK}', '{QFT_I_VEC}', '{FT_I_SCALAR}', '{FT_U_VEC}'), # For maksed qmac.
+      ('{QFT_I_VEC}', '{FT_MASK}', '{QFT_I_VEC}', '{FT_U_SCALAR}', '{FT_I_VEC}'), # For maksed qmac.
+    ],
+    vals = list(filter(lambda x: x.has_quad_widen_type(), int_vector_modes)))
+
+  # Same as above, but for eightfold-widening vector.
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      # Vector Integer Extension
+      ('{EFT_VEC}', '{FT_VEC}'),
+      # 3 args.
+      # Maksed Vector Integer Extension
+      ('{EFT_VEC}', '{FT_MASK}', '{EFT_VEC}', '{FT_VEC}'),
+    ],
+    vals = list(filter(lambda x: x.has_eightfold_widen_type(), int_vector_modes)))
+
+  # Reinterpret Prototype for integer vector mode only
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      ('{FT_I_VEC}', '{FT_I_XVEC}'),
+      ('{FT_I_VEC}', '{FT_U_XVEC}'),
+      ('{FT_U_VEC}', '{FT_I_XVEC}'),
+      ('{FT_U_VEC}', '{FT_U_XVEC}'),
+    ],
+    vals=int_vector_modes,
+    eew_reinterpret=True)
+
+  # Prototype for floating point vector mode only
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      ('{FT_F_VEC}', '{FT_F_VEC}'),
+      ('{FT_SCALAR}', '{FT_F_VEC}'),
+      ('{FT_F_VEC}', '{FT_SCALAR}'),
+      ('{FT_F_VEC}', '{FT_I_VEC}'),
+      ('{FT_F_VEC}', '{FT_U_VEC}'),
+      ('{FT_I_VEC}', '{FT_F_VEC}'),
+      ('{FT_U_VEC}', '{FT_F_VEC}'),
+
+      # 2 args.
+      ('{FT_F_VEC}', '{FT_F_VEC}', '{FT_U_VEC}'),
+      ('{FT_F_VEC}', '{FT_F_VEC}', '{FT_U_SCALAR}'),
+
+      # 3 args.
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{FT_F_VEC}'),
+      ('{FT_U_VEC}', '{FT_MASK}', '{FT_U_VEC}', '{FT_F_VEC}'),
+
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{FT_F_SCALAR}'),
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{FT_I_VEC}'),
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{FT_U_VEC}'),
+
+      # 4 args.
+      # Vector Register Gather.
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{FT_F_VEC}', '{FT_U_VEC}'),
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{FT_F_VEC}', '{FT_U_SCALAR}'),
+    ],
+    vals=float_vector_modes)
+
+  # Same as above, but for widening vector.
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      # Widening Floating-Point/Integer Type-Convert.
+      ('{WFT_F_VEC}', '{FT_F_VEC}'),
+      ('{WFT_F_VEC}', '{FT_I_VEC}'),
+      ('{WFT_F_VEC}', '{FT_U_VEC}'),
+
+      ('{WFT_I_VEC}', '{FT_F_VEC}'),
+      ('{WFT_U_VEC}', '{FT_F_VEC}'),
+
+      # Narrowing Floating-Point/Integer Type-Convert.
+      ('{FT_F_VEC}', '{WFT_F_VEC}'),
+      ('{FT_F_VEC}', '{WFT_I_VEC}'),
+      ('{FT_F_VEC}', '{WFT_U_VEC}'),
+
+      ('{FT_I_VEC}', '{WFT_F_VEC}'),
+      ('{FT_U_VEC}', '{WFT_F_VEC}'),
+
+      # 3 args.
+      # Masked Widening Floating-Point/Integer Type-Convert.
+      ('{WFT_F_VEC}', '{FT_MASK}', '{WFT_F_VEC}', '{FT_F_VEC}'),
+      ('{WFT_F_VEC}', '{FT_MASK}', '{WFT_F_VEC}', '{FT_I_VEC}'),
+      ('{WFT_F_VEC}', '{FT_MASK}', '{WFT_F_VEC}', '{FT_U_VEC}'),
+
+      ('{WFT_I_VEC}', '{FT_MASK}', '{WFT_I_VEC}', '{FT_F_VEC}'),
+      ('{WFT_U_VEC}', '{FT_MASK}', '{WFT_U_VEC}', '{FT_F_VEC}'),
+
+      # Masked Narrowing Floating-Point/Integer Type-Convert.
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{WFT_I_VEC}'),
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{WFT_U_VEC}'),
+      ('{FT_F_VEC}', '{FT_MASK}', '{FT_F_VEC}', '{WFT_F_VEC}'),
+
+      ('{FT_I_VEC}', '{FT_MASK}', '{FT_I_VEC}', '{WFT_F_VEC}'),
+      ('{FT_U_VEC}', '{FT_MASK}', '{FT_U_VEC}', '{WFT_F_VEC}'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_type(), float_vector_modes)))
+
+  # Reinterpret Prototype for floating point vector mode only
+  ft.add(
+    arg_list_templates=[
+      # 1 args.
+      ('{FT_VEC}', '{FT_XVEC}'),
+    ],
+    vals=float_vector_modes,
+    eew_reinterpret=True)
+
+  # Prototype for vector tuple modes, both for integer and floating point
+  ft.add(
+    arg_list_templates=[
+      # 0 args.
+      ('{FT_VEC_TUPLE}',),
+      # 1 args.
+      ('{FT_VEC_TUPLE}', 'C_{FT_SCALAR}_PTR'), # For vec tuple load
+
+      # 2 args.
+      ('VOID', '{FT_VEC_TUPLE}', '{FT_SCALAR}_PTR'), # For vec tuple store
+
+      ('{FT_VEC}', '{FT_VEC_TUPLE}', 'SI'), # For vec tuple extraction.
+
+      ('{FT_VEC_TUPLE}', 'C_{FT_SCALAR}_PTR', 'PTRDIFF'), # For vec tuple indexed load
+
+      # 3 args.
+      # Vector Tuple Type Insertion
+      ('{FT_VEC_TUPLE}', '{FT_VEC_TUPLE}', '{FT_VEC}', 'SI'),
+
+      # Masked Unit-Stride Segment Load
+      ('{FT_VEC_TUPLE}', '{FT_MASK}', '{FT_VEC_TUPLE}', 'C_{FT_SCALAR}_PTR'),
+
+      # Vector Unit-Stride Segment Store.
+      ('VOID', '{FT_MASK}', '{FT_VEC_TUPLE}', '{FT_SCALAR}_PTR'),
+
+      # Vector Strided Segment Store.
+      ('VOID', '{FT_VEC_TUPLE}', '{FT_SCALAR}_PTR', 'PTRDIFF'),
+
+      # 4 args.
+      # Masked Vector Strided Segment Load.
+      ('{FT_VEC_TUPLE}', '{FT_MASK}', '{FT_VEC_TUPLE}', 'C_{FT_SCALAR}_PTR', 'PTRDIFF'),
+      # Masked Vector Strided Segment Store.
+      ('VOID', '{FT_MASK}', '{FT_VEC_TUPLE}', '{FT_SCALAR}_PTR', 'PTRDIFF'),
+    ],
+    vals=vector_tuple_modes)
+
+  # Prototype for vector modes, both for integer and floating point,
+  # and with EEW
+  ft.add(
+    arg_list_templates=[
+      # 2 args.
+      # Vector Indexed Load.
+      ('{FT_VEC}', 'C_{FT_SCALAR}_PTR', '{FT_INDEX}'),
+      ('{FT_VEC}', '{FT_VEC}', '{FT_INDEX}'),
+
+      # 3 args.
+      # Vector Indexed Store.
+      ('VOID', '{FT_SCALAR}_PTR', '{FT_INDEX}', '{FT_VEC}'),
+
+      # Vector AMO.
+      ('{FT_VEC}', 'C_{FT_SCALAR}_PTR', '{FT_INDEX}', '{FT_VEC}'),
+
+      # 4 args.
+      # Masked Vector Indexed Load.
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', 'C_{FT_SCALAR}_PTR', '{FT_INDEX}'),
+      ('{FT_VEC}', '{FT_MASK}', '{FT_VEC}', '{FT_VEC}', '{FT_INDEX}'),
+
+      # Masked Vector Indexed Store.
+      ('VOID', '{FT_MASK}', '{FT_SCALAR}_PTR', '{FT_INDEX}', '{FT_VEC}'),
+
+      # Masked Vector AMO.
+      ('{FT_VEC}', '{FT_MASK}', 'C_{FT_SCALAR}_PTR', '{FT_INDEX}', '{FT_VEC}'),
+    ],
+    vals=vector_modes,
+    eew_index=True)
+
+  # Prototype for Vector Tuple Type Creation.
+  for nf in NF:
+    args = ['{FT_VEC_TUPLE}'] + (['{FT_VEC}'] * nf)
+    ft.add(
+      arg_list_templates=[
+        tuple(args)
+      ],
+      vals=vector_tuple_modes)
+
+  # Prototype for Vector Indexed Segment Loads and Stores.
+  ft.add(
+    arg_list_templates=[
+      # 2 args.
+      # Vector Indexed Segment Load.
+      ('{FT_VEC_TUPLE}', 'C_{FT_SCALAR}_PTR', '{FT_INDEX}'),
+
+      # 3 args.
+      # Vector Indexed Segment Store.
+      ('VOID', '{FT_VEC_TUPLE}', '{FT_SCALAR}_PTR', '{FT_INDEX}'),
+
+      # 4 args.
+      # Masked Vector Indexed Segment Load.
+      ('{FT_VEC_TUPLE}', '{FT_MASK}', '{FT_VEC_TUPLE}', 'C_{FT_SCALAR}_PTR', '{FT_INDEX}'),
+      # Masked Vector Indexed Segment Store.
+      ('VOID', '{FT_MASK}', '{FT_VEC_TUPLE}', '{FT_SCALAR}_PTR', '{FT_INDEX}'),
+    ],
+    vals=vector_tuple_modes,
+    eew_index=True)
+
+  # Prototype for Vector Insertion and Extraction.
+
+  # Vector Int Insertion.
+  ft.add(
+    arg_list_templates=[
+      ('{W2FT_I_VEC}', '{W2FT_I_VEC}', '{FT_I_VEC}', 'SI'),
+      ('{W2FT_U_VEC}', '{W2FT_U_VEC}', '{FT_U_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), int_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{W4FT_I_VEC}', '{W4FT_I_VEC}', '{FT_I_VEC}', 'SI'),
+      ('{W4FT_U_VEC}', '{W4FT_U_VEC}', '{FT_U_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), int_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{W8FT_I_VEC}', '{W8FT_I_VEC}', '{FT_I_VEC}', 'SI'),
+      ('{W8FT_U_VEC}', '{W8FT_U_VEC}', '{FT_U_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), int_vector_modes)))
+
+  # Vector Float Insertion.
+  ft.add(
+    arg_list_templates=[
+      ('{W2FT_F_VEC}', '{W2FT_F_VEC}', '{FT_F_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), float_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{W4FT_F_VEC}', '{W4FT_F_VEC}', '{FT_F_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), float_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{W8FT_F_VEC}', '{W8FT_F_VEC}', '{FT_F_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), float_vector_modes)))
+
+  # Vector Int Extraction.
+  ft.add(
+    arg_list_templates=[
+      ('{FT_I_VEC}', '{W2FT_I_VEC}', 'SI'),
+      ('{FT_U_VEC}', '{W2FT_U_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), int_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{FT_I_VEC}', '{W4FT_I_VEC}', 'SI'),
+      ('{FT_U_VEC}', '{W4FT_U_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), int_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{FT_I_VEC}', '{W8FT_I_VEC}', 'SI'),
+      ('{FT_U_VEC}', '{W8FT_U_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), int_vector_modes)))
+
+  # Vector Float Extraction.
+  ft.add(
+    arg_list_templates=[
+      ('{FT_F_VEC}', '{W2FT_F_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(2), float_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{FT_F_VEC}', '{W4FT_F_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(4), float_vector_modes)))
+  ft.add(
+    arg_list_templates=[
+      ('{FT_F_VEC}', '{W8FT_F_VEC}', 'SI'),
+    ],
+    vals = list(filter(lambda x: x.has_widen_lmulx(8), float_vector_modes)))
+
+  ft.gen()
+
+def gen(mode, filename):
+  this_script = os.path.abspath(__file__)
+  cwd = os.path.dirname(this_script)
+  py = sys.executable
+  output_path = os.path.join(cwd, filename)
+  subprocess.call([py, this_script, mode],
+                   stdout=open(output_path, 'w'),
+                  cwd=cwd)
+
+if __name__ == '__main__':
+  if sys.argv[1] == '-md':
+    gen_md()
+  elif sys.argv[1] == '-c':
+    gen_c()
+  elif sys.argv[1] == '-ftype':
+    gen_ftype()
+  elif sys.argv[1] == '-usr-c':
+    gen_usr_c()
+  elif sys.argv[1] == '-all':
+    gen('-md', 'vector-iterator.md')
+    gen('-c', 'riscv-vector-iterator.h')
+    gen('-ftype', 'riscv-vector-ftypes.def')
+    gen('-usr-c', 'riscv_vector_itr.h')
+  else:
+    print ("Usage: %s [-md|-c|-ftype|-usr-c|-all]" % sys.argv[0])
+    sys.exit(1)

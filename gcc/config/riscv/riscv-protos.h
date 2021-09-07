@@ -64,7 +64,7 @@ extern rtx riscv_legitimize_call_address (rtx);
 extern void riscv_set_return_address (rtx, rtx);
 extern bool riscv_expand_block_move (rtx, rtx, rtx);
 extern rtx riscv_return_addr (int, rtx);
-extern HOST_WIDE_INT riscv_initial_elimination_offset (int, int);
+extern poly_int64 riscv_initial_elimination_offset (int, int);
 extern void riscv_expand_prologue (void);
 extern void riscv_expand_epilogue (int);
 extern bool riscv_epilogue_uses (unsigned int);
@@ -74,6 +74,11 @@ extern bool riscv_expand_block_move (rtx, rtx, rtx);
 extern bool riscv_store_data_bypass_p (rtx_insn *, rtx_insn *);
 extern rtx riscv_gen_gpr_save_insn (struct riscv_frame_info *);
 extern bool riscv_gpr_save_operation_p (rtx);
+
+/* Routines for vector support.  */
+bool riscv_const_vec_all_same_in_range_p (rtx, HOST_WIDE_INT, HOST_WIDE_INT);
+extern poly_uint64 riscv_regmode_natural_size (machine_mode);
+extern void riscv_expand_vtuple_create (rtx *);
 
 /* Routines implemented in riscv-c.c.  */
 void riscv_cpu_cpp_builtins (cpp_reader *);
@@ -93,6 +98,9 @@ extern std::string riscv_arch_str (bool version_p = true);
 extern bool riscv_hard_regno_rename_ok (unsigned, unsigned);
 
 rtl_opt_pass * make_pass_shorten_memrefs (gcc::context *ctxt);
+
+/* Routines for vector tuple types.  */
+extern int riscv_get_nf (machine_mode);
 
 /* Information about one CPU we know about.  */
 struct riscv_cpu_info {

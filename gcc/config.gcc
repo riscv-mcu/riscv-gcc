@@ -527,7 +527,7 @@ riscv*)
 	cpu_type=riscv
 	extra_headers="rvp_intrinsic.h"
 	extra_objs="riscv-builtins.o riscv-c.o riscv-sr.o riscv-shorten-memrefs.o"
-	extra_headers="rvintrin.h"
+	extra_headers="rvintrin.h riscv_vector.h riscv_vector_itr.h"
 	d_target_objs="riscv-d.o"
 	;;
 rs6000*-*-*)
