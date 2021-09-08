@@ -3210,7 +3210,8 @@ riscv_prepare_builtin_arg (struct expand_operand *op, tree exp, unsigned argno,
       !(*insn_data[icode].operand[argno + has_target_p].predicate) (arg_rtx, mode))
     {
       rtx tmp_rtx = gen_reg_rtx (mode);
-      if (GET_MODE_SIZE (mode) < GET_MODE_SIZE (GET_MODE (arg_rtx)))
+      if (GET_MODE_SIZE (mode).to_constant() <
+	  GET_MODE_SIZE (GET_MODE (arg_rtx)).to_constant())
 	{
 	  tmp_rtx = simplify_gen_subreg (mode, arg_rtx, GET_MODE (arg_rtx), 0);
 	  arg_rtx = tmp_rtx;
@@ -3218,13 +3219,13 @@ riscv_prepare_builtin_arg (struct expand_operand *op, tree exp, unsigned argno,
       else if (VECTOR_MODE_P (mode) && CONST_INT_P (arg_rtx))
 	{
 	  /* Handle CONST_INT covert to CONST_VECTOR.  */
-	  int nunits = GET_MODE_NUNITS (mode);
+	  int nunits = GET_MODE_NUNITS (mode).to_constant();
 	  int i, shift = 0;
 
 	  rtvec v = rtvec_alloc (nunits);
 	  HOST_WIDE_INT val = INTVAL (arg_rtx);
 	  enum machine_mode val_mode = GET_MODE_INNER (mode);
-	  int shift_acc = GET_MODE_BITSIZE (val_mode);
+	  int shift_acc = GET_MODE_BITSIZE (val_mode).to_constant();
 	  unsigned HOST_WIDE_INT mask = GET_MODE_MASK (val_mode);
 	  HOST_WIDE_INT tmp_val = val;
 	  for (i = 0; i < nunits; i++)

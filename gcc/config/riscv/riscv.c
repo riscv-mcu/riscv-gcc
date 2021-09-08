@@ -119,8 +119,10 @@ struct GTY(())  riscv_frame_info {
   poly_int64 gp_sp_offset;
   poly_int64 fp_sp_offset;
 
+  HOST_WIDE_INT min_first_step;
+
   /* Offset of virtual frame pointer from stack pointer/frame bottom */
-  HOST_WIDE_INT frame_pointer_offset;
+  poly_int64 frame_pointer_offset;
 
   /* Offset of hard frame pointer from stack pointer/frame bottom */
   poly_int64 hard_frame_pointer_offset;
@@ -3049,7 +3051,7 @@ riscv_get_arg_info (struct riscv_arg_info *info, const CUMULATIVE_ARGS *cum,
     }
 
   /* Work out the size of the argument.  */
-  num_bytes = type ? int_size_in_bytes (type) : GET_MODE_SIZE (mode);
+  num_bytes = type ? int_size_in_bytes (type) : GET_MODE_SIZE (mode).to_constant();
   num_words = (num_bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
   /* Doubleword-aligned varargs start on an even register boundary.  */
@@ -4654,7 +4656,7 @@ riscv_expand_epilogue (int style)
     }
 
   /* Set TARGET to BASE + STEP1.  */
-  if (known_gt (step1, 0)
+  if (known_gt (step1, 0))
     {
       /* Emit a barrier to prevent loads from a deallocated stack.  */
       riscv_emit_stack_tie ();
@@ -5371,6 +5373,7 @@ riscv_conditional_register_usage (void)
     {
       for (int regno = VECT_REG_FIRST; regno <= VECT_REG_LAST; regno++)
 	      fixed_regs[regno] = call_used_regs[regno] = 1;
+    }
 }
 
 /* Return a register priority for hard reg REGNO.  */
@@ -5688,8 +5691,6 @@ riscv_promote_function_mode (const_tree type ATTRIBUTE_UNUSED,
 			     const_tree fntype ATTRIBUTE_UNUSED,
 			     int for_return ATTRIBUTE_UNUSED)
 {
-  int unsignedp;
-
   if (type != NULL_TREE)
     return promote_mode (type, mode, punsignedp);
 
@@ -5737,6 +5738,9 @@ riscv_vector_mode_supported_p (enum machine_mode mode)
       || mode == V4HImode
       || mode == V2SImode)
     return TARGET_ZPN && TARGET_64BIT;
+
+  if (TARGET_VECTOR && riscv_vector_mode (mode))
+    return true;
 
   return false;
 }
@@ -6101,17 +6105,6 @@ riscv_floatn_mode (int n, bool extended)
     return HFmode;
 
   return default_floatn_mode (n, extended);
-}
-
-/* Implement TARGET_VECTOR_MODE_SUPPORTED_P.  */
-
-static bool
-riscv_vector_mode_supported_p (machine_mode mode)
-{
-  if (TARGET_VECTOR && riscv_vector_mode (mode))
-    return true;
-
-  return false;
 }
 
 /* Implement TARGET_VECTORIZE_PREFERRED_SIMD_MODE.  */

@@ -274,7 +274,7 @@ ASM_MISA_SPEC
    - 30 unused registers for future expansion
    - 32 vector registers */
 
-#define FIRST_PSEUDO_REGISTER 66
+#define FIRST_PSEUDO_REGISTER 128
 
 /* x0, sp, gp, and tp are fixed.  */
 
@@ -484,7 +484,7 @@ enum reg_class
   { 0x00000000, 0x00000000, 0x00000000, 0xfffffffe },	/* VECTOR_REGS */\
   { 0x00000000, 0x00000000, 0x00000000, 0xffffffff },	/* VECTOR_REGS */\
   { 0x00000000, 0x00000000, 0x00000008, 0x00000000 },	/* VTYPE_REGS */\
-  { 0xffffffff, 0xffffffff, 0x0000000f, 0xffffffff }	/* ALL_REGS */		\
+  { 0xffffffff, 0xffffffff, 0x0000000f, 0xffffffff }	/* ALL_REGS */\
 }
 
 /* A C expression whose value is a register class containing hard
@@ -532,7 +532,7 @@ enum reg_class
   96,									\
   /* None of the remaining classes have defined call-saved		\
      registers.  */							\
-  64, 65, 66, 67								\
+  64, 65, 66, 67							\
 }
 
 /* True if VALUE is a signed 12-bit number.  */
