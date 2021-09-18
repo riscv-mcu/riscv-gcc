@@ -3,4 +3,4 @@
 int foo()
 {
 }
-/* { dg-error ".'-march=rv32im_s': name of supervisor extension must be more than 1 char" "" { target *-*-* } 0 } */
+/* { dg-error ".'-march=rv32im_s': name of supervisor extension must be more than 1 letter" "" { target *-*-* } 0 } */
