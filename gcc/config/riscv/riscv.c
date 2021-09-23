@@ -3644,6 +3644,34 @@ riscv_print_operand (FILE *file, rtx op, int letter)
 	break;
       }
 
+    case 'v':
+      {
+	rtx elt;
+	if (!const_vec_duplicate_p (op, &elt))
+	  output_operand_lossage ("invalid vector constant");
+	else if (GET_MODE_CLASS (GET_MODE (op)) == MODE_VECTOR_INT)
+	  asm_fprintf (file, "%wd", INTVAL (elt));
+	else
+	  output_operand_lossage ("invalid vector constant");
+      }
+      break;
+
+    case 'V':
+      {
+	rtx elt;
+	if (!const_vec_duplicate_p (op, &elt))
+	  output_operand_lossage ("invalid vector constant");
+	else if (GET_MODE_CLASS (GET_MODE (op)) == MODE_VECTOR_INT)
+	  asm_fprintf (file, "%wd", -INTVAL (elt));
+	else
+	  output_operand_lossage ("invalid vector constant");
+      }
+      break;
+
+    case 'B':
+      fputs (GET_RTX_NAME (code), file);
+      break;
+
     default:
       switch (code)
 	{
@@ -3660,33 +3688,19 @@ riscv_print_operand (FILE *file, rtx op, int letter)
 	    output_address (mode, XEXP (op, 0));
 	  break;
 
-  case 'v':
-    {
-	  rtx elt;
-	  if (!const_vec_duplicate_p (op, &elt))
-	    output_operand_lossage ("invalid vector constant");
-	  else if (GET_MODE_CLASS (GET_MODE (op)) == MODE_VECTOR_INT)
-	    asm_fprintf (file, "%wd", INTVAL (elt));
-	  else
-	    output_operand_lossage ("invalid vector constant");
-    }
-    break;
+	case CONST_VECTOR:
+	  {
+	    rtx imm;
 
-  case 'V':
-    {
-	  rtx elt;
-	  if (!const_vec_duplicate_p (op, &elt))
-	    output_operand_lossage ("invalid vector constant");
-	  else if (GET_MODE_CLASS (GET_MODE (op)) == MODE_VECTOR_INT)
-	    asm_fprintf (file, "%wd", -INTVAL (elt));
-	  else
-	    output_operand_lossage ("invalid vector constant");
-    }
-    break;
+	    if (!const_vec_duplicate_p (op, &imm)) {
+	      output_operand_lossage ("invalid immediate value for vector");
+	      break;
+	    }
 
-  case 'B':
-    fputs (GET_RTX_NAME (code), file);
-    break;
+	    gcc_assert (CONST_INT_P (imm));
+	    asm_fprintf (file, "%wd", INTVAL (imm));
+	    break;
+	  }
 
 	default:
 	  if (letter == 'z' && op == CONST0_RTX (GET_MODE (op)))
@@ -6325,7 +6339,7 @@ riscv_verify_type_context (location_t loc, type_context_kind context,
 #undef TARGET_MANGLE_TYPE
 #define TARGET_MANGLE_TYPE riscv_mangle_type
 
-#undef TARGET_SCALAR_MODE_SUPPORTED_Pv
+#undef TARGET_SCALAR_MODE_SUPPORTED_P
 #define TARGET_SCALAR_MODE_SUPPORTED_P riscv_scalar_mode_supported_p
 
 #undef TARGET_LIBGCC_FLOATING_MODE_SUPPORTED_P

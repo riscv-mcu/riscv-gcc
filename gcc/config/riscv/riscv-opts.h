@@ -92,14 +92,13 @@ enum riscv_rvv_vector_bits_enum {
 #define MASK_ZKT      (1 << 9)
 
 /* P extension subset */
-#define MASK_ZPN (1 << 0)
+#define MASK_ZPN  (1 << 0)
 #define MASK_ZPRV (1 << 1)
 #define MASK_ZPSF (1 << 2)
 
 /* V extension subset */
-#define MASK_ZVAMO  (1 << 0)
+#define MASK_ZVAMO   (1 << 0)
 #define MASK_ZVLSSEG (1 << 1)
-#define MASK_ZVQMAC (1 << 2)
 
 #define TARGET_ZICSR    ((riscv_zi_subext & MASK_ZICSR) != 0)
 #define TARGET_ZIFENCEI ((riscv_zi_subext & MASK_ZIFENCEI) != 0)
@@ -124,8 +123,6 @@ enum riscv_rvv_vector_bits_enum {
 #define TARGET_ZPRV ((riscv_rvp_subext & MASK_ZPRV) != 0)
 #define TARGET_ZPSF ((riscv_rvp_subext & MASK_ZPSF) != 0)
 
-#define TARGET_ZVAMO   ((riscv_rvv_subext & MASK_ZVAMO) != 0)
-#define TARGET_ZVLSSEG ((riscv_rvv_subext & MASK_ZVLSSEG) != 0)
-#define TARGET_ZVQMAC  ((riscv_rvv_subext & MASK_ZVQMAC) != 0)
+#define TARGET_VECTOR   (((riscv_rvv_subext & MASK_ZVAMO) != 0) && ((riscv_rvv_subext & MASK_ZVLSSEG) != 0))
 
 #endif /* ! GCC_RISCV_OPTS_H */

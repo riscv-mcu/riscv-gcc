@@ -164,11 +164,7 @@ Mask(RVC)
 
 Mask(RVE)
 
-Mask(BITMANIP)
-
 Mask(RVP)
-
-Mask(VECTOR)
 
 Mask(RVZFH)
 

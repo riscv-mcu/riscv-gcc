@@ -104,6 +104,6 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
       break;
     }
 
-    if (TARGET_VECTOR)
-      builtin_define ("__riscv_vector");
+  if (TARGET_VECTOR)
+    builtin_define ("__riscv_vector");
 }
