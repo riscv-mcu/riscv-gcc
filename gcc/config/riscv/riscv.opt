@@ -156,6 +156,8 @@ Mask(MUL)
 
 Mask(ATOMIC)
 
+Mask(BITMANIP)
+
 Mask(HARD_FLOAT)
 
 Mask(DOUBLE_FLOAT)

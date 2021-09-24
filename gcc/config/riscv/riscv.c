@@ -2811,11 +2811,11 @@ riscv_flatten_aggregate_field (const_tree type,
     default:
       if (n < 2
 	  && ((SCALAR_FLOAT_TYPE_P (type)
-	       && GET_MODE_SIZE (TYPE_MODE (type)).to_constant ()
-            <= UNITS_PER_FP_ARG)
+	       && (GET_MODE_SIZE (TYPE_MODE (type)).to_constant ()
+            <= UNITS_PER_FP_ARG))
 	      || (INTEGRAL_TYPE_P (type)
-		  && GET_MODE_SIZE (TYPE_MODE (type)).to_constant ()
-         <= UNITS_PER_WORD)))
+		  && (GET_MODE_SIZE (TYPE_MODE (type)).to_constant ()
+         <= UNITS_PER_WORD))))
 	{
 	  fields[n].type = type;
 	  fields[n].offset = offset;
@@ -3051,7 +3051,7 @@ riscv_get_arg_info (struct riscv_arg_info *info, const CUMULATIVE_ARGS *cum,
     }
 
   /* Work out the size of the argument.  */
-  num_bytes = type ? int_size_in_bytes (type) : GET_MODE_SIZE (mode).to_constant();
+  num_bytes = (type ? int_size_in_bytes (type) : GET_MODE_SIZE (mode).to_constant());
   num_words = (num_bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
   /* Doubleword-aligned varargs start on an even register boundary.  */
@@ -4264,7 +4264,7 @@ riscv_restore_reg (rtx reg, rtx mem)
    try to pick a value that will allow compression of the register saves
    without adding extra instructions.  
    
-   First stack step always step a costant range. */
+   First stack step always step a costant range.  */
 
 static HOST_WIDE_INT
 riscv_first_stack_step (struct riscv_frame_info *frame)
@@ -4683,7 +4683,7 @@ riscv_expand_epilogue (int style)
 	    riscv_adjust_frame (stack_pointer_rtx, adj_offset);
 	    step1 -= adj_offset;
 	    }
-      
+      {
 	    HOST_WIDE_INT step1_val = step1.to_constant ();
 	    /* Get an rtx for STEP1 that we can add to BASE.  */
 	    rtx adjust = GEN_INT (step1_val);
@@ -4704,7 +4704,7 @@ riscv_expand_epilogue (int style)
       RTX_FRAME_RELATED_P (insn) = 1;
 
       REG_NOTES (insn) = dwarf;
-      
+      }
     }
   else if (frame_pointer_needed)
     {
@@ -5738,27 +5738,6 @@ riscv_hard_regno_rename_ok (unsigned from_regno ATTRIBUTE_UNUSED,
   return !cfun->machine->interrupt_handler_p || df_regs_ever_live_p (to_regno);
 }
 
-bool
-riscv_vector_mode_supported_p (enum machine_mode mode)
-{
-  /* a few instructions(e.g. kdmabb) in RV64P also supports V2HI */
-  if (mode == V2HImode)
-    return TARGET_ZPN;
-
-  if (mode == V4QImode)
-    return TARGET_ZPN && !TARGET_64BIT;
-
-  if (mode == V8QImode
-      || mode == V4HImode
-      || mode == V2SImode)
-    return TARGET_ZPN && TARGET_64BIT;
-
-  if (TARGET_VECTOR && riscv_vector_mode (mode))
-    return true;
-
-  return false;
-}
-
 /* Implement TARGET_NEW_ADDRESS_PROFITABLE_P.  */
 
 bool
@@ -5927,6 +5906,27 @@ riscv_floatn_mode (int n, bool extended)
     return HFmode;
 
   return default_floatn_mode (n, extended);
+}
+
+bool
+riscv_vector_mode_supported_p (enum machine_mode mode)
+{
+  /* a few instructions(e.g. kdmabb) in RV64P also supports V2HI */
+  if (mode == V2HImode)
+    return TARGET_ZPN;
+
+  if (mode == V4QImode)
+    return TARGET_ZPN && !TARGET_64BIT;
+
+  if (mode == V8QImode
+      || mode == V4HImode
+      || mode == V2SImode)
+    return TARGET_ZPN && TARGET_64BIT;
+
+  if (TARGET_VECTOR && riscv_vector_mode (mode))
+    return true;
+
+  return false;
 }
 
 /* Implement TARGET_VECTORIZE_PREFERRED_SIMD_MODE.  */

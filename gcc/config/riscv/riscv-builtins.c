@@ -307,10 +307,10 @@ tree uint_xlen_node;
 tree int_xlen_node;
 /* Argument types.  */
 #define RISCV_ATYPE_VOID void_type_node
-#define RISCV_ATYPE_UQI unsigned_intQI_type_node
-#define RISCV_ATYPE_UHI unsigned_intHI_type_node
-#define RISCV_ATYPE_USI unsigned_intSI_type_node
-#define RISCV_ATYPE_UDI unsigned_intDI_type_node
+#define RISCV_ATYPE_UQI unsigned_int8_type_node
+#define RISCV_ATYPE_UHI unsigned_int16_type_node
+#define RISCV_ATYPE_USI unsigned_int32_type_node
+#define RISCV_ATYPE_UDI unsigned_int64_type_node
 #define RISCV_ATYPE_QI intQI_type_node
 #define RISCV_ATYPE_HI intHI_type_node
 #define RISCV_ATYPE_SI intSI_type_node
@@ -326,6 +326,7 @@ tree int_xlen_node;
 #define RISCV_ATYPE_PULLONG build_pointer_type (long_long_unsigned_type_node)
 #define RISCV_ATYPE_TI intTI_type_node
 #define RISCV_ATYPE_UTI unsigned_intTI_type_node
+#define RISCV_ATYPE_PTRDIFF ptrdiff_type_node
 #define RISCV_ATYPE_V4QI build_vector_type (intQI_type_node, 4)
 #define RISCV_ATYPE_UV4QI build_vector_type (unsigned_intQI_type_node, 4)
 #define RISCV_ATYPE_V8QI build_vector_type (intQI_type_node, 8)
@@ -340,8 +341,6 @@ tree int_xlen_node;
 #define RISCV_ATYPE_UV4SI build_vector_type (unsigned_intSI_type_node, 4)
 #define RISCV_ATYPE_V8HI build_vector_type (intHI_type_node, 8)
 #define RISCV_ATYPE_UV8HI build_vector_type (unsigned_intHI_type_node, 8)
-
-#define RISCV_ATYPE_PTRDIFF ptrdiff_type_node
 
 #define RISCV_ATYPE_QI_PTR intQI_ptr_type_node
 #define RISCV_ATYPE_HI_PTR intHI_ptr_type_node
