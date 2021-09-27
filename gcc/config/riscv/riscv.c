@@ -5923,6 +5923,9 @@ riscv_vector_mode_supported_p (enum machine_mode mode)
       || mode == V2SImode)
     return TARGET_ZPN && TARGET_64BIT;
 
+  if (mode == V8HImode || mode == V4SImode)
+    return false;
+
   if (TARGET_VECTOR && riscv_vector_mode (mode))
     return true;
 
