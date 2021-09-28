@@ -103,6 +103,7 @@ rtl_opt_pass * make_pass_shorten_memrefs (gcc::context *ctxt);
 
 /* Routines for vector tuple types.  */
 extern int riscv_get_nf (machine_mode);
+extern int riscv_get_lmul (machine_mode);
 
 /* Information about one CPU we know about.  */
 struct riscv_cpu_info {
