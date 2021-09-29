@@ -168,8 +168,6 @@ Mask(RVE)
 
 Mask(RVP)
 
-Mask(RVZFH)
-
 mriscv-attribute
 Target Report Var(riscv_emit_attribute_p) Init(-1)
 Emit RISC-V ELF attribute.
@@ -202,6 +200,9 @@ int riscv_rvv_subext
 
 TargetVariable
 int riscv_zi_subext
+
+TargetVariable
+int riscv_zfh_subext
 
 Enum
 Name(isa_spec_class) Type(enum riscv_isa_spec_class)

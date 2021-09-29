@@ -1046,7 +1046,7 @@ extern void riscv_remove_unneeded_save_restore_calls (void);
 
 #define HARD_REGNO_RENAME_OK(FROM, TO) riscv_hard_regno_rename_ok (FROM, TO)
 
-#define TARGET_FP16 TARGET_RVZFH
+#define TARGET_FP16 TARGET_ZFH
 
 #ifndef USED_FOR_TARGET
 extern poly_uint16 riscv_rvv_chunks;

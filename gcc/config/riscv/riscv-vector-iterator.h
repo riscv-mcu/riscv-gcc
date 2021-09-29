@@ -2012,3 +2012,4 @@
   MACRO (16, 1, 8, 16, H, h, VNx8x8H, vnx8x8h, __VA_ARGS__) \
   MACRO (32, 1, 8, 32, S, s, VNx8x4S, vnx8x4s, __VA_ARGS__) \
   MACRO (64, 1, 8, 64, D, d, VNx8x2D, vnx8x2d, __VA_ARGS__) \
+

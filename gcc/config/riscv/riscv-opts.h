@@ -75,6 +75,8 @@ enum riscv_rvv_vector_bits_enum {
 #define MASK_ZICSR    (1 << 0)
 #define MASK_ZIFENCEI (1 << 1)
 
+#define MASK_ZFH (1 << 2)
+
 #define MASK_ZBA (1 << 0)
 #define MASK_ZBB (1 << 1)
 #define MASK_ZBC (1 << 2)
@@ -102,6 +104,8 @@ enum riscv_rvv_vector_bits_enum {
 
 #define TARGET_ZICSR    ((riscv_zi_subext & MASK_ZICSR) != 0)
 #define TARGET_ZIFENCEI ((riscv_zi_subext & MASK_ZIFENCEI) != 0)
+
+#define TARGET_ZFH ((riscv_zfh_subext & MASK_ZFH) != 0)
 
 #define TARGET_ZBA ((riscv_bitmanip_subext & MASK_ZBA) != 0)
 #define TARGET_ZBB ((riscv_bitmanip_subext & MASK_ZBB) != 0)

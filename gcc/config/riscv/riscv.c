@@ -5912,18 +5912,22 @@ bool
 riscv_vector_mode_supported_p (enum machine_mode mode)
 {
   /* a few instructions(e.g. kdmabb) in RV64P also supports V2HI */
-  if (mode == V2HImode)
-    return TARGET_ZPN;
+  if (TARGET_ZPN && mode == V2HImode)
+    return true;
 
-  if (mode == V4QImode)
-    return TARGET_ZPN && !TARGET_64BIT;
+  if (TARGET_ZPN && !TARGET_64BIT && mode == V4QImode)
+    return true;
 
-  if (mode == V8QImode
+  if (TARGET_ZPN && TARGET_64BIT && (mode == V8QImode
       || mode == V4HImode
-      || mode == V2SImode)
-    return TARGET_ZPN && TARGET_64BIT;
+      || mode == V2SImode))
+    return true;
 
-  if (mode == V8HImode || mode == V4SImode)
+  if ((mode == V16QImode
+      || mode == V8HImode
+      || mode == V4SImode
+      || mode == V2DImode)
+      && TARGET_64BIT)
     return false;
 
   if (TARGET_VECTOR && riscv_vector_mode (mode))

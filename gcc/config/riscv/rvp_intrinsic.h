@@ -16,17 +16,6 @@ along with GCC; see the file COPYING3.  If not see
 #ifndef _RISCV_RVP_INTRINSIC_H
 #define _RISCV_RVP_INTRINSIC_H
 
-typedef signed char int8x4_t __attribute ((vector_size(4)));
-typedef signed char int8x8_t __attribute ((vector_size(8)));
-typedef short int16x2_t __attribute ((vector_size(4)));
-typedef short int16x4_t __attribute__((vector_size (8)));
-typedef int int32x2_t __attribute__((vector_size(8)));
-typedef unsigned char uint8x4_t __attribute__ ((vector_size (4)));
-typedef unsigned char uint8x8_t __attribute__ ((vector_size (8)));
-typedef unsigned short uint16x2_t __attribute__ ((vector_size (4)));
-typedef unsigned short uint16x4_t __attribute__((vector_size (8)));
-typedef unsigned int uint32x2_t __attribute__((vector_size(8)));
-
 // zpn
 #define __rv__add16(a, b) \
   (__builtin_riscv_add16 ((a), (b)))
