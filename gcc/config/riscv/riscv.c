@@ -5033,7 +5033,7 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
 	    && GET_MODE_UNIT_SIZE (mode) > UNITS_PER_FP_ARG))
 	      return false;
     }
-    else if (VECT_REG_P (regno))
+  else if (VECT_REG_P (regno))
     {
       int align = -1;
       if (!VECT_REG_P (regno + nregs -1))
