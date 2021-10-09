@@ -5931,7 +5931,7 @@ riscv_floatn_mode (int n, bool extended)
 bool
 riscv_vector_mode_supported_p (enum machine_mode mode)
 {
-  if (riscv_rvp_support_vector_mode_p (mode) && !TARGET_VECTOR)
+  if (riscv_rvp_support_vector_mode_p (mode))
     return true;
 
   if ((mode == V16QImode
@@ -5941,7 +5941,7 @@ riscv_vector_mode_supported_p (enum machine_mode mode)
       && TARGET_64BIT)
     return false;
 
-  if (TARGET_VECTOR && !TARGET_ZPN && riscv_vector_mode (mode))
+  if (TARGET_VECTOR && riscv_vector_mode (mode))
     return true;
 
   return false;
