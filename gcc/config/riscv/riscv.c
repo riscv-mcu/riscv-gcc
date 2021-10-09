@@ -4980,6 +4980,24 @@ riscv_hard_regno_nregs (unsigned int regno, machine_mode mode)
   return CEIL (constant_size, UNITS_PER_WORD);
 }
 
+static bool
+riscv_rvp_support_vector_mode_p (machine_mode mode)
+{
+  if (!TARGET_ZPN)
+    return false;
+
+  /* a few instructions(e.g. kdmabb, smulx) in RV64P also support V2HI, V4QI */
+  if (mode == V2HImode || mode == V4QImode)
+    return true;
+
+  if (TARGET_64BIT && (mode == V8QImode
+      || mode == V4HImode
+      || mode == V2SImode))
+    return true;
+
+  return false;
+}
+
 /* Implement TARGET_HARD_REGNO_MODE_OK.  */
 
 static bool
@@ -5911,16 +5929,7 @@ riscv_floatn_mode (int n, bool extended)
 bool
 riscv_vector_mode_supported_p (enum machine_mode mode)
 {
-  /* a few instructions(e.g. kdmabb) in RV64P also supports V2HI */
-  if (TARGET_ZPN && !TARGET_VECTOR && mode == V2HImode)
-    return true;
-
-  if (TARGET_ZPN && !TARGET_64BIT && !TARGET_VECTOR && mode == V4QImode)
-    return true;
-
-  if (TARGET_ZPN && TARGET_64BIT && !TARGET_VECTOR && (mode == V8QImode
-      || mode == V4HImode
-      || mode == V2SImode))
+  if (riscv_rvp_support_vector_mode_p (mode) && !TARGET_VECTOR)
     return true;
 
   if ((mode == V16QImode
