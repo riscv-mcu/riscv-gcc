@@ -5007,10 +5007,12 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
 
   if (GP_REG_P (regno))
     {
-      if (!GP_REG_P (regno + nregs - 1))
+      if (!GP_REG_P (regno + nregs - 1)
+          && !riscv_rvp_support_vector_mode_p (mode))
 	      return false;
 
-      if (VECTOR_MODE_P (mode))
+      if (VECTOR_MODE_P (mode)
+          && !riscv_rvp_support_vector_mode_p (mode))
 	      return false;
     }
   else if (FP_REG_P (regno))
