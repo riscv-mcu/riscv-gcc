@@ -4934,15 +4934,19 @@ riscv_register_move_cost (machine_mode mode,
 /* Implement TARGET_HARD_REGNO_NREGS.  */
 
 static bool
-riscv_vector_mode (machine_mode mode)
+riscv_rvv_support_vector_mode_p (machine_mode mode)
 {
   scalar_mode inner = GET_MODE_INNER (mode);
+
+  if (riscv_rvp_support_vector_mode_p (mode))
+    return false;
+
   if (VECTOR_MODE_P (mode)
       && (inner == BImode
 	  || inner == QImode
 	  || inner == HImode
-	  || inner == HFmode
 	  || inner == SImode
+	  || inner == HFmode
 	  || inner == SFmode
 	  || inner == DImode
 	  || inner == DFmode))
@@ -4956,14 +4960,14 @@ riscv_hard_regno_nregs (unsigned int regno, machine_mode mode)
 {
   /* mode for VL or VTYPE are just a marker, not holding value,
      so it always consume one register.  */
-  if (riscv_vector_mode (mode) &&
+  if (riscv_rvv_support_vector_mode_p (mode) &&
       (regno == VL_REGNUM || regno == VTYPE_REGNUM))
     return 1;
 
   /* riscv_hard_regno_mode_ok calls here first, so we must accept vector
      modes in any register, but the result won't be used for non-vector
      registers.  */
-  if (riscv_vector_mode (mode)){
+  if (riscv_rvv_support_vector_mode_p (mode)){
     /* Handle fractional LMUL, it only occupy part of vector register but still
        need one vector register to hold.  */
     if (maybe_lt (GET_MODE_SIZE (mode), BYTES_PER_RVV_VECTOR))
@@ -4986,20 +4990,18 @@ riscv_hard_regno_nregs (unsigned int regno, machine_mode mode)
   return CEIL (constant_size, UNITS_PER_WORD);
 }
 
-static bool
+bool
 riscv_rvp_support_vector_mode_p (machine_mode mode)
 {
-  if (!TARGET_ZPN)
-    return false;
-
   /* a few instructions(e.g. kdmabb, smulx) in RV64P also support V2HI, V4QI */
-  if (mode == V2HImode || mode == V4QImode)
-    return true;
+  if (mode == V2HImode
+	|| mode == V4QImode
+	|| mode == V2SImode)
+	  return true;
 
   if (TARGET_64BIT && (mode == V8QImode
-      || mode == V4HImode
-      || mode == V2SImode))
-    return true;
+	  || mode == V4HImode))
+	  return true;
 
   return false;
 }
@@ -5014,11 +5016,11 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
   if (GP_REG_P (regno))
     {
       if (!GP_REG_P (regno + nregs - 1)
-          && !riscv_rvp_support_vector_mode_p (mode))
+          && !(TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode)))
 	      return false;
 
       if (VECTOR_MODE_P (mode)
-          && !riscv_rvp_support_vector_mode_p (mode))
+          && !(TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode)))
 	      return false;
     }
   else if (FP_REG_P (regno))
@@ -5937,7 +5939,7 @@ riscv_floatn_mode (int n, bool extended)
 bool
 riscv_vector_mode_supported_p (enum machine_mode mode)
 {
-  if (riscv_rvp_support_vector_mode_p (mode))
+  if (TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode))
     return true;
 
   if ((mode == V16QImode
@@ -5947,7 +5949,7 @@ riscv_vector_mode_supported_p (enum machine_mode mode)
       && TARGET_64BIT)
     return false;
 
-  if (TARGET_VECTOR && riscv_vector_mode (mode))
+  if (TARGET_VECTOR && riscv_rvv_support_vector_mode_p (mode))
     return true;
 
   return false;

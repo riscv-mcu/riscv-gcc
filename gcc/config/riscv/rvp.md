@@ -7012,7 +7012,7 @@
 (define_expand "movv2si"
   [(set (match_operand:V2SI 0 "")
 	(match_operand:V2SI 1 ""))]
-  "TARGET_64BIT && TARGET_ZPN "
+  "TARGET_ZPN "
 {
   if (riscv_legitimize_move (V2SImode, operands[0], operands[1]))
     DONE;
@@ -7021,7 +7021,7 @@
 (define_insn "*movv2si_64bit"
   [(set (match_operand:V2SI 0 "nonimmediate_operand" "=r,r,r, m,  *f,*f,*r,*f,*m")
 	(match_operand:V2SI 1 "move_operand"         " r,T,m,rJ,*r*J,*m,*f,*f,*f"))]
-  "TARGET_64BIT && TARGET_ZPN
+  "TARGET_ZPN
    && (register_operand (operands[0], V2SImode)
        || reg_or_0_operand (operands[1], V2SImode))"
   { return riscv_output_move (operands[0], operands[1]); }

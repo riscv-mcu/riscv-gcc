@@ -241,14 +241,14 @@ DECL_CHECKER(vector_tuple_extract)
    are as for RISCV_BUILTIN.  */
 #define DIRECT_BUILTIN_NO_PREFIX(INSN, NAME, FUNCTION_TYPE, AVAIL)			\
   { CODE_FOR_ ## INSN, "__builtin_riscv_" # NAME,			\
-    RISCV_BUILTIN_DIRECT, FUNCTION_TYPE, riscv_builtin_avail_ ## AVAIL }
+    RISCV_BUILTIN_DIRECT, FUNCTION_TYPE, riscv_builtin_avail_ ## AVAIL, NULL}
 
 /* Define __builtin_riscv_<NAME>, which is a RISCV_BUILTIN_DIRECT_NO_TARGET function
    mapped to instruction CODE_FOR_<INSN>,  FUNCTION_TYPE and AVAIL
    are as for RISCV_BUILTIN.  */
 #define DIRECT_NO_TARGET_BUILTIN_NO_PREFIX(INSN, NAME, FUNCTION_TYPE, AVAIL)			\
   { CODE_FOR_ ## INSN, "__builtin_riscv_" # NAME,			\
-    RISCV_BUILTIN_DIRECT_NO_TARGET, FUNCTION_TYPE, riscv_builtin_avail_ ## AVAIL }
+    RISCV_BUILTIN_DIRECT_NO_TARGET, FUNCTION_TYPE, riscv_builtin_avail_ ## AVAIL, NULL }
 
 #define DIRECT_NO_TARGET_BUILTIN_WITH_CHECKER(INSN, FUNCTION_TYPE, AVAIL, CHECKER) \
   RISCV_BUILTIN_WITH_CHECKER (INSN, #INSN, RISCV_BUILTIN_DIRECT_NO_TARGET,		\
@@ -3248,9 +3248,17 @@ riscv_prepare_builtin_arg (struct expand_operand *op, tree exp, unsigned argno,
 {
   rtx arg_rtx = expand_normal (CALL_EXPR_ARG (exp, argno));
   enum machine_mode mode = insn_data[icode].operand[argno + has_target_p].mode;
+  bool flag = (riscv_rvp_support_vector_mode_p (mode)
+	| riscv_rvp_support_vector_mode_p (GET_MODE (arg_rtx)))
+	& TARGET_ZPN;
 
-  if (TARGET_ZPN &&
-      !(*insn_data[icode].operand[argno + has_target_p].predicate) (arg_rtx, mode))
+  if (!flag)
+    {
+      create_input_operand (op, arg_rtx, TYPE_MODE (TREE_TYPE (CALL_EXPR_ARG (exp, argno))));
+      return;
+    }
+
+  if (!(*insn_data[icode].operand[argno + has_target_p].predicate) (arg_rtx, mode))
     {
       rtx tmp_rtx = gen_reg_rtx (mode);
       if (GET_MODE_SIZE (mode).to_constant() <
@@ -3338,18 +3346,21 @@ riscv_expand_builtin_direct (enum insn_code icode, rtx target, tree exp,
   int opno = 0;
   enum machine_mode insn_return_mode = insn_data[icode].operand[opno].mode;
   enum machine_mode mode = TYPE_MODE (TREE_TYPE (exp));
+  bool flag = (riscv_rvp_support_vector_mode_p (insn_return_mode)
+	| riscv_rvp_support_vector_mode_p (mode))
+	& TARGET_ZPN;
 
   if (has_target_p)
     {
       /* p extension vector and scalar mode convension */
-      if (TARGET_ZPN &&
+      if (flag &&
           (!target
           || GET_MODE (target) != insn_return_mode
           || ! (*insn_data[icode].operand[opno].predicate) (target, insn_return_mode)))
-  {
-    mode = insn_return_mode;
-    target = gen_reg_rtx (mode);
-  }
+	{
+	  mode = insn_return_mode;
+	  target = gen_reg_rtx (mode);
+	}
 
       create_output_operand (&ops[opno++], target, mode);
     }
