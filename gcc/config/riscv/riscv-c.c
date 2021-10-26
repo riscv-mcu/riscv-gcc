@@ -106,4 +106,10 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
 
   if (TARGET_VECTOR)
     builtin_define ("__riscv_vector");
+
+  if (TARGET_ZPRV)
+    builtin_define ("__riscv_zprv");
+
+  if (TARGET_ZPSF)
+    builtin_define ("__riscv_zpsf");
 }
