@@ -124,11 +124,13 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
 
   {"zfh",  ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"b",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zba",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zbb",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zbc",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zbs",  ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"k",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zbkb",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zbkc",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zbkx",  ISA_SPEC_CLASS_NONE, 1, 0},
@@ -140,6 +142,7 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"zksh",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zkt",   ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"p",   ISA_SPEC_CLASS_NONE, 0, 94},
   {"zpn",   ISA_SPEC_CLASS_NONE, 0, 94},
   {"zprv",  ISA_SPEC_CLASS_NONE, 0, 94},
   {"zpsf",  ISA_SPEC_CLASS_NONE, 0, 94},
@@ -1005,6 +1008,11 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"zbc",   &gcc_options::x_riscv_bitmanip_subext, MASK_ZBC},
   {"zbs",   &gcc_options::x_riscv_bitmanip_subext, MASK_ZBS},
 
+  {"b",   &gcc_options::x_riscv_bitmanip_subext, MASK_ZBA},
+  {"b",   &gcc_options::x_riscv_bitmanip_subext, MASK_ZBB},
+  {"b",   &gcc_options::x_riscv_bitmanip_subext, MASK_ZBC},
+  {"b",   &gcc_options::x_riscv_bitmanip_subext, MASK_ZBS},
+
   {"zbkb",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKB},
   {"zbkc",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKC},
   {"zbkx",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKX},
@@ -1015,6 +1023,22 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"zksed", &gcc_options::x_riscv_crypto_subext, MASK_ZKSED},
   {"zksh",  &gcc_options::x_riscv_crypto_subext, MASK_ZKSH},
   {"zkt",   &gcc_options::x_riscv_crypto_subext, MASK_ZKT},
+
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKB},
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKC},
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKX},
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZKND},
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZKNE},
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZKNH},
+  {"k",   &gcc_options::x_riscv_crypto_subext, MASK_ZKR},
+  {"k", &gcc_options::x_riscv_crypto_subext, MASK_ZKSED},
+  {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZKSH},
+  {"k",   &gcc_options::x_riscv_crypto_subext, MASK_ZKT},
+
+  {"p",  &gcc_options::x_riscv_rvp_subext, MASK_RVP},
+  {"p",  &gcc_options::x_riscv_rvp_subext, MASK_ZPN},
+  {"p", &gcc_options::x_riscv_rvp_subext, MASK_ZPRV},
+  {"p", &gcc_options::x_riscv_rvp_subext, MASK_ZPSF},
 
   {"zpn",  &gcc_options::x_riscv_rvp_subext, MASK_ZPN},
   {"zprv", &gcc_options::x_riscv_rvp_subext, MASK_ZPRV},
@@ -1061,6 +1085,36 @@ riscv_parse_arch_string (const char *isa,
 	  if (subset_list->lookup (arch_ext_flag_tab->ext))
 	    opts->*arch_ext_flag_tab->var_ref |= arch_ext_flag_tab->mask;
 	}
+
+    if (subset_list->lookup("p"))
+    {
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZPN;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZPSF;
+    }
+
+    if (subset_list->lookup("b"))
+    {
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBA;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBB;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBC;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBS;
+    }
+
+    if (subset_list->lookup("k"))
+    {
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKB;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKC;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKX;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKND;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKNE;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKNH;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKR;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKSED;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKSH;
+      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKT;
+    }
+
     }
 
   if (current_subset_list)
