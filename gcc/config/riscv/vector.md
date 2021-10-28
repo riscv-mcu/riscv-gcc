@@ -4943,7 +4943,7 @@
 })
 
 (define_insn "*vfw<vfmac><mode>_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
@@ -4986,7 +4986,7 @@
 })
 
 (define_insn "*vfw<vfmac><mode>_scalar_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
@@ -8146,7 +8146,7 @@
 })
 
 (define_insn "*<u>madd<mode><vwmode>4_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
@@ -8188,7 +8188,7 @@
 })
 
 (define_insn "*sumadd<mode><vwmode>4_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
@@ -8231,7 +8231,7 @@
 })
 
 (define_insn "*<u>madd<mode><vwmode>4_scalar_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
@@ -8275,7 +8275,7 @@
 })
 
 (define_insn "*sumadd<mode><vwmode>4_scalar_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
@@ -8319,7 +8319,7 @@
 })
 
 (define_insn "*usmadd<mode><vwmode>4_scalar_mask_nosetvl"
-  [(set (match_operand:<VWMODE> 0 "register_operand" "=vr")
+  [(set (match_operand:<VWMODE> 0 "register_operand" "=&vr")
 	(unspec:<VWMODE>
 	  [(unspec:<VWMODE>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
