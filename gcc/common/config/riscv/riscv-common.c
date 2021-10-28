@@ -1083,13 +1083,30 @@ riscv_parse_arch_string (const char *isa,
 	   ++arch_ext_flag_tab)
 	{
 	  if (subset_list->lookup (arch_ext_flag_tab->ext))
-	    opts->*arch_ext_flag_tab->var_ref |= arch_ext_flag_tab->mask;
+    {
+      if(arch_ext_flag_tab->mask != MASK_ZPRV)
+      {
+        opts->*arch_ext_flag_tab->var_ref |= arch_ext_flag_tab->mask;
+      }
+      else
+      {
+        if (subset_list->xlen () == 64)
+        {
+          opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
+        }
+      }
+    }
+	    
 	}
 
     if (subset_list->lookup("p"))
     {
       opts->*arch_ext_flag_tab->var_ref |= MASK_ZPN;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
+
+      if (subset_list->xlen () == 64)
+      {
+        opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
+      }
       opts->*arch_ext_flag_tab->var_ref |= MASK_ZPSF;
     }
 
