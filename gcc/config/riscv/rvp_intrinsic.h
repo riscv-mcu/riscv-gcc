@@ -30,6 +30,77 @@ typedef unsigned short uint16x4_t __attribute__((vector_size (8)));
 typedef unsigned short uint16x8_t __attribute__((vector_size (16)));
 typedef unsigned int uint32x2_t __attribute__((vector_size(8)));
 typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
+//nuclei custom
+//nuclei dsp
+#define __dkhm8(a, b) \
+  (__builtin_riscv_dkhm8 ((a), (b)))
+#define __v_dkhm8(a, b) \
+  (__builtin_riscv_v_dkhm8 ((a), (b)))
+
+#define __dkhm16(a, b) \
+  (__builtin_riscv_dkhm16 ((a), (b)))
+#define __v_dkhm16(a, b) \
+  (__builtin_riscv_v_dkhm16 ((a), (b)))
+
+#define __dkabs8(a) \
+  (__builtin_riscv_dkabs8 ((a)))
+#define __v_dkabs8(a) \
+  (__builtin_riscv_v_dkabs8 ((a)))
+
+#define __dkabs16(a) \
+  (__builtin_riscv_dkabs16 ((a)))
+#define __v_dkabs16(a) \
+  (__builtin_riscv_v_dkabs16 ((a)))
+
+#define __dkslra8(a, b) \
+  (__builtin_riscv_dkslra8 ((a), (b)))
+#define __v_dkslra8(a, b) \
+  (__builtin_riscv_v_dkslra8 ((a), (b)))
+
+#define __dkslra16(a, b) \
+  (__builtin_riscv_dkslra16 ((a), (b)))
+#define __v_dkslra16(a, b) \
+  (__builtin_riscv_v_dkslra16 ((a), (b)))
+
+#define __dkadd8(a, b) \
+  (__builtin_riscv_dkadd8 ((a), (b)))
+#define __v_dkadd8(a, b) \
+  (__builtin_riscv_v_dkadd8 ((a), (b)))
+
+#define __dkadd16(a, b) \
+  (__builtin_riscv_dkadd16 ((a), (b)))
+#define __v_dkadd16(a, b) \
+  (__builtin_riscv_v_dkadd16 ((a), (b)))
+
+#define __dksub8(a, b) \
+  (__builtin_riscv_dksub8 ((a), (b)))
+#define __v_dksub8(a, b) \
+  (__builtin_riscv_v_dksub8 ((a), (b)))
+
+#define __dksub16(a, b) \
+  (__builtin_riscv_dksub16 ((a), (b)))
+#define __v_dksub16(a, b) \
+  (__builtin_riscv_v_dksub16 ((a), (b)))
+
+#define __expd80(a) \
+  (__builtin_riscv_expd80 ((a)))
+#define __v_expd80(a) \
+  (__builtin_riscv_v_expd80 ((a)))
+
+#define __expd81(a) \
+  (__builtin_riscv_expd81 ((a)))
+#define __v_expd81(a) \
+  (__builtin_riscv_v_expd81 ((a)))
+
+#define __expd82(a) \
+  (__builtin_riscv_expd82 ((a)))
+#define __v_expd82(a) \
+  (__builtin_riscv_v_expd82 ((a)))
+
+#define __expd83(a) \
+  (__builtin_riscv_expd83 ((a)))
+#define __v_expd83(a) \
+  (__builtin_riscv_v_expd83 ((a)))
 
 // zpn
 #define __rv__add16(a, b) \
