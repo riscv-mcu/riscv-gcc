@@ -105,8 +105,17 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
     }
 
   if (TARGET_VECTOR)
+  {
     builtin_define ("__riscv_vector");
+    builtin_define ("__riscv_v");
+  }
 
+  if (TARGET_ZPN)
+  {
+    builtin_define ("__riscv_zpn");
+    builtin_define ("__riscv_dsp");
+  }
+    
   if (TARGET_ZPRV)
     builtin_define ("__riscv_zprv");
 
@@ -114,7 +123,11 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
     builtin_define ("__riscv_zpsf");
 
   if (TARGET_ZBA)
+  {
     builtin_define ("__riscv_zba");
+    builtin_define ("__riscv_bitmanip");
+    builtin_define ("__riscv_b");
+  }
 
   if (TARGET_ZBB)
     builtin_define ("__riscv_zbb");

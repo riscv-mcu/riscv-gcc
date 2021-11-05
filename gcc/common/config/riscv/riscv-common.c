@@ -1084,19 +1084,25 @@ riscv_parse_arch_string (const char *isa,
 	{
 	  if (subset_list->lookup (arch_ext_flag_tab->ext))
     {
-      if(arch_ext_flag_tab->mask != MASK_ZPRV)
+      if(strcmp(arch_ext_flag_tab->ext, "p") == 0)
       {
-        opts->*arch_ext_flag_tab->var_ref |= arch_ext_flag_tab->mask;
+         if(arch_ext_flag_tab->mask != MASK_ZPRV)
+          {
+            opts->*arch_ext_flag_tab->var_ref |= arch_ext_flag_tab->mask;
+          }
+          else
+          {
+            if (subset_list->xlen () == 64)
+            {
+              opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
+            }
+          }
       }
       else
       {
-        if (subset_list->xlen () == 64)
-        {
-          opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
-        }
+        opts->*arch_ext_flag_tab->var_ref |= arch_ext_flag_tab->mask;
       }
     }
-	    
 	}
 
     if (subset_list->lookup("p"))
