@@ -1084,7 +1084,7 @@ riscv_parse_arch_string (const char *isa,
 	{
 	  if (subset_list->lookup (arch_ext_flag_tab->ext))
     {
-      if(strcmp(arch_ext_flag_tab->ext, "p") == 0)
+      if(strstr(arch_ext_flag_tab->ext ,"p") != NULL)
       {
          if(arch_ext_flag_tab->mask != MASK_ZPRV)
           {
@@ -1105,38 +1105,38 @@ riscv_parse_arch_string (const char *isa,
     }
 	}
 
-    if (subset_list->lookup("p"))
-    {
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZPN;
+    // if (subset_list->lookup("p"))
+    // {
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZPN;
 
-      if (subset_list->xlen () == 64)
-      {
-        opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
-      }
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZPSF;
-    }
+    //   if (subset_list->xlen () == 64)
+    //   {
+    //     opts->*arch_ext_flag_tab->var_ref |= MASK_ZPRV;
+    //   }
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZPSF;
+    // }
 
-    if (subset_list->lookup("b"))
-    {
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBA;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBB;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBC;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBS;
-    }
+    // if (subset_list->lookup("b"))
+    // {
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBA;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBB;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBC;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBS;
+    // }
 
-    if (subset_list->lookup("k"))
-    {
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKB;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKC;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKX;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKND;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKNE;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKNH;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKR;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKSED;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKSH;
-      opts->*arch_ext_flag_tab->var_ref |= MASK_ZKT;
-    }
+    // if (subset_list->lookup("k"))
+    // {
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKB;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKC;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZBKX;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKND;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKNE;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKNH;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKR;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKSED;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKSH;
+    //   opts->*arch_ext_flag_tab->var_ref |= MASK_ZKT;
+    // }
 
     }
 
