@@ -20,16 +20,13 @@ typedef signed char int8x4_t __attribute ((vector_size(4)));
 typedef signed char int8x8_t __attribute ((vector_size(8)));
 typedef short int16x2_t __attribute ((vector_size(4)));
 typedef short int16x4_t __attribute__((vector_size (8)));
-typedef short int16x8_t __attribute__((vector_size (16)));
 typedef int int32x2_t __attribute__((vector_size(8)));
-typedef int int32x4_t __attribute__((vector_size(16)));
 typedef unsigned char uint8x4_t __attribute__ ((vector_size (4)));
 typedef unsigned char uint8x8_t __attribute__ ((vector_size (8)));
 typedef unsigned short uint16x2_t __attribute__ ((vector_size (4)));
 typedef unsigned short uint16x4_t __attribute__((vector_size (8)));
-typedef unsigned short uint16x8_t __attribute__((vector_size (16)));
 typedef unsigned int uint32x2_t __attribute__((vector_size(8)));
-typedef unsigned int uint32x4_t __attribute__((vector_size(16)));
+typedef unsigned long uixlen_t;
 //nuclei custom
 //nuclei dsp
 #define __dkhm8(a, b) \
