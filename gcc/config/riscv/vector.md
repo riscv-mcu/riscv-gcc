@@ -24,7 +24,7 @@
 (define_code_iterator any_reduc [plus umax smax umin smin and ior xor])
 
 ;; Operations valid for floating-point reductions.
-(define_code_iterator any_freduc [plus smax smin])
+(define_code_iterator any_freduc [smax smin])
 
 ;; Commutative operation valid for floating-point.
 (define_code_iterator any_fcomop [plus mult smax smin])
@@ -134,6 +134,9 @@
 ;; particular code.
 (define_code_attr sz_op [(sign_extend "") (zero_extend "zero_")])
 (define_code_attr sz [(sign_extend "s") (zero_extend "z")])
+
+;; Iterator and attributes for floating-point reduction instructions.
+(define_int_iterator FREDUC_REDUC [UNSPEC_REDUC_SUM UNSPEC_ORDERED_REDUC_SUM])
 
 ;; Iterator and attributes for widening floating-point reduction instructions.
 (define_int_iterator WFREDUC_REDUC [UNSPEC_REDUC_SUM UNSPEC_ORDERED_REDUC_SUM])
@@ -6603,7 +6606,7 @@
 		     [(unspec:<V1MODES>
 			[(match_operand:<VCMPEQUIV> 1 "register_operand")
 			 (match_operand:<V1MODES> 2 "register_operand")
-			 (any_reduc:VFMODES
+			 (any_freduc:VFMODES
 			   (vec_duplicate:VFMODES
 			     (match_operand:<V1MODES> 3 "register_operand"))
 			   (match_operand:VFMODES 4 "register_operand"))]
@@ -6621,7 +6624,7 @@
 	  [(unspec:<V1MODES>
 	     [(match_operand:<VCMPEQUIV> 1 "register_operand" "vm")
 	      (match_operand:<V1MODES> 2 "register_operand" "0")
-	      (any_reduc:VFMODES
+	      (any_freduc:VFMODES
 		(vec_duplicate:VFMODES
 		  (match_operand:<V1MODES> 3 "register_operand" "vr"))
 		(match_operand:VFMODES 4 "register_operand" "vr"))]
@@ -6634,7 +6637,7 @@
   [(set_attr "type" "vector")
    (set_attr "mode" "none")])
 
-(define_expand "reduc_osum<mode>"
+(define_expand "reduc_<order>sum<mode>"
   [(set (reg:<VLMODE> VTYPE_REGNUM) (const_int UNSPECV_VSETVL))
    (parallel [(set (match_operand:<V1MODES> 0 "register_operand")
 		   (unspec:<V1MODES>
@@ -6644,7 +6647,7 @@
 			   (vec_duplicate:VFMODES
 			     (match_operand:<V1MODES> 2 "register_operand"))
 			   (match_operand:VFMODES 3 "register_operand"))]
-		       UNSPEC_ORDERED_REDUC)
+		       FREDUC_REDUC)
 		      (reg:SI VL_REGNUM)]
 		    UNSPEC_USEVL))
 	      (use (reg:<VLMODE> VTYPE_REGNUM))])]
@@ -6652,7 +6655,7 @@
 {
 })
 
-(define_insn "*reduc_osum<mode>_nosetvl"
+(define_insn "*reduc_<order>sum<mode>_nosetvl"
   [(set (match_operand:<V1MODES> 0 "register_operand" "=vr")
 	(unspec:<V1MODES>
 	  [(unspec:<V1MODES>
@@ -6661,16 +6664,16 @@
 		(vec_duplicate:VFMODES
 		  (match_operand:<V1MODES> 2 "register_operand" "vr"))
 		(match_operand:VFMODES 3 "register_operand" "vr"))]
-	    UNSPEC_ORDERED_REDUC)
+	    FREDUC_REDUC)
 	   (reg:SI VL_REGNUM)]
 	 UNSPEC_USEVL))
    (use (reg:<VLMODE> VTYPE_REGNUM))]
   "TARGET_VECTOR"
-  "vfredosum.vs\t%0,%3,%2"
+  "vfred<order>sum.vs\t%0,%3,%2"
   [(set_attr "type" "vector")
    (set_attr "mode" "none")])
 
-(define_expand "reduc_osum<mode>_mask"
+(define_expand "reduc_<order>sum<mode>_mask"
   [(set (reg:<VLMODE> VTYPE_REGNUM) (const_int UNSPECV_VSETVL))
    (parallel [(set (match_operand:<V1MODES> 0 "register_operand")
 		   (unspec:<V1MODES>
@@ -6681,7 +6684,7 @@
 			   (vec_duplicate:VFMODES
 			     (match_operand:<V1MODES> 3 "register_operand"))
 			   (match_operand:VFMODES 4 "register_operand"))]
-		       UNSPEC_ORDERED_REDUC)
+		       FREDUC_REDUC)
 		      (reg:SI VL_REGNUM)]
 		    UNSPEC_USEVL))
 	      (use (reg:<VLMODE> VTYPE_REGNUM))])]
@@ -6689,7 +6692,7 @@
 {
 })
 
-(define_insn "*reduc_osum<mode>_mask_nosetvl"
+(define_insn "*reduc_<order>sum<mode>_mask_nosetvl"
   [(set (match_operand:<V1MODES> 0 "register_operand" "=vr")
 	(unspec:<V1MODES>
 	  [(unspec:<V1MODES>
@@ -6699,12 +6702,12 @@
 		(vec_duplicate:VFMODES
 		  (match_operand:<V1MODES> 3 "register_operand" "vr"))
 		(match_operand:VFMODES 4 "register_operand" "vr"))]
-	    UNSPEC_ORDERED_REDUC)
+	    FREDUC_REDUC)
 	   (reg:SI VL_REGNUM)]
 	 UNSPEC_USEVL))
    (use (reg:<VLMODE> VTYPE_REGNUM))]
   "TARGET_VECTOR"
-  "vfredosum.vs\t%0,%4,%3,%1.t"
+  "vfred<order>sum.vs\t%0,%4,%3,%1.t"
   [(set_attr "type" "vector")
    (set_attr "mode" "none")])
 
