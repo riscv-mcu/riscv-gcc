@@ -322,6 +322,19 @@ static const struct riscv_tune_param sifive_7_tune_info = {
   true,						/* slow_unaligned_access */
 };
 
+/* Costs to use when optimizing for Nuclei n900 Series.  */
+static const struct riscv_tune_param nuclei_n900_tune_info = {
+  {COSTS_N_INSNS (4), COSTS_N_INSNS (5)},	/* fp_add */
+  {COSTS_N_INSNS (4), COSTS_N_INSNS (5)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (20)},	/* fp_div */
+  {COSTS_N_INSNS (4), COSTS_N_INSNS (4)},	/* int_mul */
+  {COSTS_N_INSNS (6), COSTS_N_INSNS (6)},	/* int_div */
+  2,						/* issue_rate */
+  4,						/* branch_cost */
+  3,						/* memory_cost */
+  true,						/* slow_unaligned_access */
+};
+
 /* Costs to use when optimizing for size.  */
 static const struct riscv_tune_param optimize_size_tune_info = {
   {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* fp_add */
@@ -373,6 +386,7 @@ static const struct riscv_tune_info riscv_tune_info_table[] = {
   { "sifive-3-series", generic, &rocket_tune_info },
   { "sifive-5-series", generic, &rocket_tune_info },
   { "sifive-7-series", sifive_7, &sifive_7_tune_info },
+  { "nuclei-n900-series", nuclei_n900, &nuclei_n900_tune_info },
   { "size", generic, &optimize_size_tune_info },
 };
 
@@ -4092,7 +4106,7 @@ riscv_compute_frame_info (void)
 			                  + riscv_stack_align (cfun->machine->varargs_size)
 			                  + riscv_stack_align (num_f_saved * UNITS_PER_FP_REG)
 			                  + riscv_stack_align (num_x_saved * UNITS_PER_WORD);
-  
+
   /* Next points the incoming stack pointer and any incoming arguments. */
 
   /* Only use save/restore routines when the GPRs are atop the frame.  */
@@ -4268,8 +4282,8 @@ riscv_restore_reg (rtx reg, rtx mem)
    compute the best value to initially allocate.  It must at a minimum
    allocate enough space to spill the callee-saved registers.  If TARGET_RVC,
    try to pick a value that will allow compression of the register saves
-   without adding extra instructions.  
-   
+   without adding extra instructions.
+
    First stack step always step a costant range.  */
 
 static HOST_WIDE_INT
@@ -4511,7 +4525,7 @@ riscv_expand_prologue (void)
 			    stack_pointer_rtx,
 			    GEN_INT (-step1));
       RTX_FRAME_RELATED_P (emit_insn (insn)) = 1;
-      
+
       riscv_for_each_saved_reg (size, riscv_save_reg, false, false);
     }
 
@@ -5107,7 +5121,7 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
   /* use even/odd pair of registers in rv32 zpsf subset */
   if (TARGET_ZPSF && !TARGET_64BIT)
     {
-      if ((GET_MODE_CLASS (mode) == MODE_INT || 
+      if ((GET_MODE_CLASS (mode) == MODE_INT ||
           GET_MODE_CLASS (mode) == MODE_VECTOR_INT) &&
           GET_MODE_UNIT_SIZE (mode) == GET_MODE_SIZE (DImode))
         return !(regno & 1);

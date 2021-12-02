@@ -365,7 +365,7 @@
 ;; logical      integer logical instructions
 ;; shift	integer shift instructions
 ;; slt		set less than instructions
-;; imul		integer multiply 
+;; imul		integer multiply
 ;; idiv		integer divide
 ;; move		integer register move (addi rd, rs1, 0)
 ;; fmove	floating point register move
@@ -381,7 +381,7 @@
 ;; ghost	an instruction that produces no real code
 ;; bitmanip	bitmanip instructions
 ;; simd   simd instruction for p extension
-;; psimd  partial-simd data processing instructions 
+;; psimd  partial-simd data processing instructions
 ;; dsp    instructions for increasing the DSP processing capabilities
 ;; dsp64  as the same as dsp, but RV64P only
 ;; vector vector instructions for rvv
@@ -470,7 +470,7 @@
 ;; Microarchitectures we know how to tune for.
 ;; Keep this in sync with enum riscv_microarchitecture.
 (define_attr "tune"
-  "generic,sifive_7"
+  "generic,sifive_7,nuclei_n900"
   (const (symbol_ref "((enum attr_tune) riscv_microarchitecture)")))
 
 ;; Describe a user's asm statement.
@@ -2875,3 +2875,4 @@
 (include "pic.md")
 (include "generic.md")
 (include "sifive-7.md")
+(include "nuclei-n900.md")
