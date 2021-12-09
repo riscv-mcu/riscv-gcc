@@ -105,7 +105,7 @@
   "nuclei_n900_pipe0 | nuclei_n900_pipe1, nuclei_n900_dsp")
 
 ;; DSP Partial SIMD
-(define_insn_reservation "nuclei_n900_dsp_simd" 3
+(define_insn_reservation "nuclei_n900_dsp_psimd" 3
   (and (eq_attr "tune" "nuclei_n900")
        (eq_attr "type" "psimd"))
   "nuclei_n900_pipe0 | nuclei_n900_pipe1, nuclei_n900_dsp")
