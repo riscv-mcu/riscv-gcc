@@ -5,13 +5,13 @@
 (final_presence_set "nuclei_n900_pipe1" "nuclei_n900_pipe0")
 
 (define_reservation "nuclei_n900_pipe_any" "nuclei_n900_pipe0 | nuclei_n900_pipe1")
-(define_reservation "nuclei_n900_single_issue" "nuclei_n900_pipe0 + nuclei_n900_pipe1")
 
 ;; Currently, dual-issue all load/store/branch/b-extension instructions.
 ;;(define_cpu_unit "nuclei_n900_load" "nuclei_n900")
 ;;(define_cpu_unit "nuclei_n900_store" "nuclei_n900")
 ;;(define_cpu_unit "nuclei_n900_branch" "nuclei_n900")
 ;;(define_cpu_unit "nuclei_n900_bmu" "nuclei_n900")
+;;(define_reservation "nuclei_n900_single_issue" "nuclei_n900_pipe0 + nuclei_n900_pipe1")
 
 ;; imul can be piped, but idiv cannot
 (define_cpu_unit "nuclei_n900_imul" "nuclei_n900")
@@ -68,14 +68,14 @@
   (and (eq_attr "tune" "nuclei_n900")
        (and (eq_attr "type" "idiv")
             (eq_attr "mode" "SI")))
-  "nuclei_n900_pipe_any + nuclei_n900_idiv, idiv * 3")
+  "nuclei_n900_pipe_any + nuclei_n900_idiv, nuclei_n900_idiv * 3")
 
 ;; Integer divide, 64 bits, defer to tune info
 (define_insn_reservation "nuclei_n900_idiv_di" 4
   (and (eq_attr "tune" "nuclei_n900")
        (and (eq_attr "type" "idiv")
             (eq_attr "mode" "DI")))
-  "nuclei_n900_pipe_any + nuclei_n900_idiv, idiv * 3")
+  "nuclei_n900_pipe_any + nuclei_n900_idiv, nuclei_n900_idiv * 3")
 
 ;; FPU misc
 (define_insn_reservation "nuclei_n900_fmisc" 3
@@ -94,7 +94,7 @@
   (and (eq_attr "tune" "nuclei_n900")
        (and (eq_attr "type" "fdiv, fsqrt")
             (eq_attr "mode" "SF")))
-  "nuclei_n900_pipe_any + nuclei_n900_fdiv, fdiv * 9")
+  "nuclei_n900_pipe_any + nuclei_n900_fdiv, nuclei_n900_fdiv * 9")
 
 ;; Float divide/sqrt, 64 bits, defer to tune info
 (define_insn_reservation "nuclei_n900_fdiv_df" 25
