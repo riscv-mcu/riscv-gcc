@@ -6,10 +6,10 @@
 
 (define_reservation "nuclei_n900_pipe_any" "nuclei_n900_pipe0 | nuclei_n900_pipe1")
 
-;; Currently, dual-issue all load/store/branch/b-extension instructions.
-;;(define_cpu_unit "nuclei_n900_load" "nuclei_n900")
-;;(define_cpu_unit "nuclei_n900_store" "nuclei_n900")
-;;(define_cpu_unit "nuclei_n900_branch" "nuclei_n900")
+;; Currently, dual-issue all b-extension instructions.
+(define_cpu_unit "nuclei_n900_load" "nuclei_n900")
+(define_cpu_unit "nuclei_n900_store" "nuclei_n900")
+(define_cpu_unit "nuclei_n900_branch" "nuclei_n900")
 ;;(define_cpu_unit "nuclei_n900_bmu" "nuclei_n900")
 ;;(define_reservation "nuclei_n900_single_issue" "nuclei_n900_pipe0 + nuclei_n900_pipe1")
 
@@ -36,26 +36,26 @@
   (and (eq_attr "tune" "nuclei_n900")
     (and (eq_attr "type" "load")
       (eq_attr "mode" "SI,DI")))
-  "nuclei_n900_pipe_any")
+  "nuclei_n900_pipe_any + nuclei_n900_load")
 
 ;; Load 8/16 bits
 (define_insn_reservation "nuclei_n900_load_bh" 4
   (and (eq_attr "tune" "nuclei_n900")
     (and (eq_attr "type" "load")
       (eq_attr "mode" "QI,HI")))
-  "nuclei_n900_pipe_any")
+  "nuclei_n900_pipe_any + nuclei_n900_load")
 
 ;; Stroe, defer to tune info
 (define_insn_reservation "nuclei_n900_store" 0
   (and (eq_attr "tune" "nuclei_n900")
        (eq_attr "type" "store"))
-  "nuclei_n900_pipe_any")
+  "nuclei_n900_pipe_any + nuclei_n900_store")
 
 ;; Branch, defer to tune info
 (define_insn_reservation "nuclei_n900_branch" 0
   (and (eq_attr "tune" "nuclei_n900")
        (eq_attr "type" "branch, jump, call"))
-  "nuclei_n900_pipe_any")
+  "nuclei_n900_pipe_any + nuclei_n900_branch")
 
 ;; Integer multiply, defer to tune info
 (define_insn_reservation "nuclei_n900_imul" 4
@@ -90,30 +90,30 @@
   "nuclei_n900_pipe_any + nuclei_n900_fmac")
 
 ;; Float divide/sqrt, 32 bits, defer to tune info
-(define_insn_reservation "nuclei_n900_fdiv_sf" 10
+(define_insn_reservation "nuclei_n900_fdiv_sf" 20
   (and (eq_attr "tune" "nuclei_n900")
        (and (eq_attr "type" "fdiv, fsqrt")
             (eq_attr "mode" "SF")))
-  "nuclei_n900_pipe_any + nuclei_n900_fdiv, nuclei_n900_fdiv * 9")
+  "nuclei_n900_pipe_any + nuclei_n900_fdiv, nuclei_n900_fdiv * 19")
 
 ;; Float divide/sqrt, 64 bits, defer to tune info
-(define_insn_reservation "nuclei_n900_fdiv_df" 25
+(define_insn_reservation "nuclei_n900_fdiv_df" 34
   (and (eq_attr "tune" "nuclei_n900")
        (and (eq_attr "type" "fdiv, fsqrt")
             (eq_attr "mode" "DF")))
-  "nuclei_n900_pipe_any + nuclei_n900_fdiv, nuclei_n900_fdiv * 24")
+  "nuclei_n900_pipe_any + nuclei_n900_fdiv, nuclei_n900_fdiv * 33")
 
 ;; Float load
 (define_insn_reservation "nuclei_n900_fpload" 4
   (and (eq_attr "tune" "nuclei_n900")
        (eq_attr "type" "fpload"))
-  "nuclei_n900_pipe_any")
+  "nuclei_n900_pipe_any + nuclei_n900_load")
 
 ;; Float store, defer to tune info
 (define_insn_reservation "nuclei_n900_fpstore" 0
   (and (eq_attr "tune" "nuclei_n900")
        (eq_attr "type" "fpstore"))
-  "nuclei_n900_pipe_any")
+  "nuclei_n900_pipe_any + nuclei_n900_store")
 
 ;; DSP SIMD
 (define_insn_reservation "nuclei_n900_dsp_simd" 2

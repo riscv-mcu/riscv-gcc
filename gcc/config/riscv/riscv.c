@@ -326,7 +326,7 @@ static const struct riscv_tune_param sifive_7_tune_info = {
 static const struct riscv_tune_param nuclei_n900_tune_info = {
   {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_add */
   {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_mul */
-  {COSTS_N_INSNS (10), COSTS_N_INSNS (25)},	/* fp_div */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
   {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* int_mul */
   {COSTS_N_INSNS (17), COSTS_N_INSNS (33)},	/* int_div */
   2,						/* issue_rate */
