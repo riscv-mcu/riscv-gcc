@@ -7,8 +7,8 @@
 (define_cpu_unit "nuclei_n300_idiv" "nuclei_n300")
 
 ;; load + store can be piped, load + load or store + store cannot
-(define_cpu_uint "nuclei_300_load" "nuclei_n300")
-(define_cpu_uint "nuclei_300_store" "nuclei_n300")
+(define_cpu_unit "nuclei_300_load" "nuclei_n300")
+(define_cpu_unit "nuclei_300_store" "nuclei_n300")
 
 ;; fmisc/fmac can be piped, but fdiv cannot
 (define_cpu_unit "nuclei_n300_fmisc" "nuclei_n300")
