@@ -1,14 +1,14 @@
 (define_automaton "nuclei_n300")
 
-(define_cpu_unit "nuclei_300_pipe0" "nuclei_n300")
+(define_cpu_unit "nuclei_n300_pipe0" "nuclei_n300")
 
 ;; imul can be piped, but idiv cannot
 (define_cpu_unit "nuclei_n300_imul" "nuclei_n300")
 (define_cpu_unit "nuclei_n300_idiv" "nuclei_n300")
 
 ;; load + store can be piped, load + load or store + store cannot
-(define_cpu_unit "nuclei_300_load" "nuclei_n300")
-(define_cpu_unit "nuclei_300_store" "nuclei_n300")
+(define_cpu_unit "nuclei_n300_load" "nuclei_n300")
+(define_cpu_unit "nuclei_n300_store" "nuclei_n300")
 
 ;; fmisc/fmac can be piped, but fdiv cannot
 (define_cpu_unit "nuclei_n300_fmisc" "nuclei_n300")
