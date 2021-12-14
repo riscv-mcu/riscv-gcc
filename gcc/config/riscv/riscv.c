@@ -322,7 +322,20 @@ static const struct riscv_tune_param sifive_7_tune_info = {
   true,						/* slow_unaligned_access */
 };
 
-/* Costs to use when optimizing for Nuclei n900 Series.  */
+/* Costs to use when optimizing for Nuclei n300 Series. */
+static const struct riscv_tune_param nuclei_n300_tune_info = {
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* int_mul */
+  {COSTS_N_INSNS (17), COSTS_N_INSNS (33)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  5,						/* memory_cost */
+  true,						/* slow_unaligned_access */
+};
+
+/* Costs to use when optimizing for Nuclei n900 Series. */
 static const struct riscv_tune_param nuclei_n900_tune_info = {
   {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_add */
   {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_mul */
@@ -386,6 +399,7 @@ static const struct riscv_tune_info riscv_tune_info_table[] = {
   { "sifive-3-series", generic, &rocket_tune_info },
   { "sifive-5-series", generic, &rocket_tune_info },
   { "sifive-7-series", sifive_7, &sifive_7_tune_info },
+  { "nuclei-n300-series", nuclei_n300, &nuclei_n300_tune_info },
   { "nuclei-n900-series", nuclei_n900, &nuclei_n900_tune_info },
   { "size", generic, &optimize_size_tune_info },
 };
