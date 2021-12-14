@@ -1,6 +1,6 @@
 (define_automaton "nuclei_n300")
 
-(define_cpu_uint "nuclei_300_pipe0" "nuclei_n300")
+(define_cpu_unit "nuclei_300_pipe0" "nuclei_n300")
 
 ;; imul can be piped, but idiv cannot
 (define_cpu_unit "nuclei_n300_imul" "nuclei_n300")
