@@ -2848,11 +2848,6 @@
   [(set_attr "length" "0")]
 )
 
-(define_expand "clzsi2"
-  [(set (match_operand:SI 0 "")
-	(clz:SI (match_operand:SI 1 "")))]
-  "TARGET_ZBB && !TARGET_ZPN")
-
 (include "bitmanip.md")
 (include "crypto.md")
 (include "rvp.md")
