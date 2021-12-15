@@ -2589,43 +2589,43 @@ vf##OP##_vf_f##WSEW##m##WLMUL (vfloat##SEW##m##LMUL##_t a, T b, word_type vl)		\
 
 _RVV_WFLOAT_ITERATOR_ARG (_RVV_FLOAT_WMUL, wmul)
 
-#define _RVV_MAC_INT_MAX(SEW, LMUL, MLEN, T, OP, IOP)			\
-__extension__ extern __inline vint##SEW##m##LMUL##_t			\
-__attribute__ ((__always_inline__, __gnu_inline__, __artificial__))	\
-v##OP##_vv_i##SEW##m##LMUL (vint##SEW##m##LMUL##_t acc,			\
-			    vint##SEW##m##LMUL##_t a,			\
-			    vint##SEW##m##LMUL##_t b)			\
-{									\
-  vsetvlmax_e##SEW##m##LMUL ()						\
-  return __builtin_riscv_v##IOP##_sv_i##SEW##m##LMUL (acc, a, b);	\
-}									\
-__extension__ extern __inline vuint##SEW##m##LMUL##_t			\
-__attribute__ ((__always_inline__, __gnu_inline__, __artificial__))	\
-v##OP##_vv_u##SEW##m##LMUL (vuint##SEW##m##LMUL##_t acc,		\
-			    vuint##SEW##m##LMUL##_t a,			\
-			    vuint##SEW##m##LMUL##_t b)			\
-{									\
-  vsetvlmax_e##SEW##m##LMUL ()						\
-  return __builtin_riscv_v##IOP##_sv_u##SEW##m##LMUL (acc, a, b);	\
-}									\
-__extension__ extern __inline vint##SEW##m##LMUL##_t			\
-__attribute__ ((__always_inline__, __gnu_inline__, __artificial__))	\
-v##OP##_vx_i##SEW##m##LMUL (vint##SEW##m##LMUL##_t acc,			\
-			    T a,					\
-			    vint##SEW##m##LMUL##_t b)			\
-{									\
-  vsetvlmax_e##SEW##m##LMUL ()						\
-  return __builtin_riscv_v##IOP##_sv_i##SEW##m##LMUL##_scalar (acc, a, b);\
-}									\
-__extension__ extern __inline vuint##SEW##m##LMUL##_t			\
-__attribute__ ((__always_inline__, __gnu_inline__, __artificial__))	\
-v##OP##_vx_u##SEW##m##LMUL (vuint##SEW##m##LMUL##_t acc,		\
-			    u##T a,					\
-			    vuint##SEW##m##LMUL##_t b)			\
-{									\
-  vsetvlmax_e##SEW##m##LMUL ()						\
-  return __builtin_riscv_v##IOP##_sv_u##SEW##m##LMUL##_scalar (acc, a, b);\
-}
+#define _RVV_MAC_INT_MAX(SEW, LMUL, MLEN, T, OP, IOP)                       \
+  __extension__ extern __inline vint##SEW##m##LMUL##_t                      \
+      __attribute__((__always_inline__, __gnu_inline__, __artificial__))    \
+      v##OP##_vv_i##SEW##m##LMUL(vint##SEW##m##LMUL##_t acc,                \
+                                 vint##SEW##m##LMUL##_t a,                  \
+                                 vint##SEW##m##LMUL##_t b)                  \
+  {                                                                         \
+    vsetvlmax_e##SEW##m##LMUL();                                            \
+    return __builtin_riscv_v##IOP##_sv_i##SEW##m##LMUL(acc, a, b);          \
+  }                                                                         \
+  __extension__ extern __inline vuint##SEW##m##LMUL##_t                     \
+      __attribute__((__always_inline__, __gnu_inline__, __artificial__))    \
+      v##OP##_vv_u##SEW##m##LMUL(vuint##SEW##m##LMUL##_t acc,               \
+                                 vuint##SEW##m##LMUL##_t a,                 \
+                                 vuint##SEW##m##LMUL##_t b)                 \
+  {                                                                         \
+    vsetvlmax_e##SEW##m##LMUL();                                            \
+    return __builtin_riscv_v##IOP##_sv_u##SEW##m##LMUL(acc, a, b);          \
+  }                                                                         \
+  __extension__ extern __inline vint##SEW##m##LMUL##_t                      \
+      __attribute__((__always_inline__, __gnu_inline__, __artificial__))    \
+      v##OP##_vx_i##SEW##m##LMUL(vint##SEW##m##LMUL##_t acc,                \
+                                 T a,                                       \
+                                 vint##SEW##m##LMUL##_t b)                  \
+  {                                                                         \
+    vsetvlmax_e##SEW##m##LMUL();                                            \
+    return __builtin_riscv_v##IOP##_sv_i##SEW##m##LMUL##_scalar(acc, a, b); \
+  }                                                                         \
+  __extension__ extern __inline vuint##SEW##m##LMUL##_t                     \
+      __attribute__((__always_inline__, __gnu_inline__, __artificial__))    \
+      v##OP##_vx_u##SEW##m##LMUL(vuint##SEW##m##LMUL##_t acc,               \
+                                 u##T a,                                    \
+                                 vuint##SEW##m##LMUL##_t b)                 \
+  {                                                                         \
+    vsetvlmax_e##SEW##m##LMUL();                                            \
+    return __builtin_riscv_v##IOP##_sv_u##SEW##m##LMUL##_scalar(acc, a, b); \
+  }
 
 _RVV_INT_ITERATOR_ARG (_RVV_MAC_INT_MAX, ma, macc)
 
