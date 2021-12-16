@@ -2,7 +2,7 @@
 
 (define_cpu_unit "nuclei_n900_pipe0" "nuclei_n900")
 (define_cpu_unit "nuclei_n900_pipe1" "nuclei_n900")
-;;(final_presence_set "nuclei_n900_pipe1" "nuclei_n900_pipe0")
+(final_presence_set "nuclei_n900_pipe1" "nuclei_n900_pipe0")
 
 (define_reservation "nuclei_n900_pipe_any" "nuclei_n900_pipe0 | nuclei_n900_pipe1")
 
