@@ -53,8 +53,10 @@ extern enum riscv_isa_spec_class riscv_isa_spec;
 enum riscv_microarchitecture_type {
   generic,
   sifive_7,
-  nuclei_n300,
-  nuclei_n900
+  nuclei_200,
+  nuclei_300,
+  nuclei_600,
+  nuclei_900
 };
 extern enum riscv_microarchitecture_type riscv_microarchitecture;
 
