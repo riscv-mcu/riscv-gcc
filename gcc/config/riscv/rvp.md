@@ -7673,36 +7673,36 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dksmds32"
+(define_insn "dsp_dsmds32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
-			 UNSPEC_DKSMDS32))]
+			 UNSPEC_DSMDS32))]
   "TARGET_ZPSF && !TARGET_64BIT"
-  "dksmds32\t%0, %2, %3"
+  "dsmds32\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dksmdrs32"
+(define_insn "dsp_dsmdrs32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
-			 UNSPEC_DKSMDRS32))]
+			 UNSPEC_DSMDRS32))]
   "TARGET_ZPSF && !TARGET_64BIT"
-  "dksmdrs32\t%0, %2, %3"
+  "dsmdrs32\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dksmxds32"
+(define_insn "dsp_dsmxds32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
-			 UNSPEC_DKSMXDS32))]
+			 UNSPEC_DSMXDS32))]
   "TARGET_ZPSF && !TARGET_64BIT"
-  "dksmxds32\t%0, %2, %3"
+  "dsmxds32\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 

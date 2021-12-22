@@ -204,14 +204,14 @@ typedef unsigned long uixlen_t;
 #define __dkmsxda32(a, b, c) \
   (__builtin_riscv_dkmsxda32 ((a), (b), (c)))
 
-#define __dksmds32(a, b, c) \
-  (__builtin_riscv_dksmds32 ((a), (b), (c)))
+#define __dsmds32(a, b, c) \
+  (__builtin_riscv_dsmds32 ((a), (b), (c)))
 
-#define __dksmdrs32(a, b, c) \
-  (__builtin_riscv_dksmdrs32 ((a), (b), (c)))
+#define __dsmdrs32(a, b, c) \
+  (__builtin_riscv_dsmdrs32 ((a), (b), (c)))
 
-#define __dksmxds32(a, b, c) \
-  (__builtin_riscv_dksmxds32 ((a), (b), (c)))
+#define __dsmxds32(a, b, c) \
+  (__builtin_riscv_dsmxds32 ((a), (b), (c)))
 
 #define __dsmalda(a, b, c) \
   (__builtin_riscv_dsmalda ((a), (b), (c)))
