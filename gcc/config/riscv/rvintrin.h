@@ -167,19 +167,6 @@ static inline int64_t _rv64_unshfl (int64_t rs1, int64_t rs2) { int64_t rd; if (
 #endif
 
 #ifdef RVINTRIN_RV32
-static inline int32_t _rv32_bext(int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("bext  %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
-static inline int32_t _rv32_bdep(int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("bdep  %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
-#endif
-
-#ifdef RVINTRIN_RV64
-static inline int32_t _rv32_bext(int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("bextw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
-static inline int32_t _rv32_bdep(int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("bdepw %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
-
-static inline int64_t _rv64_bext(int64_t rs1, int64_t rs2) { int64_t rd; __asm__ ("bext  %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
-static inline int64_t _rv64_bdep(int64_t rs1, int64_t rs2) { int64_t rd; __asm__ ("bdep  %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
-#endif
-
-#ifdef RVINTRIN_RV32
 static inline int32_t _rv32_clmul (int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("clmul   %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
 static inline int32_t _rv32_clmulh(int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("clmulh  %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
 static inline int32_t _rv32_clmulr(int32_t rs1, int32_t rs2) { int32_t rd; __asm__ ("clmulr  %0, %1, %2" : "=r"(rd) : "r"(rs1), "r"(rs2)); return rd; }
@@ -540,53 +527,6 @@ static inline int64_t _rv64_unshfl(int64_t rs1, int64_t rs2)
 	return x;
 }
 
-static inline int32_t _rv32_bext(int32_t rs1, int32_t rs2)
-{
-	uint32_t c = 0, i = 0, data = rs1, mask = rs2;
-	while (mask) {
-		uint32_t b = mask & ~((mask | (mask-1)) + 1);
-		c |= (data & b) >> (_rv32_ctz(b) - i);
-		i += _rv32_pcnt(b);
-		mask -= b;
-	}
-	return c;
-}
-
-static inline int32_t _rv32_bdep(int32_t rs1, int32_t rs2)
-{
-	uint32_t c = 0, i = 0, data = rs1, mask = rs2;
-	while (mask) {
-		uint32_t b = mask & ~((mask | (mask-1)) + 1);
-		c |= (data << (_rv32_ctz(b) - i)) & b;
-		i += _rv32_pcnt(b);
-		mask -= b;
-	}
-	return c;
-}
-
-static inline int64_t _rv64_bext(int64_t rs1, int64_t rs2)
-{
-	uint64_t c = 0, i = 0, data = rs1, mask = rs2;
-	while (mask) {
-		uint64_t b = mask & ~((mask | (mask-1)) + 1);
-		c |= (data & b) >> (_rv64_ctz(b) - i);
-		i += _rv64_pcnt(b);
-		mask -= b;
-	}
-	return c;
-}
-
-static inline int64_t _rv64_bdep(int64_t rs1, int64_t rs2)
-{
-	uint64_t c = 0, i = 0, data = rs1, mask = rs2;
-	while (mask) {
-		uint64_t b = mask & ~((mask | (mask-1)) + 1);
-		c |= (data << (_rv64_ctz(b) - i)) & b;
-		i += _rv64_pcnt(b);
-		mask -= b;
-	}
-	return c;
-}
 
 static inline int32_t _rv32_clmul(int32_t rs1, int32_t rs2)
 {
@@ -816,8 +756,6 @@ static inline long _rv_grev   (long rs1, long rs2) { return _rv32_grev   (rs1, r
 static inline long _rv_gorc   (long rs1, long rs2) { return _rv32_gorc   (rs1, rs2); }
 static inline long _rv_shfl   (long rs1, long rs2) { return _rv32_shfl   (rs1, rs2); }
 static inline long _rv_unshfl (long rs1, long rs2) { return _rv32_unshfl (rs1, rs2); }
-static inline long _rv_bext   (long rs1, long rs2) { return _rv32_bext   (rs1, rs2); }
-static inline long _rv_bdep   (long rs1, long rs2) { return _rv32_bdep   (rs1, rs2); }
 static inline long _rv_clmul  (long rs1, long rs2) { return _rv32_clmul  (rs1, rs2); }
 static inline long _rv_clmulh (long rs1, long rs2) { return _rv32_clmulh (rs1, rs2); }
 static inline long _rv_clmulr (long rs1, long rs2) { return _rv32_clmulr (rs1, rs2); }
@@ -857,8 +795,6 @@ static inline long _rv_grev   (long rs1, long rs2) { return _rv64_grev   (rs1, r
 static inline long _rv_gorc   (long rs1, long rs2) { return _rv64_gorc   (rs1, rs2); }
 static inline long _rv_shfl   (long rs1, long rs2) { return _rv64_shfl   (rs1, rs2); }
 static inline long _rv_unshfl (long rs1, long rs2) { return _rv64_unshfl (rs1, rs2); }
-static inline long _rv_bext   (long rs1, long rs2) { return _rv64_bext   (rs1, rs2); }
-static inline long _rv_bdep   (long rs1, long rs2) { return _rv64_bdep   (rs1, rs2); }
 static inline long _rv_clmul  (long rs1, long rs2) { return _rv64_clmul  (rs1, rs2); }
 static inline long _rv_clmulh (long rs1, long rs2) { return _rv64_clmulh (rs1, rs2); }
 static inline long _rv_clmulr (long rs1, long rs2) { return _rv64_clmulr (rs1, rs2); }
