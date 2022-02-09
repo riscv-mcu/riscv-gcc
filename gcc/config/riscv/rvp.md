@@ -7341,6 +7341,26 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "SI")])
 
+(define_insn "dsp_dkhmx8"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")] 
+			 UNSPEC_DKHMX8))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "dkhmx8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkhmx16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")] 
+			 UNSPEC_DKHMX16))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "dkhmx16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
 (define_insn "dsp_dsmmul"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
