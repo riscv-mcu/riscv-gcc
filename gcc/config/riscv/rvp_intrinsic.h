@@ -112,10 +112,10 @@ typedef unsigned long uixlen_t;
   (__builtin_riscv_expd87 ((a)))
 
 #define __dkhmx8(a, b) \
-  (__builtin_riscv_dsmmul ((a), (b)))
+  (__builtin_riscv_dkhmx8 ((a), (b)))
 
 #define __dkhmx16(a, b) \
-  (__builtin_riscv_dsmmul ((a), (b)))
+  (__builtin_riscv_dkhmx16 ((a), (b)))
 
 #define __dsmmul(a, b) \
   (__builtin_riscv_dsmmul ((a), (b)))
