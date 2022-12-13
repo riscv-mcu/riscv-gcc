@@ -67,6 +67,10 @@
   (ior (match_operand 0 "memory_operand")
        (match_operand 0 "register_operand")))
 
+(define_predicate "imm5_operand"
+  (and (match_code "const_int")
+       (match_test "INTVAL (op) < 5")))
+
 (define_predicate "uimm5_operand"
   (match_operand 0 "const_csr_operand"))
 

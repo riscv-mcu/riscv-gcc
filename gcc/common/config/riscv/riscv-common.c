@@ -142,6 +142,10 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"zksh",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"zkt",   ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"zicboz",ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zicbom",ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zicbop",ISA_SPEC_CLASS_NONE, 1, 0},
+
   {"p",   ISA_SPEC_CLASS_NONE, 0, 94},
   {"zpn",   ISA_SPEC_CLASS_NONE, 0, 94},
   {"zprv",  ISA_SPEC_CLASS_NONE, 0, 94},
@@ -1023,6 +1027,10 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"zksed", &gcc_options::x_riscv_crypto_subext, MASK_ZKSED},
   {"zksh",  &gcc_options::x_riscv_crypto_subext, MASK_ZKSH},
   {"zkt",   &gcc_options::x_riscv_crypto_subext, MASK_ZKT},
+
+  {"zicboz", &gcc_options::x_riscv_zicmo_subext, MASK_ZICBOZ},
+  {"zicbom", &gcc_options::x_riscv_zicmo_subext, MASK_ZICBOM},
+  {"zicbop", &gcc_options::x_riscv_zicmo_subext, MASK_ZICBOP},
 
   {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKB},
   {"k",  &gcc_options::x_riscv_crypto_subext, MASK_ZBKC},

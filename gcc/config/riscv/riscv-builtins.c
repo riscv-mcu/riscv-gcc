@@ -184,6 +184,17 @@ AVAIL (crypto_zksh64, TARGET_ZKSH && TARGET_64BIT)
 AVAIL (crypto_zksed32, TARGET_ZKSED && !TARGET_64BIT)
 AVAIL (crypto_zksed64, TARGET_ZKSED && TARGET_64BIT)
 
+AVAIL (clean32, TARGET_ZICBOM && !TARGET_64BIT)
+AVAIL (clean64, TARGET_ZICBOM && TARGET_64BIT)
+AVAIL (flush32, TARGET_ZICBOM && !TARGET_64BIT)
+AVAIL (flush64, TARGET_ZICBOM && TARGET_64BIT)
+AVAIL (inval32, TARGET_ZICBOM && !TARGET_64BIT)
+AVAIL (inval64, TARGET_ZICBOM && TARGET_64BIT)
+AVAIL (zero32,  TARGET_ZICBOZ && !TARGET_64BIT)
+AVAIL (zero64,  TARGET_ZICBOZ && TARGET_64BIT)
+AVAIL (prefetchi32, TARGET_ZICBOP && !TARGET_64BIT)
+AVAIL (prefetchi64, TARGET_ZICBOP && TARGET_64BIT)
+
 /* p ext */
 AVAIL (zpn, TARGET_ZPN)
 AVAIL (zpn64, TARGET_ZPN && TARGET_64BIT)
@@ -315,6 +326,7 @@ tree int_xlen_node;
 #define RISCV_ATYPE_HI intHI_type_node
 #define RISCV_ATYPE_SI intSI_type_node
 #define RISCV_ATYPE_DI intDI_type_node
+#define RISCV_ATYPE_VOID_PTR ptr_type_node
 #define RISCV_ATYPE_SIZE size_type_node
 #define RISCV_ATYPE_ULONG long_unsigned_type_node
 #define RISCV_ATYPE_LONG long_integer_type_node
@@ -2508,6 +2520,7 @@ _RVV_SEG_ARG (RISCV_DECL_SEG_TYPES, X)
 static const struct riscv_builtin_description riscv_builtins[] = {
   #include "riscv-builtins-crypto.def"
   #include "riscv-builtins-rvp.def"
+  #include "riscv-cmo.def"
 
   DIRECT_BUILTIN (pcntw, RISCV_SI_FTYPE_SI, bitmanip64),
   DIRECT_BUILTIN (rolw, RISCV_SI_FTYPE_SI_SI, bitmanip64),

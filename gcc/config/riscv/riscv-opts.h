@@ -97,6 +97,10 @@ enum riscv_rvv_vector_bits_enum {
 #define MASK_ZKSH     (1 << 8)
 #define MASK_ZKT      (1 << 9)
 
+#define MASK_ZICBOZ   (1 << 0)
+#define MASK_ZICBOM   (1 << 1)
+#define MASK_ZICBOP   (1 << 2)
+
 /* P extension subset */
 #define MASK_ZPN  (1 << 0)
 #define MASK_ZPRV (1 << 1)
@@ -126,6 +130,10 @@ enum riscv_rvv_vector_bits_enum {
 #define TARGET_ZKSED ((riscv_crypto_subext & MASK_ZKSED) != 0)
 #define TARGET_ZKSH  ((riscv_crypto_subext & MASK_ZKSH) != 0)
 #define TARGET_ZKT   ((riscv_crypto_subext & MASK_ZKT) != 0)
+
+#define TARGET_ZICBOZ ((riscv_zicmo_subext & MASK_ZICBOZ) != 0)
+#define TARGET_ZICBOM ((riscv_zicmo_subext & MASK_ZICBOM) != 0)
+#define TARGET_ZICBOP ((riscv_zicmo_subext & MASK_ZICBOP) != 0)
 
 #define TARGET_ZPN ((riscv_rvp_subext & MASK_ZPN) != 0)
 #define TARGET_ZPRV ((riscv_rvp_subext & MASK_ZPRV) != 0)
