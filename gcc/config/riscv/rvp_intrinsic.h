@@ -141,6 +141,226 @@ typedef unsigned long uixlen_t;
 #define __dksub32(a, b) \
   (__builtin_riscv_dksub32 ((a), (b)))
 
+#define __dradd16(a, b) \
+  (__builtin_riscv_dradd16 ((a), (b)))
+
+#define __dsub16(a, b) \
+  (__builtin_riscv_dsub16 ((a), (b)))
+
+#define __dradd32(a, b) \
+  (__builtin_riscv_dradd32 ((a), (b)))
+
+#define __dsub32(a, b) \
+  (__builtin_riscv_dsub32 ((a), (b)))
+
+#define __dkmda(a, b) \
+  (__builtin_riscv_dkmda ((a), (b)))
+
+#define __dkmxda(a, b) \
+  (__builtin_riscv_dkmxda ((a), (b)))
+
+#define __dsmdrs(a, b) \
+  (__builtin_riscv_dsmdrs ((a), (b)))
+
+#define __dsmxds(a, b) \
+  (__builtin_riscv_dsmxds ((a), (b)))
+
+#define __dsmbb32(a, b) \
+  (__builtin_riscv_dsmbb32 ((a), (b)))
+
+#define __dsmbb32_sra14(a, b) \
+  (__builtin_riscv_dsmbb32_sra14 ((a), (b)))
+
+#define __dsmbb32_sra32(a, b) \
+  (__builtin_riscv_dsmbb32_sra32 ((a), (b)))
+
+#define __dsmbt32(a, b) \
+  (__builtin_riscv_dsmbt32 ((a), (b)))
+
+#define __dsmbt32_sra14(a, b) \
+  (__builtin_riscv_dsmbt32_sra14 ((a), (b)))
+
+#define __dsmbt32_sra32(a, b) \
+  (__builtin_riscv_dsmbt32_sra32 ((a), (b)))
+
+#define __dsmtt32(a, b) \
+  (__builtin_riscv_dsmtt32 ((a), (b)))
+
+#define __dsmtt32_sra14(a, b) \
+  (__builtin_riscv_dsmtt32_sra14 ((a), (b)))
+
+#define __dsmtt32_sra32(a, b) \
+  (__builtin_riscv_dsmtt32_sra32 ((a), (b)))
+
+#define __dpkbb32(a, b) \
+  (__builtin_riscv_dpkbb32 ((a), (b)))
+
+#define __dpkbt32(a, b) \
+  (__builtin_riscv_dpkbt32 ((a), (b)))
+
+#define __dpktt32(a, b) \
+  (__builtin_riscv_dpktt32 ((a), (b)))
+
+#define __dpktb32(a, b) \
+  (__builtin_riscv_dpktb32 ((a), (b)))
+
+#define __dpktb16(a, b) \
+  (__builtin_riscv_dpktb16 ((a), (b)))
+
+#define __dpkbb16(a, b) \
+  (__builtin_riscv_dpkbb16 ((a), (b)))
+
+#define __dpkbt16(a, b) \
+  (__builtin_riscv_dpkbt16 ((a), (b)))
+
+#define __dpktt16(a, b) \
+  (__builtin_riscv_dpktt16 ((a), (b)))
+
+#define __dsra16(a, b) \
+  (__builtin_riscv_dsra16 ((a), (b)))
+
+#define __dadd16(a, b) \
+  (__builtin_riscv_dadd16 ((a), (b)))
+
+#define __dadd32(a, b) \
+  (__builtin_riscv_dadd32 ((a), (b)))
+
+#define __dsmbb16(a, b) \
+  (__builtin_riscv_dsmbb16 ((a), (b)))
+
+#define __dsmbt16(a, b) \
+  (__builtin_riscv_dsmbt16 ((a), (b)))
+
+#define __dsmtt16(a, b) \
+  (__builtin_riscv_dsmtt16 ((a), (b)))
+
+#define __drcrsa16(a, b) \
+  (__builtin_riscv_drcrsa16 ((a), (b)))
+
+#define __drcras16(a, b) \
+  (__builtin_riscv_drcras16 ((a), (b)))
+
+#define __dkcrsa16(a, b) \
+  (__builtin_riscv_dkcrsa16 ((a), (b)))
+
+#define __dkcras16(a, b) \
+  (__builtin_riscv_dkcras16 ((a), (b)))
+
+#define __drsub16(a, b) \
+  (__builtin_riscv_drsub16 ((a), (b)))
+
+#define __drsub32(a, b) \
+  (__builtin_riscv_drsub32 ((a), (b)))
+
+#define __dstsa32(a, b) \
+  (__builtin_riscv_dstsa32 ((a), (b)))
+
+#define __dstas32(a, b) \
+  (__builtin_riscv_dstas32 ((a), (b)))
+
+#define __dkcras32(a, b) \
+  (__builtin_riscv_dkcras32 ((a), (b)))
+
+#define __dkcrsa32(a, b) \
+  (__builtin_riscv_dkcrsa32 ((a), (b)))
+
+#define __dcrsa32(a, b) \
+  (__builtin_riscv_dcrsa32 ((a), (b)))
+
+#define __dcras32(a, b) \
+  (__builtin_riscv_dcras32 ((a), (b)))
+
+#define __dkstsa16(a, b) \
+  (__builtin_riscv_dkstsa16 ((a), (b)))
+
+#define __dkstas16(a, b) \
+  (__builtin_riscv_dkstas16 ((a), (b)))
+
+#define __dsclip8(a, b) \
+  (__builtin_riscv_dsclip8 ((a), (b)))
+
+#define __dsclip16(a, b) \
+  (__builtin_riscv_dsclip16 ((a), (b)))
+
+#define __dsclip32(a, b) \
+  (__builtin_riscv_dsclip32 ((a), (b)))
+
+#define __drcrsa32(a, b) \
+  (__builtin_riscv_drcrsa32 ((a), (b)))
+
+#define __drcras32(a, b) \
+  (__builtin_riscv_drcras32 ((a), (b)))
+
+#define __dkclip64(a) \
+  (__builtin_riscv_dkclip64 ((a)))
+
+//N3
+#define __dmsr16(a, b) \
+  (__builtin_riscv_dmsr16 ((a), (b)))
+
+#define __dmsr17(a, b) \
+  (__builtin_riscv_dmsr17 ((a), (b)))
+
+#define __dmsr33(a, b) \
+  (__builtin_riscv_dmsr33 ((a), (b)))
+
+#define __dmxsr33(a, b) \
+  (__builtin_riscv_dmxsr33 ((a), (b)))
+
+#define __dsmada16(a, b, c) \
+  (__builtin_riscv_dsmada16 ((a), (b), (c)))
+
+#define __dsmaxda16(a, b, c) \
+  (__builtin_riscv_dsmaxda16 ((a), (b), (c)))
+
+#define __dksms32_u(a, b, c) \
+  (__builtin_riscv_dksms32_u ((a), (b), (c)))
+
+#define __dmada32(a, b, c) \
+  (__builtin_riscv_dmada32 ((a), (b), (c)))
+
+#define __dredas16(a) \
+  (__builtin_riscv_dredas16 ((a)))
+
+#define __dredsa16(a) \
+  (__builtin_riscv_dredsa16 ((a)))
+
+#define __dreda32(a) \
+  (__builtin_riscv_dreda32 ((a)))
+
+#define __dreds32(a) \
+  (__builtin_riscv_dreds32 ((a)))
+
+#define __dsma32_u(a, b) \
+  (__builtin_riscv_dsma32_u ((a), (b)))
+
+#define __dsmxs32_u(a, b) \
+  (__builtin_riscv_dsmxs32_u ((a), (b)))
+
+#define __dsmxa32_u(a, b) \
+  (__builtin_riscv_dsmxa32_u ((a), (b)))
+
+#define __dsms32_u(a, b) \
+  (__builtin_riscv_dsms32_u ((a), (b)))
+
+#define __dsmalbb(a, b, c) \
+  (__builtin_riscv_dsmalbb ((a), (b), (c)))
+
+#define __dsmalbt(a, b, c) \
+  (__builtin_riscv_dsmalbt ((a), (b), (c)))
+
+#define __dsmaltt(a, b, c) \
+  (__builtin_riscv_dsmaltt ((a), (b), (c)))
+
+#define __dkmabb32(a, b, c) \
+  (__builtin_riscv_dkmabb32 ((a), (b), (c)))
+
+#define __dkmabt32(a, b, c) \
+  (__builtin_riscv_dkmabt32 ((a), (b), (c)))
+
+#define __dkmatt32(a, b, c) \
+  (__builtin_riscv_dkmatt32 ((a), (b), (c)))
+  
 #define __dkmmac(a, b, c) \
   (__builtin_riscv_dkmmac ((a), (b), (c)))
 
