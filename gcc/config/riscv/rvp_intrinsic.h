@@ -403,11 +403,11 @@ typedef unsigned long uixlen_t;
 #define __dumaqa(a, b, c) \
   (__builtin_riscv_dumaqa ((a), (b), (c)))
 
-#define __dkmda32(a, b, c) \
-  (__builtin_riscv_dkmda32 ((a), (b), (c)))
+#define __dkmda32(a, b) \
+  (__builtin_riscv_dkmda32 ((a), (b)))
 
-#define __dkmxda32(a, b, c) \
-  (__builtin_riscv_dkmxda32 ((a), (b), (c)))
+#define __dkmxda32(a, b) \
+  (__builtin_riscv_dkmxda32 ((a), (b)))
 
 #define __dkmada32(a, b, c) \
   (__builtin_riscv_dkmada32 ((a), (b), (c)))
@@ -430,14 +430,14 @@ typedef unsigned long uixlen_t;
 #define __dkmsxda32(a, b, c) \
   (__builtin_riscv_dkmsxda32 ((a), (b), (c)))
 
-#define __dsmds32(a, b, c) \
-  (__builtin_riscv_dsmds32 ((a), (b), (c)))
+#define __dsmds32(a, b) \
+  (__builtin_riscv_dsmds32 ((a), (b)))
 
-#define __dsmdrs32(a, b, c) \
-  (__builtin_riscv_dsmdrs32 ((a), (b), (c)))
+#define __dsmdrs32(a, b) \
+  (__builtin_riscv_dsmdrs32 ((a), (b)))
 
-#define __dsmxds32(a, b, c) \
-  (__builtin_riscv_dsmxds32 ((a), (b), (c)))
+#define __dsmxds32(a, b) \
+  (__builtin_riscv_dsmxds32 ((a), (b)))
 
 #define __dsmalda(a, b, c) \
   (__builtin_riscv_dsmalda ((a), (b), (c)))
