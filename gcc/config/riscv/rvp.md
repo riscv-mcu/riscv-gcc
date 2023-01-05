@@ -7962,7 +7962,7 @@
 
 (define_insn "dsp_dsmada16"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMADA16))]
@@ -7973,7 +7973,7 @@
 
 (define_insn "dsp_dsmaxda16"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMAXDA16))]
@@ -7984,7 +7984,7 @@
 
 (define_insn "dsp_dksms32_u"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKSMS32_U))]
@@ -7995,7 +7995,7 @@
 
 (define_insn "dsp_dmada32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DMADA32))]
@@ -8093,7 +8093,7 @@
 
 (define_insn "dsp_dsmalbt"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALBT))]
@@ -8104,7 +8104,7 @@
 
 (define_insn "dsp_dsmaltt"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALTT))]
@@ -8115,7 +8115,7 @@
 
 (define_insn "dsp_dkmabb32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMABB32))]
@@ -8126,7 +8126,7 @@
 
 (define_insn "dsp_dkmabt32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMABT32))]
@@ -8137,7 +8137,7 @@
 
 (define_insn "dsp_dkmatt32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMATT32))]
@@ -8148,7 +8148,7 @@
 
 (define_insn "dsp_dkmmac"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMMAC))]
@@ -8159,7 +8159,7 @@
 
 (define_insn "dsp_dkmmacu"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMMACU))]
@@ -8170,7 +8170,7 @@
 
 (define_insn "dsp_dkmmsb"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMMSB))]
@@ -8192,7 +8192,7 @@
 
 (define_insn "dsp_dkmada"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMADA))]
@@ -8203,7 +8203,7 @@
 
 (define_insn "dsp_dkmaxda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMAXDA))]
@@ -8214,7 +8214,7 @@
 
 (define_insn "dsp_dkmads"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMADS))]
@@ -8225,7 +8225,7 @@
 
 (define_insn "dsp_dkmadrs"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMADRS))]
@@ -8236,7 +8236,7 @@
 
 (define_insn "dsp_dkmaxds"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMAXDS))]
@@ -8247,7 +8247,7 @@
 
 (define_insn "dsp_dkmsda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMSDA))]
@@ -8258,7 +8258,7 @@
 
 (define_insn "dsp_dkmsxda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMSXDA))]
@@ -8269,7 +8269,7 @@
 
 (define_insn "dsp_dsmaqa"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMAQA))]
@@ -8280,7 +8280,7 @@
 
 (define_insn "dsp_dsmaqasu"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMAQASU))]
@@ -8291,7 +8291,7 @@
 
 (define_insn "dsp_dumaqa"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DUMAQA))]
@@ -8302,7 +8302,7 @@
 
 (define_insn "dsp_dkmda32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 			 (match_operand:DI 2 "register_operand" " r")] 
 			 UNSPEC_DKMDA32))]
   "TARGET_ZPSF && !TARGET_64BIT"
@@ -8322,7 +8322,7 @@
 
 (define_insn "dsp_dkmada32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMADA32))]
@@ -8333,7 +8333,7 @@
 
 (define_insn "dsp_dkmaxda32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMAXDA32))]
@@ -8344,7 +8344,7 @@
 
 (define_insn "dsp_dkmads32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMADS32))]
@@ -8355,7 +8355,7 @@
 
 (define_insn "dsp_dkmadrs32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMADRS32))]
@@ -8366,7 +8366,7 @@
 
 (define_insn "dsp_dkmaxds32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMAXDS32))]
@@ -8377,7 +8377,7 @@
 
 (define_insn "dsp_dkmsda32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMSDA32))]
@@ -8388,7 +8388,7 @@
 
 (define_insn "dsp_dkmsxda32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DKMSXDA32))]
@@ -8429,7 +8429,7 @@
 
 (define_insn "dsp_dsmalda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALDA))]
@@ -8440,7 +8440,7 @@
 
 (define_insn "dsp_dsmalxda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALXDA))]
@@ -8451,7 +8451,7 @@
 
 (define_insn "dsp_dsmalds"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALDS))]
@@ -8462,7 +8462,7 @@
 
 (define_insn "dsp_dsmaldrs"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALDRS))]
@@ -8473,7 +8473,7 @@
 
 (define_insn "dsp_dsmalxds"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMALXDS))]
@@ -8484,7 +8484,7 @@
 
 (define_insn "dsp_dsmslda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMSLDA))]
@@ -8495,7 +8495,7 @@
 
 (define_insn "dsp_dsmslxda"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DSMSLXDA))]
@@ -8506,7 +8506,7 @@
 
 (define_insn "dsp_ddsmaqa"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DDSMAQA))]
@@ -8517,7 +8517,7 @@
 
 (define_insn "dsp_ddsmaqasu"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DDSMAQASU))]
@@ -8528,7 +8528,7 @@
 
 (define_insn "dsp_ddumaqa"
 [(set (match_operand:DI 0 "register_operand"               "=r")
-	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")] 
 			 UNSPEC_DDUMAQA))]
