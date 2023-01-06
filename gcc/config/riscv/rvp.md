@@ -8400,7 +8400,7 @@
 (define_insn "dsp_dsmds32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
-			 (match_operand:DI 3 "register_operand" " r")] 
+			 (match_operand:DI 2 "register_operand" " r")] 
 			 UNSPEC_DSMDS32))]
   "TARGET_ZPSF && !TARGET_64BIT"
   "dsmds32\t%0, %1, %2"
