@@ -152,6 +152,16 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"ssstateen", "zicsr"},
   {"sstc", "zicsr"},
 
+  {"xxlcz", "xxlczpstinc"},
+  {"xxlcz", "xxlczbmrk"},
+  {"xxlcz", "xxlczbitop"},
+  {"xxlcz", "xxlczslet"},
+  {"xxlcz", "xxlczabs"},
+  {"xxlcz", "xxlczmac"},
+  {"xxlcz", "xxlczbri"},
+  {"xxlcz", "xxlczbitrev"},
+  {"xxlcz", "xxlczgp"},
+
   {NULL, NULL}
 };
 
@@ -324,6 +334,17 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"xtheadsync", ISA_SPEC_CLASS_NONE, 1, 0},
 
   {"xventanacondops", ISA_SPEC_CLASS_NONE, 1, 0},
+
+  {"xxlcz",       ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczpstinc", ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbmrk",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbitop",  ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczslet",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczabs",    ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczmac",    ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbri",    ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbitrev", ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczgp",     ISA_SPEC_CLASS_NONE, 1, 0},
 
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
@@ -1494,6 +1515,16 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"xtheadsync",    &gcc_options::x_riscv_xthead_subext, MASK_XTHEADSYNC},
 
   {"xventanacondops", &gcc_options::x_riscv_xventana_subext, MASK_XVENTANACONDOPS},
+
+  {"xxlczpstinc", &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZPSTINC},
+  {"xxlczbmrk",   &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBMRK},
+  {"xxlczbitop",  &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBITOP},
+  {"xxlczslet",   &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZSLET},
+  {"xxlczabs",    &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZABS},
+  {"xxlczmac",    &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZMAC},
+  {"xxlczbri",    &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBRI},
+  {"xxlczbitrev", &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBITREV},
+  {"xxlczgp",     &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZGP},
 
   {NULL, NULL, 0}
 };
