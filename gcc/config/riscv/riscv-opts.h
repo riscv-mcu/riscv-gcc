@@ -287,6 +287,27 @@ enum riscv_entity
 #define TARGET_SVINVAL ((riscv_sv_subext & MASK_SVINVAL) != 0)
 #define TARGET_SVNAPOT ((riscv_sv_subext & MASK_SVNAPOT) != 0)
 
+
+#define MASK_XXLCZPSTINC  (1 << 0)
+#define MASK_XXLCZBMRK    (1 << 1)
+#define MASK_XXLCZBITOP   (1 << 2)
+#define MASK_XXLCZSLET    (1 << 3)
+#define MASK_XXLCZABS     (1 << 4)
+#define MASK_XXLCZMAC     (1 << 5)
+#define MASK_XXLCZBRI     (1 << 6)
+#define MASK_XXLCZBITREV  (1 << 7)
+#define MASK_XXLCZGP      (1 << 8)
+
+#define TARGET_XXLCZPSTINC  ((riscv_xxlcz_subext & MASK_XXLCZPSTINC) != 0)
+#define TARGET_XXLCZBMRK    ((riscv_xxlcz_subext & MASK_XXLCZBMRK) != 0)
+#define TARGET_XXLCZBITOP   ((riscv_xxlcz_subext & MASK_XXLCZBITOP) != 0)
+#define TARGET_XXLCZSLET    ((riscv_xxlcz_subext & MASK_XXLCZSLET) != 0)
+#define TARGET_XXLCZABS     ((riscv_xxlcz_subext & MASK_XXLCZABS) != 0)
+#define TARGET_XXLCZMAC     ((riscv_xxlcz_subext & MASK_XXLCZMAC) != 0)
+#define TARGET_XXLCZBRI     ((riscv_xxlcz_subext & MASK_XXLCZBRI) != 0)
+#define TARGET_XXLCZBITREV  ((riscv_xxlcz_subext & MASK_XXLCZBITREV) != 0)
+#define TARGET_XXLCZGP      ((riscv_xxlcz_subext & MASK_XXLCZGP) != 0)
+
 /* Bit of riscv_zvl_flags will set contintuly, N-1 bit will set if N-bit is
    set, e.g. MASK_ZVL64B has set then MASK_ZVL32B is set, so we can use
    popcount to caclulate the minimal VLEN.  */

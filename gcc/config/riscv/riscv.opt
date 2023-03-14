@@ -260,6 +260,9 @@ int riscv_xthead_subext
 TargetVariable
 int riscv_xventana_subext
 
+TargetVariable
+int riscv_xxlcz_subext
+
 Enum
 Name(isa_spec_class) Type(enum riscv_isa_spec_class)
 Supported ISA specs (for use with the -misa-spec= option):
