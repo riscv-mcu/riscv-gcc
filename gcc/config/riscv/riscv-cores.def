@@ -38,6 +38,10 @@ RISCV_TUNE("sifive-3-series", generic, rocket_tune_info)
 RISCV_TUNE("sifive-5-series", generic, rocket_tune_info)
 RISCV_TUNE("sifive-7-series", sifive_7, sifive_7_tune_info)
 RISCV_TUNE("thead-c906", generic, thead_c906_tune_info)
+RISCV_TUNE("nuclei-200-series", nuclei_200, nuclei_200_tune_info)
+RISCV_TUNE("nuclei-300-series", nuclei_300, nuclei_300_tune_info)
+RISCV_TUNE("nuclei-600-series", nuclei_600, nuclei_600_tune_info)
+RISCV_TUNE("nuclei-900-series", nuclei_900, nuclei_900_tune_info)
 RISCV_TUNE("size", generic, optimize_size_tune_info)
 
 #undef RISCV_TUNE
@@ -77,4 +81,44 @@ RISCV_CORE("thead-c906",      "rv64imafdc_xtheadba_xtheadbb_xtheadbs_xtheadcmo_"
 			      "xtheadcondmov_xtheadfmemidx_xtheadmac_"
 			      "xtheadmemidx_xtheadmempair_xtheadsync",
 			      "thead-c906")
+
+RISCV_CORE("nuclei-n200",     "rv32imc",    "nuclei-200-series")
+RISCV_CORE("nuclei-n201",     "rv32iac",    "nuclei-200-series")
+RISCV_CORE("nuclei-n203",     "rv32imac",   "nuclei-200-series")
+RISCV_CORE("nuclei-n205",     "rv32imac",   "nuclei-200-series")
+
+RISCV_CORE("nuclei-n203e",    "rv32emac",   "nuclei-200-series")
+RISCV_CORE("nuclei-n205e",    "rv32emac",   "nuclei-200-series")
+
+RISCV_CORE("nuclei-n300",     "rv32imac",   "nuclei-300-series")
+RISCV_CORE("nuclei-n300f",    "rv32imafc",  "nuclei-300-series")
+RISCV_CORE("nuclei-n300fd",   "rv32imafdc", "nuclei-300-series")
+
+RISCV_CORE("nuclei-n305",     "rv32imac",   "nuclei-300-series")
+RISCV_CORE("nuclei-n307",     "rv32imafc",  "nuclei-300-series")
+RISCV_CORE("nuclei-n307fd",   "rv32imafdc", "nuclei-300-series")
+
+RISCV_CORE("nuclei-n600",     "rv32imac",   "nuclei-600-series")
+RISCV_CORE("nuclei-n600f",    "rv32imafc",  "nuclei-600-series")
+RISCV_CORE("nuclei-n600fd",   "rv32imafdc", "nuclei-600-series")
+
+RISCV_CORE("nuclei-n900",     "rv32imac",   "nuclei-900-series")
+RISCV_CORE("nuclei-n900f",    "rv32imafdc", "nuclei-900-series")
+RISCV_CORE("nuclei-n900fd",   "rv32imafdc", "nuclei-900-series")
+
+RISCV_CORE("nuclei-nx600",    "rv64imac",   "nuclei-600-series")
+RISCV_CORE("nuclei-nx600f",   "rv64imafc",  "nuclei-600-series")
+RISCV_CORE("nuclei-nx600fd",  "rv64imafdc", "nuclei-600-series")
+
+RISCV_CORE("nuclei-ux600",    "rv64imac",   "nuclei-600-series")
+RISCV_CORE("nuclei-ux600f",   "rv64imafc",  "nuclei-600-series")
+RISCV_CORE("nuclei-ux600fd",  "rv64imafdc", "nuclei-600-series")
+
+RISCV_CORE("nuclei-nx900",    "rv64imac",   "nuclei-900-series")
+RISCV_CORE("nuclei-nx900f",   "rv64imafc",  "nuclei-900-series")
+RISCV_CORE("nuclei-nx900fd",  "rv64imafdc", "nuclei-900-series")
+
+RISCV_CORE("nuclei-ux900",    "rv64imac",   "nuclei-900-series")
+RISCV_CORE("nuclei-ux900f",   "rv64imafc",  "nuclei-900-series")
+RISCV_CORE("nuclei-ux900fd",  "rv64imafdc", "nuclei-900-series")
 #undef RISCV_CORE
