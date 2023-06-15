@@ -346,6 +346,10 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"xxlczbitrev", ISA_SPEC_CLASS_NONE, 1, 0},
   {"xxlczgp",     ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"zpn",   ISA_SPEC_CLASS_NONE, 0, 94},
+  {"zprv",  ISA_SPEC_CLASS_NONE, 0, 94},
+  {"zpsf",  ISA_SPEC_CLASS_NONE, 0, 94},
+
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
 };
@@ -1525,6 +1529,10 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"xxlczbri",    &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBRI},
   {"xxlczbitrev", &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBITREV},
   {"xxlczgp",     &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZGP},
+
+  {"zpn",     &gcc_options::x_riscv_rvp_subext, MASK_ZPN},
+  {"zprv",    &gcc_options::x_riscv_rvp_subext, MASK_ZPRV},
+  {"zpsf",    &gcc_options::x_riscv_rvp_subext, MASK_ZPSF},
 
   {NULL, NULL, 0}
 };
