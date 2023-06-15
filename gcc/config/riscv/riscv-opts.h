@@ -159,4 +159,13 @@ enum stringop_strategy_enum {
 #define TARGET_MAX_LMUL                                                        \
   (int) (riscv_autovec_lmul == RVV_DYNAMIC ? RVV_M8 : riscv_autovec_lmul)
 
+/* P extension subset */
+#define MASK_ZPN (1 << 0)
+#define MASK_ZPRV (1 << 1)
+#define MASK_ZPSF (1 << 2)
+
+#define TARGET_ZPN ((riscv_rvp_subext & MASK_ZPN) != 0)
+#define TARGET_ZPRV ((riscv_rvp_subext & MASK_ZPRV) != 0)
+#define TARGET_ZPSF ((riscv_rvp_subext & MASK_ZPSF) != 0)
+
 #endif /* ! GCC_RISCV_OPTS_H */
