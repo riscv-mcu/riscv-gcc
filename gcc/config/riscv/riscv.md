@@ -107,6 +107,56 @@
   UNSPEC_XXLCZ_FFNZ
   UNSPEC_XXLCZ_ADDRCHK
   UNSPEC_XXLCZ_BEZM
+
+  ;; rvp
+  UNSPEC_KABS
+  UNSPEC_KADDW
+  UNSPEC_KSUBW
+  UNSPEC_KADDH
+  UNSPEC_KSUBH
+  UNSPEC_UKADDW
+  UNSPEC_UKSUBW
+  UNSPEC_UKADDH
+  UNSPEC_UKSUBH
+  UNSPEC_BITREV
+  UNSPEC_CLO
+  UNSPEC_KDMABB
+  UNSPEC_KDMABT
+  UNSPEC_KDMATT
+  UNSPEC_KHMBB
+  UNSPEC_KHMBT
+  UNSPEC_KHMTT
+  UNSPEC_KHM
+  UNSPEC_KHMX
+  UNSPEC_ROUND
+  UNSPEC_KMMWU
+  UNSPEC_KMMW
+  UNSPEC_KSLRAW
+  UNSPEC_KSLRAWU
+  UNSPEC_PBSAD
+  UNSPEC_PBSADA
+  UNSPEC_RDOV
+  UNSPEC_CLIPS
+  UNSPEC_CLIPS_OV
+  UNSPEC_SMUL8
+  UNSPEC_SMULX8
+  UNSPEC_UMUL8
+  UNSPEC_UMULX8
+  UNSPEC_SMUL16
+  UNSPEC_SMULX16
+  UNSPEC_UMUL16
+  UNSPEC_UMULX16
+  UNSPEC_ROUND64
+  UNSPEC_BSWAP
+  UNSPEC_UCLIP
+  UNSPEC_UCLIP_OV
+  UNSPEC_VEC_COMPARE
+  UNSPEC_KDMBB16
+  UNSPEC_KDMBT16
+  UNSPEC_KDMTT16
+  UNSPEC_KHMBB16
+  UNSPEC_KHMBT16
+  UNSPEC_KHMTT16
 ])
 
 (define_c_enum "unspecv" [
@@ -148,6 +198,9 @@
   ;; XTheadFmv unspec
   UNSPEC_XTHEADFMV
   UNSPEC_XTHEADFMV_HW
+
+  ;; RVP
+  UNSPEC_CLROV
 ])
 
 (define_constants
@@ -448,6 +501,10 @@
 ;; vcompress    vector compress instruction
 ;; vmov         whole vector register move
 ;; vector       unknown vector instruction
+;; simd   simd instruction for p extension
+;; psimd  partial-simd data processing instructions
+;; dsp    instructions for increasing the DSP processing capabilities
+;; dsp64  as the same as dsp, but RV64P only
 (define_attr "type"
   "unknown,branch,jump,call,load,fpload,store,fpstore,
    mtc,mfc,const,arith,logical,shift,slt,imul,idiv,move,fmove,fadd,fmul,
@@ -467,7 +524,8 @@
    vired,viwred,vfredu,vfredo,vfwredu,vfwredo,
    vmalu,vmpop,vmffs,vmsfs,vmiota,vmidx,vimovvx,vimovxv,vfmovvf,vfmovfv,
    vslideup,vslidedown,vislide1up,vislide1down,vfslide1up,vfslide1down,
-   vgather,vcompress,vmov,vector"
+   vgather,vcompress,vmov,vector,
+   simd,psimd,dsp,dsp64"
   (cond [(eq_attr "got" "load") (const_string "load")
 
 	 ;; If a doubleword move uses these expensive instructions,
@@ -3613,3 +3671,4 @@
 (include "zicond.md")
 (include "zc.md")
 (include "nuclei-xxlcz.md")
+(include "rvp.md")

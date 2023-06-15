@@ -181,7 +181,7 @@
 #			the --with-sysroot configure option or the
 #			--sysroot command line option is used this
 #			will be relative to the sysroot.
-# target_type_format_char 
+# target_type_format_char
 # 			The default character to be used for formatting
 #			the attribute in a
 #			.type symbol_name, ${t_t_f_c}<property>
@@ -534,7 +534,7 @@ riscv*)
 	extra_objs="${extra_objs} riscv-vector-builtins.o riscv-vector-builtins-shapes.o riscv-vector-builtins-bases.o"
 	extra_objs="${extra_objs} thead.o"
 	d_target_objs="riscv-d.o"
-	extra_headers="riscv_vector.h riscv_nuclei_xlcz.h"
+	extra_headers="riscv_vector.h rvp_intrinsic.h riscv_nuclei_xlcz.h"
 	target_gtfiles="$target_gtfiles \$(srcdir)/config/riscv/riscv-vector-builtins.cc"
 	target_gtfiles="$target_gtfiles \$(srcdir)/config/riscv/riscv-vector-builtins.h"
 	;;

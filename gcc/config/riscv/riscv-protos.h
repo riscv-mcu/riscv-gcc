@@ -139,6 +139,7 @@ extern bool riscv_shamt_matches_mask_p (int, HOST_WIDE_INT);
 extern void riscv_subword_address (rtx, rtx *, rtx *, rtx *, rtx *);
 extern void riscv_lshift_subword (machine_mode, rtx, rtx, rtx *);
 extern enum memmodel riscv_union_memmodels (enum memmodel, enum memmodel);
+extern bool riscv_rvp_support_vector_mode_p (machine_mode mode);
 
 /* Routines implemented in riscv-c.cc.  */
 void riscv_cpu_cpp_builtins (cpp_reader *);

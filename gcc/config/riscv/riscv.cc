@@ -134,6 +134,8 @@ struct GTY(())  riscv_frame_info {
   poly_int64 v_sp_offset_top;
   poly_int64 v_sp_offset_bottom;
 
+  HOST_WIDE_INT min_first_step;
+
   /* Offset of virtual frame pointer from stack pointer/frame bottom */
   poly_int64 frame_pointer_offset;
 
@@ -1191,6 +1193,10 @@ riscv_v_ext_vector_mode_p (machine_mode mode)
 #define ENTRY(MODE, REQUIREMENT, ...)                                          \
   case MODE##mode:                                                             \
     return REQUIREMENT;
+
+  if (riscv_rvp_support_vector_mode_p (mode))
+    return false;
+
   switch (mode)
     {
 #include "riscv-vector-switch.def"
@@ -4305,9 +4311,9 @@ riscv_flatten_aggregate_field (const_tree type,
     default:
       if (n < 2
 	  && ((SCALAR_FLOAT_TYPE_P (type)
-	       && GET_MODE_SIZE (TYPE_MODE (type)).to_constant () <= UNITS_PER_FP_ARG)
+	       && (GET_MODE_SIZE (TYPE_MODE (type)).to_constant () <= UNITS_PER_FP_ARG))
 	      || (INTEGRAL_TYPE_P (type)
-		  && GET_MODE_SIZE (TYPE_MODE (type)).to_constant () <= UNITS_PER_WORD)))
+		  && (GET_MODE_SIZE (TYPE_MODE (type)).to_constant () <= UNITS_PER_WORD))))
 	{
 	  fields[n].type = type;
 	  fields[n].offset = offset;
@@ -4732,7 +4738,7 @@ riscv_get_arg_info (struct riscv_arg_info *info, const CUMULATIVE_ARGS *cum,
     }
 
   /* Work out the size of the argument.  */
-  num_bytes = type ? int_size_in_bytes (type) : GET_MODE_SIZE (mode).to_constant ();
+  num_bytes = (type ? int_size_in_bytes (type) : GET_MODE_SIZE (mode).to_constant ());
   num_words = (num_bytes + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 
   /* Doubleword-aligned varargs start on an even register boundary.  */
@@ -7671,6 +7677,23 @@ riscv_hard_regno_nregs (unsigned int regno, machine_mode mode)
   return (GET_MODE_SIZE (mode).to_constant () + UNITS_PER_WORD - 1) / UNITS_PER_WORD;
 }
 
+bool
+riscv_rvp_support_vector_mode_p (machine_mode mode)
+{
+  /* a few instructions(e.g. kdmabb, smulx) in RV64P also support V2HI, V4QI */
+  if (mode == V2HImode
+	|| mode == V4QImode
+	|| mode == V2SImode)
+	  return true;
+
+  if (TARGET_64BIT && (mode == V8QImode
+	  || mode == V4HImode))
+	  return true;
+
+
+  return false;
+}
+
 /* Implement TARGET_HARD_REGNO_MODE_OK.  */
 
 static bool
@@ -7680,10 +7703,12 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
 
   if (GP_REG_P (regno))
     {
-      if (riscv_v_ext_mode_p (mode))
+      if (riscv_v_ext_mode_p (mode)
+          && !(TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode)))
 	return false;
 
-      if (!GP_REG_P (regno + nregs - 1))
+      if (!GP_REG_P (regno + nregs - 1)
+         && !(TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode)))
 	return false;
     }
   else if (FP_REG_P (regno))
@@ -7735,6 +7760,15 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
      GET_MODE_UNIT_SIZE (mode) == GET_MODE_SIZE (DFmode))
     return !(regno & 1);
   }
+
+  /* use even/odd pair of registers in rv32 zpsf subset */
+  if (TARGET_ZPSF && !TARGET_64BIT)
+    {
+      if ((GET_MODE_CLASS (mode) == MODE_INT ||
+          GET_MODE_CLASS (mode) == MODE_VECTOR_INT) &&
+          GET_MODE_UNIT_SIZE (mode) == GET_MODE_SIZE (DImode))
+        return !(regno & 1);
+    }
 
   return true;
 }
@@ -8896,6 +8930,16 @@ riscv_vector_mode_supported_p (machine_mode mode)
 {
   if (TARGET_VECTOR)
     return riscv_v_ext_mode_p (mode);
+
+  if (TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode))
+    return true;
+
+  if ((mode == V16QImode
+      || mode == V8HImode
+      || mode == V4SImode
+      || mode == V2DImode)
+      && TARGET_64BIT)
+    return false;
 
   return false;
 }
