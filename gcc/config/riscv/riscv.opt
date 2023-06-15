@@ -160,6 +160,8 @@ Mask(VECTOR)
 
 Mask(FULL_V)
 
+Mask(RVP)
+
 mriscv-attribute
 Target Var(riscv_emit_attribute_p) Init(-1)
 Emit RISC-V ELF attribute.
@@ -205,6 +207,9 @@ Use the given offset for addressing the stack-protector guard.
 
 TargetVariable
 long riscv_stack_protector_guard_offset = 0
+
+TargetVariable
+int riscv_rvp_subext
 
 TargetVariable
 int riscv_zi_subext
