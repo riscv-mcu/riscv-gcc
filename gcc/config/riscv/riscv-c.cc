@@ -145,7 +145,7 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
     builtin_define ("__riscv_zpsf");
   }
 
-  if (TARGET_ZBA)
+  if (TARGET_ZBA && TARGET_ZBB && TARGET_ZBC && TARGET_ZBS)
   {
     builtin_define ("__riscv_bitmanip");
   }
