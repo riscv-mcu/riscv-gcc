@@ -148,7 +148,7 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                    (match_operand:SI 2 "register_operand" "r")
-                   (match_operand:SI 3 "register_operand" "D03")]
+                   (match_operand:SI 3 "immediate_operand" "D03")]
                    UNSPEC_AES_DSI))]
   "TARGET_ZKND && !TARGET_64BIT"
   "aes32dsi\t%0,%1,%2,%3"
@@ -158,7 +158,7 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                    (match_operand:SI 2 "register_operand" "r")
-                   (match_operand:SI 3 "register_operand" "D03")]
+                   (match_operand:SI 3 "immediate_operand" "D03")]
                    UNSPEC_AES_DSMI))]
   "TARGET_ZKND && !TARGET_64BIT"
   "aes32dsmi\t%0,%1,%2,%3"
@@ -214,7 +214,7 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                    (match_operand:SI 2 "register_operand" "r")
-                   (match_operand:SI 3 "register_operand" "D03")]
+                   (match_operand:SI 3 "immediate_operand" "D03")]
                    UNSPEC_AES_ESI))]
   "TARGET_ZKNE && !TARGET_64BIT"
   "aes32esi\t%0,%1,%2,%3"
@@ -224,7 +224,7 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                    (match_operand:SI 2 "register_operand" "r")
-                   (match_operand:SI 3 "register_operand" "D03")]
+                   (match_operand:SI 3 "immediate_operand" "D03")]
                    UNSPEC_AES_ESMI))]
   "TARGET_ZKNE && !TARGET_64BIT"
   "aes32esmi\t%0,%1,%2,%3"
@@ -431,7 +431,7 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                    (match_operand:SI 2 "register_operand" "r")
-                   (match_operand:SI 3 "register_operand" "D03")]
+                   (match_operand:SI 3 "immediate_operand" "D03")]
                    SM4_OP))]
   "TARGET_ZKSED && !TARGET_64BIT"
   "<sm4_op>\t%0,%1,%2,%3"
@@ -442,7 +442,7 @@
         (sign_extend:DI
              (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                         (match_operand:SI 2 "register_operand" "r")
-                        (match_operand:SI 3 "register_operand" "D03")]
+                        (match_operand:SI 3 "immediate_operand" "D03")]
                         SM4_OP)))]
   "TARGET_ZKSED && TARGET_64BIT"
   "<sm4_op>\t%0,%1,%2,%3"
@@ -452,7 +452,7 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                    (match_operand:SI 2 "register_operand" "r")
-                   (match_operand:SI 3 "register_operand" "D03")]
+                   (match_operand:SI 3 "immediate_operand" "D03")]
                    SM4_OP))]
   "TARGET_ZKSED"
   {
