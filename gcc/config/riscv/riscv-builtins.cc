@@ -238,6 +238,21 @@ tree int_xlen_node;
 #define RISCV_ATYPE_V8HI build_vector_type (intHI_type_node, 8)
 #define RISCV_ATYPE_UV8HI build_vector_type (unsigned_intHI_type_node, 8)
 
+#define RISCV_ATYPE_RVPV4QI build_vector_type (intQI_type_node, 4)
+#define RISCV_ATYPE_URVPV4QI build_vector_type (unsigned_intQI_type_node, 4)
+#define RISCV_ATYPE_RVPV8QI build_vector_type (intQI_type_node, 8)
+#define RISCV_ATYPE_URVPV8QI build_vector_type (unsigned_intQI_type_node, 8)
+#define RISCV_ATYPE_RVPV2HI build_vector_type (intHI_type_node, 2)
+#define RISCV_ATYPE_URVPV2HI build_vector_type (unsigned_intHI_type_node, 2)
+#define RISCV_ATYPE_RVPV4HI build_vector_type (intHI_type_node, 4)
+#define RISCV_ATYPE_URVPV4HI build_vector_type (unsigned_intHI_type_node, 4)
+#define RISCV_ATYPE_RVPV2SI build_vector_type (intSI_type_node, 2)
+#define RISCV_ATYPE_URVPV2SI build_vector_type (unsigned_intSI_type_node, 2)
+#define RISCV_ATYPE_RVPV4SI build_vector_type (intSI_type_node, 4)
+#define RISCV_ATYPE_URVPV4SI build_vector_type (unsigned_intSI_type_node, 4)
+#define RISCV_ATYPE_RVPV8HI build_vector_type (intHI_type_node, 8)
+#define RISCV_ATYPE_URVPV8HI build_vector_type (unsigned_intHI_type_node, 8)
+
 #define RISCV_ATYPE_IXLEN  int_xlen_node
 #define RISCV_ATYPE_UIXLEN uint_xlen_node
 
