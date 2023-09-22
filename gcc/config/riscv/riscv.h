@@ -765,6 +765,11 @@ extern enum riscv_cc get_riscv_cc (const rtx use);
    : (TRAMPOLINE_CODE_SIZE + POINTER_SIZE * 2))
 #define TRAMPOLINE_ALIGNMENT POINTER_SIZE
 
+#define HAVE_POST_INCREMENT TARGET_XXLCZPSTINC
+#define HAVE_POST_DECREMENT TARGET_XXLCZPSTINC
+#define HAVE_POST_MODIFY_DISP TARGET_XXLCZPSTINC
+#define HAVE_POST_MODIFY_REG TARGET_XXLCZPSTINC
+
 /* Addressing modes, and classification of registers for them.  */
 
 #define REGNO_OK_FOR_INDEX_P(REGNO) \

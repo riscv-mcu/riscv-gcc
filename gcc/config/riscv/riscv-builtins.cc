@@ -47,6 +47,8 @@ along with GCC; see the file COPYING3.  If not see
 #define RISCV_FTYPE_NAME1(A, B) RISCV_##A##_FTYPE_##B
 #define RISCV_FTYPE_NAME2(A, B, C) RISCV_##A##_FTYPE_##B##_##C
 #define RISCV_FTYPE_NAME3(A, B, C, D) RISCV_##A##_FTYPE_##B##_##C##_##D
+#define RISCV_FTYPE_NAME4(A, B, C, D, E) RISCV_##A##_FTYPE_##B##_##C##_##D##_##E
+#define RISCV_FTYPE_NAME5(A, B, C, D, E, F) RISCV_##A##_FTYPE_##B##_##C##_##D##_##E##_##F
 
 /* Classifies the prototype of a built-in function.  */
 enum riscv_function_type {
@@ -121,6 +123,13 @@ AVAIL (clmul_zbkc32_or_zbc32, (TARGET_ZBKC || TARGET_ZBC) && !TARGET_64BIT)
 AVAIL (clmul_zbkc64_or_zbc64, (TARGET_ZBKC || TARGET_ZBC) && TARGET_64BIT)
 AVAIL (clmulr_zbc32, TARGET_ZBC && !TARGET_64BIT)
 AVAIL (clmulr_zbc64, TARGET_ZBC && TARGET_64BIT)
+AVAIL (xxlczpstinc, TARGET_XXLCZPSTINC)
+AVAIL (xxlczbitop,  TARGET_XXLCZBITOP)
+AVAIL (xxlczabs,    TARGET_XXLCZABS)
+AVAIL (xxlczslet,   TARGET_XXLCZSLET)
+AVAIL (xxlczmac,    TARGET_XXLCZMAC)
+AVAIL (xxlczbitrev, TARGET_XXLCZBITREV)
+AVAIL (xxlczbmrk,   TARGET_XXLCZBMRK)
 AVAIL (hint_pause, (!0))
 
 /* Construct a riscv_builtin_description from the given arguments.
@@ -139,11 +148,21 @@ AVAIL (hint_pause, (!0))
   { CODE_FOR_riscv_ ## INSN, "__builtin_riscv_" NAME,			\
     BUILTIN_TYPE, FUNCTION_TYPE, riscv_builtin_avail_ ## AVAIL }
 
+#define RISCV_BUILTIN1(INSN, NAME, BUILTIN_TYPE, FUNCTION_TYPE, AVAIL)   \
+  { CODE_FOR_ ## INSN, "__builtin_xxlcz_" NAME,                                 \
+    BUILTIN_TYPE, FUNCTION_TYPE, riscv_builtin_avail_ ## AVAIL },
+
 /* Define __builtin_riscv_<INSN>, which is a RISCV_BUILTIN_DIRECT function
    mapped to instruction CODE_FOR_riscv_<INSN>,  FUNCTION_TYPE and AVAIL
    are as for RISCV_BUILTIN.  */
 #define DIRECT_BUILTIN(INSN, FUNCTION_TYPE, AVAIL)			\
   RISCV_BUILTIN (INSN, #INSN, RISCV_BUILTIN_DIRECT, FUNCTION_TYPE, AVAIL)
+
+#define DIRECT_BUILTIN1(INSN, NAME, FUNCTION_TYPE, AVAIL)                \
+  RISCV_BUILTIN1 (INSN, #NAME, RISCV_BUILTIN_DIRECT, FUNCTION_TYPE, AVAIL)
+
+#define DIRECT_BUILTIN2(INSN, NAME, FUNCTION_TYPE, AVAIL)                \
+  RISCV_BUILTIN1 (INSN, #NAME, RISCV_BUILTIN_DIRECT_NO_TARGET, FUNCTION_TYPE, AVAIL)
 
 /* Define __builtin_riscv_<INSN>, which is a RISCV_BUILTIN_DIRECT_NO_TARGET
    function mapped to instruction CODE_FOR_riscv_<INSN>,  FUNCTION_TYPE
@@ -159,6 +178,8 @@ AVAIL (hint_pause, (!0))
 #define RISCV_ATYPE_USI unsigned_intSI_type_node
 #define RISCV_ATYPE_UDI unsigned_intDI_type_node
 #define RISCV_ATYPE_VOID_PTR ptr_type_node
+#define RISCV_ATYPE_INT integer_type_node
+#define RISCV_ATYPE_SHORT short_integer_type_node
 
 /* RISCV_FTYPE_ATYPESN takes N RISCV_FTYPES-like type codes and lists
    their associated RISCV_ATYPEs.  */
@@ -170,10 +191,17 @@ AVAIL (hint_pause, (!0))
   RISCV_ATYPE_##A, RISCV_ATYPE_##B, RISCV_ATYPE_##C
 #define RISCV_FTYPE_ATYPES3(A, B, C, D) \
   RISCV_ATYPE_##A, RISCV_ATYPE_##B, RISCV_ATYPE_##C, RISCV_ATYPE_##D
+#define RISCV_FTYPE_ATYPES4(A, B, C, D, E) \
+  RISCV_ATYPE_##A, RISCV_ATYPE_##B, RISCV_ATYPE_##C, RISCV_ATYPE_##D, \
+  RISCV_ATYPE_##E
+#define RISCV_FTYPE_ATYPES5(A, B, C, D, E, F) \
+  RISCV_ATYPE_##A, RISCV_ATYPE_##B, RISCV_ATYPE_##C, RISCV_ATYPE_##D, \
+  RISCV_ATYPE_##E, RISCV_ATYPE_##F
 
 static const struct riscv_builtin_description riscv_builtins[] = {
   #include "riscv-cmo.def"
   #include "riscv-scalar-crypto.def"
+  #include "nuclei-builtins.def"
 
   DIRECT_BUILTIN (frflags, RISCV_USI_FTYPE, hard_float),
   DIRECT_NO_TARGET_BUILTIN (fsflags, RISCV_VOID_FTYPE_USI, hard_float),
