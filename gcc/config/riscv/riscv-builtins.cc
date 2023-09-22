@@ -145,6 +145,13 @@ AVAIL (zprv, TARGET_ZPRV && TARGET_64BIT)
 AVAIL (zpsf, TARGET_ZPSF)
 AVAIL (zpsf32, TARGET_ZPSF && !TARGET_64BIT)
 AVAIL (zpsf64, TARGET_ZPSF && TARGET_64BIT)
+AVAIL (xxldsp, TARGET_XXLDSP)
+AVAIL (xxldsp_64, TARGET_XXLDSP && TARGET_64BIT)
+AVAIL (xxldspn1x, TARGET_XXLDSPN1X && !TARGET_64BIT)
+AVAIL (xxldspn1x_64, TARGET_XXLDSPN1X && TARGET_64BIT)
+AVAIL (xxldspn2x, TARGET_XXLDSPN2X && !TARGET_64BIT)
+AVAIL (xxldspn3x, TARGET_XXLDSPN3X && !TARGET_64BIT)
+AVAIL (xxldspn3x_64, TARGET_XXLDSPN3X && TARGET_64BIT)
 
 /* Construct a riscv_builtin_description from the given arguments.
 
@@ -205,6 +212,9 @@ tree int_xlen_node;
 
 /* Argument types.  */
 #define RISCV_ATYPE_VOID void_type_node
+#define RISCV_ATYPE_HI intHI_type_node
+#define RISCV_ATYPE_SI intSI_type_node
+#define RISCV_ATYPE_DI intDI_type_node
 #define RISCV_ATYPE_UQI unsigned_intQI_type_node
 #define RISCV_ATYPE_UHI unsigned_intHI_type_node
 #define RISCV_ATYPE_USI unsigned_intSI_type_node
