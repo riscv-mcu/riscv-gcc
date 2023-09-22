@@ -162,6 +162,13 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"xxlcz", "xxlczbitrev"},
   {"xxlcz", "xxlczgp"},
 
+  {"xxldspn3x", "xxldsp"},
+  {"xxldspn3x", "xxldspn1x"},
+  {"xxldspn3x", "xxldspn2x"},
+  {"xxldspn2x", "xxldsp"},
+  {"xxldspn2x", "xxldspn1x"},
+  {"xxldspn1x", "xxldsp"},
+
   {NULL, NULL}
 };
 
@@ -349,6 +356,11 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"zpn",   ISA_SPEC_CLASS_NONE, 0, 94},
   {"zprv",  ISA_SPEC_CLASS_NONE, 0, 94},
   {"zpsf",  ISA_SPEC_CLASS_NONE, 0, 94},
+
+  {"xxldsp",      ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxldspn1x",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxldspn2x",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxldspn3x",   ISA_SPEC_CLASS_NONE, 1, 0},
 
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
@@ -1530,9 +1542,13 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"xxlczbitrev", &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZBITREV},
   {"xxlczgp",     &gcc_options::x_riscv_xxlcz_subext, MASK_XXLCZGP},
 
-  {"zpn",     &gcc_options::x_riscv_rvp_subext, MASK_ZPN},
-  {"zprv",    &gcc_options::x_riscv_rvp_subext, MASK_ZPRV},
-  {"zpsf",    &gcc_options::x_riscv_rvp_subext, MASK_ZPSF},
+  {"zpn",        &gcc_options::x_riscv_rvp_subext, MASK_ZPN},
+  {"zprv",       &gcc_options::x_riscv_rvp_subext, MASK_ZPRV},
+  {"zpsf",       &gcc_options::x_riscv_rvp_subext, MASK_ZPSF},
+  {"xxldsp",     &gcc_options::x_riscv_rvp_subext, MASK_XXLDSP},
+  {"xxldspn1x",  &gcc_options::x_riscv_rvp_subext, MASK_XXLDSPN1X},
+  {"xxldspn2x",  &gcc_options::x_riscv_rvp_subext, MASK_XXLDSPN2X},
+  {"xxldspn3x",  &gcc_options::x_riscv_rvp_subext, MASK_XXLDSPN3X},
 
   {NULL, NULL, 0}
 };
