@@ -178,19 +178,37 @@
   [(set (match_operand:SI 0 "register_operand" "=r")
 	(sign_extend:SI (unspec:SI [(match_operand:SI 1 "register_operand" "r")
 				    (match_operand:SI 2 "register_operand" "r")] UNSPEC_KADDH)))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && !TARGET_64BIT"
   "kaddh\t%0, %1, %2"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
+
+(define_insn "kaddh_64"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(sign_extend:DI (unspec:SI [(match_operand:SI 1 "register_operand" "r")
+				    (match_operand:SI 2 "register_operand" "r")] UNSPEC_KADDH)))]
+  "TARGET_ZPN && TARGET_64BIT"
+  "kaddh\t%0, %1, %2"
+ [(set_attr "type" "dsp64")
+  (set_attr "mode" "DI")])
 
 (define_insn "ksubh"
   [(set (match_operand:SI 0 "register_operand" "=r")
 	(sign_extend:SI (unspec:SI [(match_operand:SI 1 "register_operand" "r")
 				    (match_operand:SI 2 "register_operand" "r")] UNSPEC_KSUBH)))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && !TARGET_64BIT"
   "ksubh\t%0, %1, %2"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
+
+(define_insn "ksubh_64"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(sign_extend:DI (unspec:SI [(match_operand:SI 1 "register_operand" "r")
+				    (match_operand:SI 2 "register_operand" "r")] UNSPEC_KSUBH)))]
+  "TARGET_ZPN && TARGET_64BIT"
+  "ksubh\t%0, %1, %2"
+ [(set_attr "type" "dsp64")
+  (set_attr "mode" "DI")])
 
 (define_insn "ukaddw"
   [(set (match_operand:SI 0 "register_operand"             "=r")
@@ -356,7 +374,7 @@
 (define_insn "clrov<X:mode>"
   [(unspec_volatile:X [(const_int 0)] UNSPEC_CLROV)]
   "TARGET_ZPN"
-  "csrrci zero, vxsat, 1"
+  "csrrci zero, ucode, 1"
   [(set_attr "mode" "<MODE>")])
 
 ;; clrs, clz
@@ -1227,43 +1245,16 @@
   [(set_attr "type" "dsp")
    (set_attr "mode" "RVPV4QI")])
 
-(define_expand "insb64"
-  [(match_operand:RVPV8QI 0 "register_operand" "")
-   (match_operand:RVPV8QI 1 "register_operand" "")
-   (match_operand:SI 2 "register_operand" "")
-   (match_operand:SI 3 "const_insb64_operand" "")]
+(define_insn "insb64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:DI 2 "register_operand" " r")
+			(match_operand:DI 3 "immediate_operand" " i")]
+		    UNSPEC_INSB))]
   "TARGET_ZPN && TARGET_64BIT"
-{
-  if (INTVAL (operands[3]) > 7 || INTVAL (operands[3]) < 0)
-    gcc_unreachable ();
-
-  rtx src = gen_reg_rtx (QImode);
-
-  convert_move (src, operands[2], false);
-
-  HOST_WIDE_INT selector_index;
-  selector_index = INTVAL (operands[3]);
-  rtx selector = gen_int_mode (1 << selector_index, SImode);
-  emit_insn (gen_vec_setrvpv8qi_internal (operands[0], src,
-				       operands[1], selector));
-  DONE;
-}
-[(set_attr "type" "dsp")])
-
-(define_insn "vec_setrvpv8qi_internal"
-  [(set (match_operand:RVPV8QI 0 "register_operand"    "=r")
-	(vec_merge:RVPV8QI
-	  (vec_duplicate:RVPV8QI
-	    (match_operand:QI 1 "register_operand"  "r"))
-	  (match_operand:RVPV8QI 2 "register_operand"  "0")
-	  (match_operand:SI 3 "pwr_7_operand" " D07")))]
-  "TARGET_ZPN && TARGET_64BIT"
-{
-  operands[3] = GEN_INT (exact_log2 (INTVAL (operands[3])));
-  return "insb\t%0, %1, %3";
-}
-  [(set_attr "type" "dsp")
-   (set_attr "mode" "RVPV8QI")])
+  "insb\t%0, %2, %3";
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
 
 ;; KDMBB, KDMBT, KDMTT (32 (*) (xlen, xlen) for vector mode & 32 (*) (32, 32) for non-vector mode)
 (define_expand "kdmbb"
@@ -1439,7 +1430,7 @@
 		  (parallel [(match_operand:SI 4 "imm_0_1_operand"  " C00, C01, C01, C00")]))))
 	    (const_int 1))
 	  (match_operand:SI 5 "register_operand"                    "   0,   0,   0,   0")))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && !TARGET_64BIT"
   "@
    kdmabb\t%0, %1, %2
    kdmabt\t%0, %1, %2
@@ -1447,6 +1438,39 @@
    kdmabt\t%0, %2, %1"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
+
+(define_insn "kdmabb_64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:DI 2 "register_operand" " r")
+			(match_operand:DI 3 "register_operand" " r")]
+		    UNSPEC_KDMABB))]
+ "TARGET_ZPN && TARGET_64BIT"
+ "kdmabb\t%0, %1, %2"
+ [(set_attr "type" "dsp64")
+  (set_attr "mode" "DI")])
+
+(define_insn "kdmabt_64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:DI 2 "register_operand" " r")
+			(match_operand:DI 3 "register_operand" " r")]
+		    UNSPEC_KDMABT))]
+ "TARGET_ZPN && TARGET_64BIT"
+ "kdmabt\t%0, %1, %2"
+ [(set_attr "type" "dsp64")
+  (set_attr "mode" "DI")])
+
+(define_insn "kdmatt_64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:DI 2 "register_operand" " r")
+			(match_operand:DI 3 "register_operand" " r")]
+		    UNSPEC_KDMATT))]
+ "TARGET_ZPN && TARGET_64BIT"
+ "kdmatt\t%0, %1, %2"
+ [(set_attr "type" "dsp64")
+  (set_attr "mode" "DI")])
 
 ;; KHMBB, KHMBT, KHMTT (xlen (*) (xlen, xlen) for vector mode, xlen (*) (32, 32) for non-vector mode)
 (define_insn "khmbb<mode>"
@@ -1911,6 +1935,17 @@
   "TARGET_ZPN && TARGET_64BIT"
   "kmaxds\t%0, %2, %3"
   [(set_attr "type" "simd")])
+
+(define_insn "rvp_kmar64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_KMAR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "kmar64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
 
 ;; RV64P KMAR64
 (define_insn "vkmar64"
@@ -2668,6 +2703,18 @@
   "kmsxda\t%0, %2, %3"
   [(set_attr "type" "simd")])
 
+
+(define_insn "rvp_kmsr64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_KMSR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "kmsr64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
 ;; RV64P KMSR64
 (define_insn "vkmsr64"
   [(set (match_operand:DI 0 "register_operand"             "=r")
@@ -3118,7 +3165,7 @@
   [(set (match_operand:SI 0 "register_operand"          "=r")
 	(smax:SI (match_operand:SI 1 "register_operand" " r")
 		 (match_operand:SI 2 "register_operand" " r")))]
-  "TARGET_ZPN && !TARGET_ZBB"
+  "TARGET_ZPN && !TARGET_ZBB && !TARGET_64BIT"
   "maxw\t%0, %1, %2"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
@@ -3127,17 +3174,37 @@
   [(set (match_operand:SI 0 "register_operand"          "=r")
 	(smin:SI (match_operand:SI 1 "register_operand" " r")
 		 (match_operand:SI 2 "register_operand" " r")))]
-  "TARGET_ZPN && !TARGET_ZBB"
+  "TARGET_ZPN && !TARGET_ZBB && !TARGET_64BIT"
   "minw\t%0, %1, %2"
   [(set_attr "type" "dsp")
    (set_attr "mode" "SI")])
+
+(define_insn "psmaxsi3_64"
+  [(set (match_operand:DI 0 "register_operand"          "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		 (match_operand:SI 2 "register_operand" " r")]
+		 UNSPEC_MAXW))]
+  "TARGET_ZPN && !TARGET_ZBB && TARGET_64BIT"
+  "maxw\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "psminsi3_64"
+  [(set (match_operand:DI 0 "register_operand"          "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		 (match_operand:SI 2 "register_operand" " r")]
+		 UNSPEC_MINW))]
+  "TARGET_ZPN && !TARGET_ZBB && TARGET_64BIT"
+  "minw\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
 
 ;; MULR64, MULSR64
 (define_insn "rvp_umulsidi3"
   [(set (match_operand:DI 0 "register_operand"                          "=r")
 	(mult:DI (zero_extend:DI (match_operand:SI 1 "register_operand" " r"))
 		 (zero_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPSF"
+  "TARGET_ZPSF && TARGET_64BIT"
   "mulr64\t%0, %1, %2"
   [(set_attr "type"   "dsp")
    (set_attr "mode"   "DI")])
@@ -3146,7 +3213,7 @@
   [(set (match_operand:DI 0 "register_operand"                          "=r")
 	(mult:DI (sign_extend:DI (match_operand:SI 1 "register_operand" " r"))
 		 (sign_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPSF"
+  "TARGET_ZPSF && TARGET_64BIT"
   "mulsr64\t%0, %1, %2"
   [(set_attr "type"   "dsp")
    (set_attr "mode"   "DI")])
@@ -3500,7 +3567,7 @@
   [(set (match_operand:X 0 "register_operand" "=r")
 	(unspec_volatile:X [(const_int 0)] UNSPEC_RDOV))]
   "TARGET_ZPN"
-  "csrr \t%0, vxsat, zero"
+  "csrrs \t%0, ucode, zero"
   [(set_attr "type" "dsp")
    (set_attr "mode" "<MODE>")])
 
@@ -4250,6 +4317,28 @@
   "<su>m<add_sub>r64\t%0, %1, %2"
   [(set_attr "type"   "dsp64")
    (set_attr "mode"   "DI")])
+
+(define_insn "rvp_smar64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_SMAR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "smar64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "rvp_umar64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_UMAR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "umar64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
 
 ;; SMAR64, UMAR64
 (define_insn "v<su>mar64_1"
@@ -5288,6 +5377,28 @@
   "smslxda\t%0, %2, %3"
   [(set_attr "type" "dsp64")])
 
+(define_insn "rvp_smsr64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_SMSR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "smsr64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "rvp_umsr64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_UMSR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "umsr64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
 ;; SMSR64, UMSR64
 
 (define_insn "v<su>msr64"
@@ -6128,6 +6239,17 @@
   [(set_attr "type" "simd")
    (set_attr "mode" "SI")])
 
+(define_insn "rvp_ukmar64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_UKMAR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "ukmar64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
 ;; RV64P ukmar64
 (define_insn "vukmar64"
   [(set (match_operand:DI 0 "register_operand"             "=r")
@@ -6149,6 +6271,17 @@
 		(vec_select:SI (match_dup 3) (parallel [(const_int 1)])))))))]
   "TARGET_ZPSF && TARGET_64BIT"
   "ukmar64\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "rvp_ukmsr64"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		    (match_operand:SI 2 "register_operand" " r")
+			(match_operand:SI 3 "register_operand" " r")]
+		    UNSPEC_UKMSR64))]
+  "TARGET_ZPSF && !TARGET_64BIT"
+  "ukmsr64\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
@@ -6998,3 +7131,1559 @@
   { return riscv_output_move (operands[0], operands[1]); }
   [(set_attr "move_type" "move,const,load,store,mtc,fpload,mfc,fmove,fpstore")
    (set_attr "mode" "RVPV2SI")])
+
+;;Nuclei custom dsp N1
+(define_insn "dsp_dkhmdi3"
+  [(set (match_operand:DI 0 "register_operand"              "=r")
+  	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		    (match_operand:DI 2 "register_operand" " r")]
+		    UNSPEC_DKHM8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkhm8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkhmdi3"
+	[(set (match_operand:RVPV8QI 0 "register_operand"               "=r")
+	(unspec:RVPV8QI [(match_operand:RVPV8QI 1 "register_operand" " r")
+		     (match_operand:RVPV8QI 2 "register_operand" " r")]
+			 UNSPEC_DKHM8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkhm8\t%0, %1, %2"
+  [(set_attr "type" "simd")
+   (set_attr "mode" "RVPV8QI")])
+
+(define_insn "dsp_dkhmsi3"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKHM16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkhm16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkhmsi3"
+	[(set (match_operand:RVPV4HI 0 "register_operand"               "=r")
+	(unspec:RVPV4HI [(match_operand:RVPV4HI 1 "register_operand" " r")
+		     (match_operand:RVPV4HI 2 "register_operand" " r")]
+			 UNSPEC_DKHM16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkhm16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV4HI")])
+
+;; dkslra8 dkslra16
+
+(define_insn "dsp_dkabsdi3"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" "r")]
+		UNSPEC_DKABS8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkabs8\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkabsdi3"
+  [(set (match_operand:RVPV8QI 0 "register_operand" "=r")
+	(unspec:RVPV8QI [(match_operand:RVPV8QI 1 "register_operand" "r")]
+		UNSPEC_DKABS8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkabs8\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV8QI")])
+
+(define_insn "dsp_dkabssi3"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_DKABS16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkabs16\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkabssi3"
+	[(set (match_operand:RVPV4HI 0 "register_operand"               "=r")
+	(unspec:RVPV4HI [(match_operand:RVPV4HI 1 "register_operand" " r")]
+			 UNSPEC_DKABS16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkabs16\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV4HI")])
+
+;; dkslra8 dkslra16
+(define_insn "dsp_dkslradi3"
+	[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:SI 2 "register_operand" " r")]
+			 UNSPEC_DKSLRA8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkslra8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkslradi3"
+	[(set (match_operand:RVPV8QI 0 "register_operand"               "=r")
+	(unspec:RVPV8QI [(match_operand:RVPV8QI 1 "register_operand" " r")
+		     (match_operand:SI 2 "register_operand" " r")]
+			 UNSPEC_DKSLRA8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkslra8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV8QI")])
+
+(define_insn "dsp_dkslrasi3"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:SI 2 "register_operand" " r")]
+			 UNSPEC_DKSLRA16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkslra16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkslrasi3"
+	[(set (match_operand:RVPV4HI 0 "register_operand"               "=r")
+	(unspec:RVPV4HI [(match_operand:RVPV4HI 1 "register_operand" " r")
+		     (match_operand:SI 2 "register_operand" " r")]
+			 UNSPEC_DKSLRA16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkslra16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV4HI")])
+
+;; dkadd8 dkadd16
+(define_insn "dsp_dkadddi3"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKADD8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkadd8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkadddi3"
+	[(set (match_operand:RVPV8QI 0 "register_operand"               "=r")
+	(unspec:RVPV8QI [(match_operand:RVPV8QI 1 "register_operand" " r")
+		     (match_operand:RVPV8QI 2 "register_operand" " r")]
+			 UNSPEC_DKADD8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkadd8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV8QI")])
+
+(define_insn "dsp_dkaddsi3"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKADD16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkadd16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dkaddsi3"
+	[(set (match_operand:RVPV4HI 0 "register_operand"               "=r")
+	(unspec:RVPV4HI [(match_operand:RVPV4HI 1 "register_operand" " r")
+		     (match_operand:RVPV4HI 2 "register_operand" " r")]
+			 UNSPEC_DKADD16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dkadd16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV4HI")])
+
+;; dksub8 dksub16
+(define_insn "dsp_dksubdi3"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKSUB8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dksub8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dksubdi3"
+	[(set (match_operand:RVPV8QI 0 "register_operand"               "=r")
+	(unspec:RVPV8QI [(match_operand:RVPV8QI 1 "register_operand" " r")
+		     (match_operand:RVPV8QI 2 "register_operand" " r")]
+			 UNSPEC_DKSUB8))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dksub8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV8QI")])
+
+(define_insn "dsp_dksubsi3"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKSUB16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dksub16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_v_dksubsi3"
+	[(set (match_operand:RVPV4HI 0 "register_operand"               "=r")
+	(unspec:RVPV4HI [(match_operand:RVPV4HI 1 "register_operand" " r")
+		     (match_operand:RVPV4HI 2 "register_operand" " r")]
+			 UNSPEC_DKSUB16))]
+  "TARGET_XXLDSPN1X && !TARGET_64BIT"
+  "dksub16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV4HI")])
+
+;;expd
+(define_insn "dsp_expd80si"
+ [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+			 UNSPEC_EXPD80))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd80\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_v_expd80si"
+	[(set (match_operand:RVPV2HI 0 "register_operand"               "=r")
+	(unspec:RVPV2HI [(match_operand:RVPV2HI 1 "register_operand" " r")]
+			 UNSPEC_EXPD80))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd80\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV2HI")])
+
+(define_insn "dsp_expd81si"
+ [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+			 UNSPEC_EXPD81))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd81\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_v_expd81si"
+	[(set (match_operand:RVPV2HI 0 "register_operand"               "=r")
+	(unspec:RVPV2HI [(match_operand:RVPV2HI 1 "register_operand" " r")]
+			 UNSPEC_EXPD81))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd81\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV2HI")])
+
+(define_insn "dsp_expd82si"
+ [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+			 UNSPEC_EXPD82))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd82\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_v_expd82si"
+	[(set (match_operand:RVPV2HI 0 "register_operand"               "=r")
+	(unspec:RVPV2HI [(match_operand:RVPV2HI 1 "register_operand" " r")]
+			 UNSPEC_EXPD82))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd82\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV2HI")])
+
+(define_insn "dsp_expd83si"
+ [(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:SI 1 "register_operand" " r")]
+			 UNSPEC_EXPD83))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd83\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_v_expd83si"
+	[(set (match_operand:RVPV2HI 0 "register_operand"               "=r")
+	(unspec:RVPV2HI [(match_operand:RVPV2HI 1 "register_operand" " r")]
+			 UNSPEC_EXPD83))]
+  "TARGET_XXLDSP && !TARGET_64BIT"
+  "expd83\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "RVPV2HI")])
+
+(define_insn "dsp_expd80di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD80))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd80\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd81di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD81))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd81\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd82di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD82))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd82\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd83di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD83))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd83\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd84di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD84))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd84\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd85di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD85))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd85\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd86di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD86))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd86\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_expd87di"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_EXPD87))]
+  "TARGET_XXLDSP && TARGET_64BIT"
+  "expd87\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+;;Nuclei custom dsp N2
+(define_insn "dsp_dkhmx8"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKHMX8))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkhmx8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkhmx16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKHMX16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkhmx16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmmul"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMMUL))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmmul\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmmulu"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMMULU))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmmul.u\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkwmmul"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKWMMUL))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkwmmul\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkwmmulu"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKWMMULU))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkwmmul.u\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkabs32"
+ [(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_DKABS32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkabs32\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkslra32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:SI 2 "register_operand" " r")]
+			 UNSPEC_DKSLRA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkslra32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkadd32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKADD32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkadd32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dksub32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKSUB32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dksub32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dradd16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRADD16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dradd16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsub16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSUB16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsub16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dradd32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRADD32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dradd32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsub32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSUB32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsub32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKMDA))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkmda\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmxda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKMXDA))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkmxda\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmdrs"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMDRS))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmdrs\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmxds"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMXDS))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmxds\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbb32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBB32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbb32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbb32_sra14"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBB32_SRA14))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbb32.sra14\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbb32_sra32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBB32_SRA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbb32.sra32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbt32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+ 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+ 		     (match_operand:DI 2 "register_operand" " r")]
+ 			 UNSPEC_DSMBT32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbt32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbt32_sra14"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBT32_SRA14))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbt32.sra14\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbt32_sra32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBT32_SRA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbt32.sra32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmtt32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMTT32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmtt32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmtt32_sra14"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMTT32_SRA14))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmtt32.sra14\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmtt32_sra32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMTT32_SRA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmtt32.sra32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpkbb32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKBB32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpkbb32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpkbt32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKBT32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpkbt32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpktt32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKTT32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpktt32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpktb32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKTB32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpktb32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpktb16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKTB16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpktb16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpkbb16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKBB16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpkbb16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpkbt16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKBT16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpkbt16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dpktt16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DPKTT16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpktt16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsra16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSRA16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsra16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dadd16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DADD16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dadd16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dadd32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DADD32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dadd32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbb16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBB16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbb16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmbt16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMBT16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmbt16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmtt16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMTT16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsmtt16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_drcrsa16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRCRSA16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "drcrsa16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_drcras16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRCRAS16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "drcras16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkcrsa16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKCRSA16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkcrsa16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkcras16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKCRAS16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkcras16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_drsub16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRSUB16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "drsub16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_drsub32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRSUB32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "drsub32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dstsa32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSTSA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dstsa32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dstas32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSTAS32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dstas32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkcras32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKCRAS32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkcras32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkcrsa32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKCRSA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkcrsa32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dcrsa32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DCRSA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dcrsa32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dcras32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DCRAS32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dcras32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkstsa16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKSTSA16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkstsa16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkstas16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKSTAS16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkstas16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsclip8"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:SI 2 "imm5u_operand"	" u05")]
+			 UNSPEC_DSCLIP8))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsclip8\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsclip16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:SI 2 "imm5u_operand"	" u05")]
+			 UNSPEC_DSCLIP16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsclip16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsclip32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:SI 2 "imm5u_operand"	" u05")]
+			 UNSPEC_DSCLIP32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dsclip32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_drcrsa32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRCRSA32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "drcrsa32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_drcras32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DRCRAS32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "drcras32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkclip64"
+[(set (match_operand:HI 0 "register_operand"               "=r")
+	(unspec:HI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_DKCLIP64))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dkclip64\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "HI")])
+
+;;Nuclei custom dsp N3
+(define_insn "dsp_dkmmac"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMMAC))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmmac\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmmacu"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMMACU))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmmac.u\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmmsb"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMMSB))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmmsb\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmmsbu"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMMSBU))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmmsb.u\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmada"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMADA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmada\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmaxda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMAXDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmaxda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmads"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMADS))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmads\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmadrs"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMADRS))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmadrs\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmaxds"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMAXDS))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmaxds\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmsda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMSDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmsda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmsxda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMSXDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmsxda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmaqa"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMAQA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmaqa\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmaqasu"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMAQASU))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmaqas.u\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dumaqa"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DUMAQA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dumaqa\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmda32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+			 (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKMDA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmda32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmxda32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+			 (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DKMXDA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmxda32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmada32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMADA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmada32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmaxda32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMAXDA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmaxda32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmads32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMADS32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmads32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmadrs32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMADRS32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmadrs32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmaxds32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMAXDS32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmaxds32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmsda32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMSDA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmsda32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmsxda32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMSXDA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmsxda32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmds32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+			 (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMDS32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmds32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmdrs32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+			 (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMDRS32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmdrs32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmxds32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+			 (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMXDS32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmxds32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmalda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmalda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmalxda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALXDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmalxda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmalds"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALDS))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmalds\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmaldrs"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALDRS))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmaldrs\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmalxds"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALXDS))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmalxds\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmslda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMSLDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmslda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmslxda"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMSLXDA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmslxda\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_ddsmaqa"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DDSMAQA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "ddsmaqa\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_ddsmaqasu"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DDSMAQASU))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "ddsmaqas.u\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_ddumaqa"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DDUMAQA))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "ddumaqa\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dmsr16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DMSR16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dmsr16\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dmsr17"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DMSR17))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dmsr17\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dmsr33"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DMSR33))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dmsr33\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dmxsr33"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DMXSR33))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dmxsr33\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmada16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMADA16))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmada16\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmaxda16"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMAXDA16))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmaxda16\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dksms32_u"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKSMS32_U))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dksms32.u\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dmada32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DMADA32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dmada32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dredas16"
+[(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_DREDAS16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dredas16\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_dredsa16"
+[(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:DI 1 "register_operand" " r")]
+			 UNSPEC_DREDSA16))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dredsa16\t%0, %1"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_dsma32_u"
+[(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMA32_U))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsma32.u\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_dsmxs32_u"
+[(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMXS32_U))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmxs32.u\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_dsmxa32_u"
+[(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMXA32_U))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmxa32.u\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_dsms32_u"
+[(set (match_operand:SI 0 "register_operand"               "=r")
+	(unspec:SI [(match_operand:DI 1 "register_operand" " r")
+		     (match_operand:DI 2 "register_operand" " r")]
+			 UNSPEC_DSMS32_U))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsms32.u\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "SI")])
+
+(define_insn "dsp_dsmalbb"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALBB))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmalbb\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmalbt"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALBT))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmalbt\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dsmaltt"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DSMALTT))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dsmaltt\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmabb32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMABB32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmabb32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmabt32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMABT32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmabt32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
+(define_insn "dsp_dkmatt32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
+		     (match_operand:DI 2 "register_operand" " r")
+			 (match_operand:DI 3 "register_operand" " r")]
+			 UNSPEC_DKMATT32))]
+  "TARGET_XXLDSPN3X && !TARGET_64BIT"
+  "dkmatt32\t%0, %2, %3"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
