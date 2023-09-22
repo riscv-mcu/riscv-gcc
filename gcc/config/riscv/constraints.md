@@ -151,6 +151,11 @@
 (define_register_constraint "zmvr" "(TARGET_ZFA || TARGET_XTHEADFMV) ? GR_REGS : NO_REGS"
   "An integer register for  ZFA or XTheadFmv.")
 
+(define_constraint "C05"
+  "Unsigned immediate 5-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < 15 && ival > -16 && ival != 0")))
+
 ;; Vector constraints.
 
 (define_register_constraint "vr" "TARGET_VECTOR ? V_REGS : NO_REGS"

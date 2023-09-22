@@ -607,3 +607,17 @@
   (and (match_code "const_int")
        (ior (match_operand 0 "not_uimm_extra_bit_operand")
 	    (match_operand 0 "const_nottwobits_not_arith_operand"))))
+
+(define_predicate "imm5u_operand"
+  (and (match_operand 0 "const_int_operand")
+       (match_test "satisfies_constraint_u05 (op)")))
+
+(define_predicate "imm5z_operand"
+  (and (match_operand 0 "const_int_operand")
+       (match_test "satisfies_constraint_C05 (op)")))
+
+(define_predicate "xxlcz_branching_operator"
+  (match_code "eq,ne")
+{
+  return TARGET_XXLCZBRI;
+})

@@ -75,6 +75,8 @@
 ;; Iterator for floating-point modes that can be loaded into X registers.
 (define_mode_iterator SOFTF [SF (DF "TARGET_64BIT") (HF "TARGET_ZFHMIN")])
 
+;; Iterator for xxlcz pstinc.
+(define_mode_iterator SUBDISF [QI HI SI (SF "!TARGET_HARD_FLOAT")])
 
 ;; -------------------------------------------------------------------
 ;; Mode attributes
@@ -139,6 +141,14 @@
 (define_mode_attr slot10_offset [(SI "-44") (DI "-88")])
 (define_mode_attr slot11_offset [(SI "-48") (DI "-96")])
 (define_mode_attr slot12_offset [(SI "-52") (DI "-104")])
+
+(define_mode_attr LDSTINDMODE [(SF "SF") (SI "SI") (HI "HI") (QI "QI")])
+
+(define_mode_attr size_mem   [(SF "4")
+			      (SI "4") (HI "2") (QI "1")])
+(define_mode_attr size_load_store [(SF "w")
+				   (SI "w") (QI "b") (HI "h")])
+(define_mode_attr LDSTMODE [(SI "SI") (HI "HI") (QI "QI")])
 
 ;; -------------------------------------------------------------------
 ;; Code Iterators
