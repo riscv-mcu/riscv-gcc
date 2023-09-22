@@ -137,6 +137,19 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
 				     riscv_ext_version_value (0, 11));
     }
 
+  if (TARGET_XXLDSP)
+  {
+    builtin_define ("__riscv_dsp");
+    builtin_define ("__riscv_zpn");
+    builtin_define ("__riscv_zprv");
+    builtin_define ("__riscv_zpsf");
+  }
+
+  if (TARGET_ZBA)
+  {
+    builtin_define ("__riscv_bitmanip");
+  }
+
   /* Define architecture extension test macros.  */
   builtin_define_with_int_value ("__riscv_arch_test", 1);
 
