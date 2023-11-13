@@ -1774,6 +1774,9 @@ typedef unsigned long uixlen_t;
 #define __dpkbt32(a, b) \
   (__builtin_riscv_dpkbt32 ((a), (b)))
 
+#define __dpack32(a, b) \
+  (__builtin_riscv_dpack32 ((a), (b)))
+
 #define __dpktt32(a, b) \
   (__builtin_riscv_dpktt32 ((a), (b)))
 

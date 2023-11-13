@@ -7769,6 +7769,16 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
+(define_insn "dsp_dpack32"
+[(set (match_operand:DI 0 "register_operand"               "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		     (match_operand:SI 2 "register_operand" " r")]
+			 UNSPEC_DPACK32))]
+  "TARGET_XXLDSPN2X && !TARGET_64BIT"
+  "dpack32\t%0, %1, %2"
+  [(set_attr "type" "dsp64")
+   (set_attr "mode" "DI")])
+
 (define_insn "dsp_dpktt32"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
