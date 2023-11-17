@@ -707,6 +707,10 @@ riscv_block_move_loop (rtx dest, rtx src, unsigned HOST_WIDE_INT length,
 bool
 riscv_expand_block_move (rtx dest, rtx src, rtx length)
 {
+  if (riscv_memcpy_strategy == USE_LIBCALL
+      || riscv_memcpy_strategy == USE_VECTOR)
+    return false;
+
   if (CONST_INT_P (length))
     {
       unsigned HOST_WIDE_INT hwi_length = UINTVAL (length);
