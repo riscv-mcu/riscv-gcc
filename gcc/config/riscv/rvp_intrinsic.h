@@ -1890,6 +1890,37 @@ typedef unsigned long uixlen_t;
 
 #define __dredsa16(a) \
   (__builtin_riscv_dredsa16 ((a)))
+
+#define __dsunpkd810(a) \
+  (__builtin_riscv_dsunpkd810 ((a)))
+
+#define __dsunpkd820(a) \
+  (__builtin_riscv_dsunpkd820 ((a)))
+
+#define __dsunpkd830(a) \
+  (__builtin_riscv_dsunpkd830 ((a)))
+
+#define __dsunpkd831(a) \
+  (__builtin_riscv_dsunpkd831 ((a)))
+
+#define __dsunpkd832(a) \
+  (__builtin_riscv_dsunpkd832 ((a)))
+
+#define __dzunpkd810(a) \
+  (__builtin_riscv_dzunpkd810 ((a)))
+
+#define __dzunpkd820(a) \
+  (__builtin_riscv_dzunpkd820 ((a)))
+
+#define __dzunpkd830(a) \
+  (__builtin_riscv_dzunpkd830 ((a)))
+
+#define __dzunpkd831(a) \
+  (__builtin_riscv_dzunpkd831 ((a)))
+
+#define __dzunpkd832(a) \
+  (__builtin_riscv_dzunpkd832 ((a)))
+
 #endif
 #endif
 
