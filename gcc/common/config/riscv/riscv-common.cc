@@ -302,6 +302,10 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"zvfhmin",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"zvfh",      ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"zfbfmin",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zvfbfmin",  ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zvfbfwma",  ISA_SPEC_CLASS_NONE, 1, 0},
+
   {"zfa",     ISA_SPEC_CLASS_NONE, 1, 0},
 
   {"zmmul", ISA_SPEC_CLASS_NONE, 1, 0},
