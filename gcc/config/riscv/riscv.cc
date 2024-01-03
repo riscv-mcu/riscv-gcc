@@ -397,6 +397,19 @@ static const struct riscv_tune_param generic_ooo_tune_info = {
   4,						/* fmv_cost */
   false,					/* slow_unaligned_access */
   false,					/* use_divmod_expansion */
+}
+
+/* Costs to use when optimizing for Nuclei 100 Series. */
+static const struct riscv_tune_param nuclei_100_tune_info = {
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* int_mul */
+  {COSTS_N_INSNS (34), COSTS_N_INSNS (64)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  5,						/* memory_cost */
+  true,					/* slow_unaligned_access */
 };
 
 /* Costs to use when optimizing for Nuclei 200 Series. */
