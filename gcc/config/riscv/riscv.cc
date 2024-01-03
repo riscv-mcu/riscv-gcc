@@ -463,6 +463,21 @@ static const struct riscv_tune_param nuclei_900_tune_info = {
   true,						/* slow_unaligned_access */
 };
 
+/* Costs to use when optimizing for a nuclei 1000 profile.  */
+static const struct riscv_tune_param nuclei_1000_tune_info = {
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
+  {COSTS_N_INSNS (5), COSTS_N_INSNS (6)},	/* fp_mul */
+  {COSTS_N_INSNS (7), COSTS_N_INSNS (8)},	/* fp_div */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* int_mul */
+  {COSTS_N_INSNS (6), COSTS_N_INSNS (6)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  4,						/* memory_cost */
+  4,						/* fmv_cost */
+  false,					/* slow_unaligned_access */
+  false,					/* use_divmod_expansion */
+}
+
 /* Costs to use when optimizing for size.  */
 static const struct riscv_tune_param optimize_size_tune_info = {
   {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* fp_add */
@@ -7796,7 +7811,7 @@ riscv_sched_adjust_cost (rtx_insn *, int, rtx_insn *insn, int cost,
 			 unsigned int)
 {
   /* Only do adjustments for the generic out-of-order scheduling model.  */
-  if (!TARGET_VECTOR || riscv_microarchitecture != generic_ooo)
+  if (!TARGET_VECTOR || (riscv_microarchitecture != generic_ooo && riscv_microarchitecture != nuclei_1000))
     return cost;
 
   if (recog_memoized (insn) < 0)
