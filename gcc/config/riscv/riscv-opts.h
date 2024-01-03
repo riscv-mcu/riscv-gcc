@@ -55,6 +55,7 @@ enum riscv_microarchitecture_type {
   generic,
   sifive_7,
   generic_ooo,
+  nuclei_100,
   nuclei_200,
   nuclei_300,
   nuclei_600,
