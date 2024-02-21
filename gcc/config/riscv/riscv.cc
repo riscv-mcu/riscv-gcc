@@ -480,17 +480,16 @@ static const struct riscv_tune_param nuclei_900_tune_info = {
 
 /* Costs to use when optimizing for a nuclei 1000 profile.  */
 static const struct riscv_tune_param nuclei_1000_tune_info = {
-  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
-  {COSTS_N_INSNS (5), COSTS_N_INSNS (6)},	/* fp_mul */
-  {COSTS_N_INSNS (7), COSTS_N_INSNS (8)},	/* fp_div */
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_add */
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_mul */
+  {COSTS_N_INSNS (16), COSTS_N_INSNS (16)},	/* fp_div */
   {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* int_mul */
-  {COSTS_N_INSNS (6), COSTS_N_INSNS (6)},	/* int_div */
-  1,						/* issue_rate */
+  {COSTS_N_INSNS (16), COSTS_N_INSNS (16)},	/* int_div */
+  2,						/* issue_rate */
   3,						/* branch_cost */
-  4,						/* memory_cost */
-  4,						/* fmv_cost */
-  false,					/* slow_unaligned_access */
-  false,					/* use_divmod_expansion */
+  3,						/* memory_cost */
+  3,						/* fmv_cost */
+  true,					/* slow_unaligned_access */
 };
 
 /* Costs to use when optimizing for size.  */
