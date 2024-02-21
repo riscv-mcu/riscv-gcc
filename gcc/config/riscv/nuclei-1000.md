@@ -27,14 +27,11 @@
 ;;   - To/From VXU: 6 cycles.
 
 ;; Integer/float issue queues.
-(define_cpu_unit "issue0,issue1,issue2,issue3,issue4" "nuclei_1000")
+;;(define_cpu_unit "nuclei_1000")
 
 ;; Separate issue queue for vector instructions.
 (define_cpu_unit "nuclei_1000_vxu_issue" "nuclei_1000")
 
-;; Integer/float execution units.
-(define_cpu_unit "ixu0,ixu1,ixu2,ixu3" "nuclei_1000")
-(define_cpu_unit "fxu0,fxu1" "nuclei_1000")
 
 ;; Integer subunit for division.
 (define_cpu_unit "nuclei_1000_div" "nuclei_1000")
@@ -52,23 +49,23 @@
 
 
 ;; Integer load/store
-(define_insn_reservation "nuclei_1000_int_load" 4
+(define_insn_reservation "nuclei_1000_int_load" 3
   (and (eq_attr "tune" "nuclei_1000")
        (eq_attr "type" "load"))
-  "nuclei_1000_issue,nuclei_1000_ixu_alu")
+  "nuclei_1000_issue,nuclei_1000_ixu_alu*2")
 
-(define_insn_reservation "nuclei_1000_int_store" 4
+(define_insn_reservation "nuclei_1000_int_store" 1
   (and (eq_attr "tune" "nuclei_1000")
        (eq_attr "type" "store"))
   "nuclei_1000_issue,nuclei_1000_ixu_alu")
 
 ;; Float load/store
-(define_insn_reservation "nuclei_1000_float_load" 6
+(define_insn_reservation "nuclei_1000_float_load" 3
   (and (eq_attr "tune" "nuclei_1000")
        (eq_attr "type" "fpload"))
-  "nuclei_1000_issue,nuclei_1000_ixu_alu")
+  "nuclei_1000_issue,nuclei_1000_ixu_alu*3")
 
-(define_insn_reservation "nuclei_1000_float_store" 6
+(define_insn_reservation "nuclei_1000_float_store" 1
   (and (eq_attr "tune" "nuclei_1000")
        (eq_attr "type" "fpstore"))
   "nuclei_1000_issue,nuclei_1000_fxu")
@@ -137,7 +134,7 @@
   "nuclei_1000_issue,nuclei_1000_fxu")
 
 ;; Float FMA.
-(define_insn_reservation "nuclei_1000_float_fma" 6
+(define_insn_reservation "nuclei_1000_float_fma" 4
   (and (eq_attr "tune" "nuclei_1000")
        (eq_attr "type" "fmadd"))
   "nuclei_1000_issue,nuclei_1000_fxu")
