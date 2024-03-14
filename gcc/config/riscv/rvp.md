@@ -7510,11 +7510,11 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dsmmulu"
+(define_insn "dsp_dsmmul_u"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
 		     (match_operand:DI 2 "register_operand" " r")]
-			 UNSPEC_DSMMULU))]
+			 UNSPEC_DSMMUL_U))]
   "TARGET_XXLDSPN2X && !TARGET_64BIT"
   "dsmmul.u\t%0, %1, %2"
   [(set_attr "type" "dsp64")
@@ -7530,11 +7530,11 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dkwmmulu"
+(define_insn "dsp_dkwmmul_u"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " r")
 		     (match_operand:DI 2 "register_operand" " r")]
-			 UNSPEC_DKWMMULU))]
+			 UNSPEC_DKWMMUL_U))]
   "TARGET_XXLDSPN2X && !TARGET_64BIT"
   "dkwmmul.u\t%0, %1, %2"
   [(set_attr "type" "dsp64")
@@ -8110,12 +8110,12 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dkmmacu"
+(define_insn "dsp_dkmmac_u"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")]
-			 UNSPEC_DKMMACU))]
+			 UNSPEC_DKMMAC_U))]
   "TARGET_XXLDSPN3X && !TARGET_64BIT"
   "dkmmac.u\t%0, %2, %3"
   [(set_attr "type" "dsp64")
@@ -8132,12 +8132,12 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dkmmsbu"
+(define_insn "dsp_dkmmsb_u"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")]
-			 UNSPEC_DKMMSBU))]
+			 UNSPEC_DKMMSB_U))]
   "TARGET_XXLDSPN3X && !TARGET_64BIT"
   "dkmmsb.u\t%0, %2, %3"
   [(set_attr "type" "dsp64")
@@ -8231,14 +8231,14 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_dsmaqasu"
+(define_insn "dsp_dsmaqa_su"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")]
-			 UNSPEC_DSMAQASU))]
+			 UNSPEC_DSMAQA_SU))]
   "TARGET_XXLDSPN3X && !TARGET_64BIT"
-  "dsmaqas.u\t%0, %2, %3"
+  "dsmaqa.su\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
@@ -8468,14 +8468,14 @@
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 
-(define_insn "dsp_ddsmaqasu"
+(define_insn "dsp_ddsmaqa_su"
 [(set (match_operand:DI 0 "register_operand"               "=r")
 	(unspec:DI [(match_operand:DI 1 "register_operand" " 0")
 		     (match_operand:DI 2 "register_operand" " r")
 			 (match_operand:DI 3 "register_operand" " r")]
-			 UNSPEC_DDSMAQASU))]
+			 UNSPEC_DDSMAQA_SU))]
   "TARGET_XXLDSPN3X && !TARGET_64BIT"
-  "ddsmaqas.u\t%0, %2, %3"
+  "ddsmaqa.su\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
 

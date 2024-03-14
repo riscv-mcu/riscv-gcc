@@ -1696,14 +1696,14 @@ typedef unsigned long uixlen_t;
 #define __dsmmul(a, b) \
   (__builtin_riscv_dsmmul ((a), (b)))
 
-#define __dsmmulu(a, b) \
-  (__builtin_riscv_dsmmulu ((a), (b)))
+#define __dsmmul_u(a, b) \
+  (__builtin_riscv_dsmmul_u ((a), (b)))
 
 #define __dkwmmul(a, b) \
   (__builtin_riscv_dkwmmul ((a), (b)))
 
-#define __dkwmmulu(a, b) \
-  (__builtin_riscv_dkwmmulu ((a), (b)))
+#define __dkwmmul_u(a, b) \
+  (__builtin_riscv_dkwmmul_u ((a), (b)))
 
 #define __dkabs32(a) \
   (__builtin_riscv_dkabs32 ((a)))
@@ -1930,14 +1930,14 @@ typedef unsigned long uixlen_t;
 #define __dkmmac(a, b, c) \
   (__builtin_riscv_dkmmac ((a), (b), (c)))
 
-#define __dkmmacu(a, b, c) \
-  (__builtin_riscv_dkmmacu ((a), (b), (c)))
+#define __dkmmac_u(a, b, c) \
+  (__builtin_riscv_dkmmac_u ((a), (b), (c)))
 
 #define __dkmmsb(a, b, c) \
   (__builtin_riscv_dkmmsb ((a), (b), (c)))
 
-#define __dkmmsbu(a, b, c) \
-  (__builtin_riscv_dkmmsbu ((a), (b), (c)))
+#define __dkmmsb_u(a, b, c) \
+  (__builtin_riscv_dkmmsb_u ((a), (b), (c)))
 
 #define __dkmada(a, b, c) \
   (__builtin_riscv_dkmada ((a), (b), (c)))
@@ -1963,8 +1963,8 @@ typedef unsigned long uixlen_t;
 #define __dsmaqa(a, b, c) \
   (__builtin_riscv_dsmaqa ((a), (b), (c)))
 
-#define __dsmaqasu(a, b, c) \
-  (__builtin_riscv_dsmaqasu ((a), (b), (c)))
+#define __dsmaqa_su(a, b, c) \
+  (__builtin_riscv_dsmaqa_su ((a), (b), (c)))
 
 #define __dumaqa(a, b, c) \
   (__builtin_riscv_dumaqa ((a), (b), (c)))
@@ -2029,8 +2029,8 @@ typedef unsigned long uixlen_t;
 #define __ddsmaqa(a, b, c) \
   (__builtin_riscv_ddsmaqa ((a), (b), (c)))
 
-#define __ddsmaqasu(a, b, c) \
-  (__builtin_riscv_ddsmaqasu ((a), (b), (c)))
+#define __ddsmaqa_su(a, b, c) \
+  (__builtin_riscv_ddsmaqa_su ((a), (b), (c)))
 
 #define __ddumaqa(a, b, c) \
   (__builtin_riscv_ddumaqa ((a), (b), (c)))
