@@ -1217,7 +1217,10 @@ extern void riscv_remove_unneeded_save_restore_calls (void);
    e.g. RVVMF64BI vs RVVMF1BI on zvl512b, which is [1, 1] vs [64, 64].  */
 #define MAX_POLY_VARIANT 64
 
+#ifndef HAVE_POST_MODIFY_DISP
 #define HAVE_POST_MODIFY_DISP TARGET_XTHEADMEMIDX
+#endif
+
 #define HAVE_PRE_MODIFY_DISP  TARGET_XTHEADMEMIDX
 
 #endif /* ! GCC_RISCV_H */
