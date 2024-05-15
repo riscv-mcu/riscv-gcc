@@ -264,7 +264,7 @@
 	(if_then_else
 	 (match_operator 1 "xxlcz_branching_operator"
 			 [(match_operand:X 2 "register_operand" "r")
-			  (match_operand:X 3 "imm5z_operand" "C05")])
+			  (match_operand:X 3 "imm5z_operand" "c05")])
 	 (label_ref (match_operand 0 "" ""))
 	 (pc)))]
   "TARGET_XXLCZBRI"

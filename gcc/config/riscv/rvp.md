@@ -1235,7 +1235,7 @@
 	  (vec_duplicate:RVPV4QI
 	    (match_operand:QI 1 "register_operand"  "    r,    r,    r,    r"))
 	  (match_operand:RVPV4QI 2 "register_operand"  "    0,    0,    0,    0")
-	  (match_operand:SI 3 "imm_1_2_4_8_operand" " C01, C02, C04, C08")))]
+	  (match_operand:SI 3 "imm_1_2_4_8_operand" " c01, c02, c04, c08")))]
   "TARGET_ZPN && !TARGET_64BIT"
   "@
    insb\t%0, %1, 0
@@ -1300,11 +1300,11 @@
 	    (sign_extend:SI
 	  (vec_select:HI
 		(match_operand:RVPV2HI 1 "register_operand"          "   r,   r,   r,   r")
-		(parallel [(match_operand:SI 3 "imm_0_1_operand"  " C00, C00, C01, C01")])))
+		(parallel [(match_operand:SI 3 "imm_0_1_operand"  " c00, c00, c01, c01")])))
 	    (sign_extend:SI
 	  (vec_select:HI
 		(match_operand:RVPV2HI 2 "register_operand"          "   r,   r,   r,   r")
-		(parallel [(match_operand:SI 4 "imm_0_1_operand"  " C00, C01, C01, C00")]))))
+		(parallel [(match_operand:SI 4 "imm_0_1_operand"  " c00, c01, c01, c00")]))))
 	(const_int 1)))]
   "TARGET_ZPN"
   "@
@@ -1360,11 +1360,11 @@
 	    (sign_extend:SI
 	  (vec_select:HI
 		(match_operand:RVPV4HI 1 "register_operand"          "   r,   r,   r,   r")
-		(parallel [(match_operand:SI 3 "imm_0_1_operand"  " C00, C00, C01, C01")])))
+		(parallel [(match_operand:SI 3 "imm_0_1_operand"  " c00, c00, c01, c01")])))
 	    (sign_extend:SI
 	  (vec_select:HI
 		(match_operand:RVPV4HI 2 "register_operand"          "   r,   r,   r,   r")
-		(parallel [(match_operand:SI 4 "imm_0_1_operand"  " C00, C01, C01, C00")]))))
+		(parallel [(match_operand:SI 4 "imm_0_1_operand"  " c00, c01, c01, c00")]))))
 	  (const_int 1)))]
   "TARGET_ZPN && TARGET_64BIT"
   "@
@@ -1423,11 +1423,11 @@
 	      (sign_extend:SI
 		(vec_select:HI
 		  (match_operand:RVPV2HI 1 "register_operand"          "   r,   r,   r,   r")
-		  (parallel [(match_operand:SI 3 "imm_0_1_operand"  " C00, C00, C01, C01")])))
+		  (parallel [(match_operand:SI 3 "imm_0_1_operand"  " c00, c00, c01, c01")])))
 	      (sign_extend:SI
 		(vec_select:HI
 		  (match_operand:RVPV2HI 2 "register_operand"          "   r,   r,   r,   r")
-		  (parallel [(match_operand:SI 4 "imm_0_1_operand"  " C00, C01, C01, C00")]))))
+		  (parallel [(match_operand:SI 4 "imm_0_1_operand"  " c00, c01, c01, c00")]))))
 	    (const_int 1))
 	  (match_operand:SI 5 "register_operand"                    "   0,   0,   0,   0")))]
   "TARGET_ZPN && !TARGET_64BIT"
@@ -1580,11 +1580,11 @@
 	    (sign_extend:SI
 	      (vec_select:HI
 		(match_operand:RVPV2HI 1 "register_operand"         "   r,   r,   r,   r")
-	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " C00, C00, C01, C01")])))
+	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " c00, c00, c01, c01")])))
 	    (sign_extend:SI
 	      (vec_select:HI
 	        (match_operand:RVPV2HI 2 "register_operand"         "   r,   r,   r,   r")
-	        (parallel [(match_operand:SI 4 "imm_0_1_operand" " C00, C01, C01, C00")]))))
+	        (parallel [(match_operand:SI 4 "imm_0_1_operand" " c00, c01, c01, c00")]))))
 	  (match_operand:SI 5 "register_operand"                 "   0,   0,   0,   0")))]
   "TARGET_ZPN && !TARGET_64BIT"
 {
@@ -1646,13 +1646,13 @@
 	    (sign_extend:RVPV2SI
 	      (vec_select:RVPV2HI
 		(match_operand:RVPV4HI 1 "register_operand"         "   r,   r,   r,   r")
-	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " C00, C00, C01, C01")
-			   (match_operand:SI 4 "imm_2_3_operand" " C02, C02, C03, C03")])))
+	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " c00, c00, c01, c01")
+			   (match_operand:SI 4 "imm_2_3_operand" " c02, c02, c03, c03")])))
 	    (sign_extend:RVPV2SI
 	      (vec_select:RVPV2HI
 	        (match_operand:RVPV4HI 2 "register_operand"         "   r,   r,   r,   r")
-	        (parallel [(match_operand:SI 5 "imm_0_1_operand" " C00, C01, C01, C00")
-			   (match_operand:SI 6 "imm_2_3_operand" " C02, C03, C03, C02")]))))
+	        (parallel [(match_operand:SI 5 "imm_0_1_operand" " c00, c01, c01, c00")
+			   (match_operand:SI 6 "imm_2_3_operand" " c02, c03, c03, c02")]))))
 	  (match_operand:RVPV2SI 7 "register_operand"               "   0,   0,   0,   0")))]
   "TARGET_ZPN && TARGET_64BIT"
   "@
@@ -2123,8 +2123,8 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_operand:RVPV2HI 2 "register_operand"         "   r,   r,   r,   r")
-		      (parallel [(match_operand:SI 3 "imm_0_1_operand" " C00, C01, C00, C01")]))))
-	      (match_operand:SI 5 "imm_15_16_operand"                  " C16, C16, C15, C15" )))))]
+		      (parallel [(match_operand:SI 3 "imm_0_1_operand" " c00, c01, c00, c01")]))))
+	      (match_operand:SI 5 "imm_15_16_operand"                  " c16, c16, c15, c15" )))))]
   "TARGET_ZPN && !TARGET_64BIT"
   "@
   kmmawb\t%0, %1, %2
@@ -2197,9 +2197,9 @@
 		   (sign_extend:DI
 		     (vec_select:HI
 		       (match_operand:RVPV2HI 2 "register_operand"           "   r,   r,   r,   r")
-		       (parallel [(match_operand:SI 3 "imm_0_1_operand"   " C00, C01, C00, C01")]))))]
+		       (parallel [(match_operand:SI 3 "imm_0_1_operand"   " c00, c01, c00, c01")]))))]
 		UNSPEC_ROUND)
-	      (match_operand:SI 5 "imm_15_16_operand"                     " C16, C16, C15, C15")))))]
+	      (match_operand:SI 5 "imm_15_16_operand"                     " c16, c16, c15, c15")))))]
   "TARGET_ZPN && !TARGET_64BIT"
   "@
   kmmawb.u\t%0, %1, %2
@@ -2275,8 +2275,8 @@
 		(sign_extend:DI
 		  (vec_select:HI
 		    (match_operand:RVPV4HI 2 "register_operand"           "  r,   r,   r,   r")
-		      (parallel [(match_operand:SI 3 "imm_0_1_operand" "C00, C01, C00, C01")]))))
-	      (match_operand:SI 6 "imm_15_16_operand"                  "C16, C16, C15, C15")))
+		      (parallel [(match_operand:SI 3 "imm_0_1_operand" "c00, c01, c00, c01")]))))
+	      (match_operand:SI 6 "imm_15_16_operand"                  "c16, c16, c15, c15")))
 	  (truncate:SI
 	    (lshiftrt:DI
 	      (mult:DI
@@ -2287,7 +2287,7 @@
 		(sign_extend:DI
 		  (vec_select:HI
 		    (match_dup 2)
-		      (parallel [(match_operand:SI 4 "imm_2_3_operand" "C02, C03, C02, C03")]))))
+		      (parallel [(match_operand:SI 4 "imm_2_3_operand" "c02, c03, c02, c03")]))))
 	      (match_dup 6))))))]
   "TARGET_ZPN && TARGET_64BIT"
   "@
@@ -2369,7 +2369,7 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_operand:RVPV4HI 2 "register_operand"           "  r,   r,   r,   r")
-			(parallel [(match_operand:SI 3 "imm_0_1_operand" "C00, C01, C00, C01")]))))]
+			(parallel [(match_operand:SI 3 "imm_0_1_operand" "c00, c01, c00, c01")]))))]
 		UNSPEC_ROUND)
 	      (const_int 16)))
 	  (truncate:SI
@@ -2383,9 +2383,9 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_dup 2)
-			(parallel [(match_operand:SI 4 "imm_2_3_operand" "C02, C03, C02, C03")]))))]
+			(parallel [(match_operand:SI 4 "imm_2_3_operand" "c02, c03, c02, c03")]))))]
 		  UNSPEC_ROUND)
-	      (match_operand:SI 6 "imm_15_16_operand"                    "C16, C16, C15, C15"))))))]
+	      (match_operand:SI 6 "imm_15_16_operand"                    "c16, c16, c15, c15"))))))]
 "TARGET_ZPN && TARGET_64BIT"
   "@
   kmmawb.u\t%0, %1, %2
@@ -2516,7 +2516,7 @@
 		 (sign_extend:DI
 		   (vec_select:HI
 		     (match_operand:RVPV2HI 2 "register_operand"           "    r,    r")
-		     (parallel [(match_operand:SI 3 "imm_0_1_operand"   "  C00,  C01")]))))]
+		     (parallel [(match_operand:SI 3 "imm_0_1_operand"   "  c00,  c01")]))))]
 	      UNSPEC_KMMWU)
 	    (const_int 15))))]
   "TARGET_ZPN && !TARGET_64BIT"
@@ -2563,7 +2563,7 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_operand:RVPV4HI 2 "register_operand"           "  r,   r")
-		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "C00, C01")]))))]
+		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "c00, c01")]))))]
 		UNSPEC_KMMWU)
 	      (const_int 15)))
 	  (truncate:SI
@@ -2577,7 +2577,7 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_dup 2)
-		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "C02, C03")]))))]
+		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "c02, c03")]))))]
 		UNSPEC_KMMWU)
 	      (const_int 15)))))]
   "TARGET_ZPN && TARGET_64BIT"
@@ -2777,7 +2777,7 @@
 		(sign_extend:DI
 		  (vec_select:HI
 		    (match_operand:RVPV4HI 2 "register_operand"           "  r,   r")
-		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "C00, C01")]))))]
+		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "c00, c01")]))))]
 	      UNSPEC_KMMW)
 	      (const_int 15)))
 	  (truncate:SI
@@ -2790,7 +2790,7 @@
 		(sign_extend:DI
 		  (vec_select:HI
 		    (match_dup 2)
-		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "C02, C03")]))))]
+		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "c02, c03")]))))]
 	      UNSPEC_KMMW)
 	      (const_int 15)))))]
   "TARGET_ZPN && TARGET_64BIT"
@@ -2830,7 +2830,7 @@
 	      (sign_extend:DI
 		(vec_select:HI
 		  (match_operand:RVPV2HI 2 "register_operand"           "    r,    r")
-		  (parallel [(match_operand:SI 3 "imm_0_1_operand"   "  C00,  C01")]))))]
+		  (parallel [(match_operand:SI 3 "imm_0_1_operand"   "  c00,  c01")]))))]
 	    UNSPEC_KMMW)
 	    (const_int 15))))]
   "TARGET_ZPN && !TARGET_64BIT"
@@ -3245,12 +3245,12 @@
 	  (vec_duplicate:VSHI
 	    (vec_select:<VNHALF>
 	      (match_operand:VSHI 1 "register_operand"         "  r,   r,   r,   r,   r,   r,   r,   r")
-	      (parallel [(match_operand:SI 4 "imm_0_1_operand" "C00, C00, C01, C01, C00, C00, C01, C01")])))
+	      (parallel [(match_operand:SI 4 "imm_0_1_operand" "c00, c00, c01, c01, c00, c00, c01, c01")])))
 	  (vec_duplicate:VSHI
 	    (vec_select:<VNHALF>
 	      (match_operand:VSHI 2 "register_operand"         "  r,   r,   r,   r,   r,   r,   r,   r")
-	      (parallel [(match_operand:SI 5 "imm_0_1_operand" "C00, C01, C01, C00, C00, C01, C01, C00")])))
-	  (match_operand:SI 3 "imm_1_2_operand"                "C01, C01, C01, C01, C02, C02, C02, C02")))]
+	      (parallel [(match_operand:SI 5 "imm_0_1_operand" "c00, c01, c01, c00, c00, c01, c01, c00")])))
+	  (match_operand:SI 3 "imm_1_2_operand"                "c01, c01, c01, c01, c02, c02, c02, c02")))]
   "TARGET_ZPN"
   "@
    pkbb<bits>\t%0, %2, %1
@@ -3904,11 +3904,11 @@
 	    (sign_extend:DI
 	      (vec_select:HI
 		(match_operand:RVPV2HI 1 "register_operand"         "   r,   r,   r,   r")
-		(parallel [(match_operand:SI 4 "imm_0_1_operand" " C00, C00, C01, C01")])))
+		(parallel [(match_operand:SI 4 "imm_0_1_operand" " c00, c00, c01, c01")])))
 	    (sign_extend:DI
 	      (vec_select:HI
 		(match_operand:RVPV2HI 2 "register_operand"         "   r,   r,   r,   r")
-		(parallel [(match_operand:SI 5 "imm_0_1_operand" " C00, C01, C01, C00")]))))))]
+		(parallel [(match_operand:SI 5 "imm_0_1_operand" " c00, c01, c01, c00")]))))))]
   "TARGET_ZPSF && !TARGET_64BIT"
 {
     const char *pats[] = { "smalbb\t%0, %1, %2",
@@ -3974,20 +3974,20 @@
 	      (sign_extend:DI
 		(vec_select:HI
 		  (match_operand:RVPV4HI 1 "register_operand"         "   r,   r,   r,   r")
-		  (parallel [(match_operand:SI 4 "imm_0_1_operand" " C00, C00, C01, C01")])))
+		  (parallel [(match_operand:SI 4 "imm_0_1_operand" " c00, c00, c01, c01")])))
 	      (sign_extend:DI
 		(vec_select:HI
 		  (match_operand:RVPV4HI 2 "register_operand"         "   r,   r,   r,   r")
-		  (parallel [(match_operand:SI 5 "imm_0_1_operand" " C00, C01, C01, C00")]))))
+		  (parallel [(match_operand:SI 5 "imm_0_1_operand" " c00, c01, c01, c00")]))))
 	    (mult:DI
 	      (sign_extend:DI
 		(vec_select:HI
 		  (match_dup 1)
-		  (parallel [(match_operand:SI 6 "imm_2_3_operand" " C02, C02, C03, C03")])))
+		  (parallel [(match_operand:SI 6 "imm_2_3_operand" " c02, c02, c03, c03")])))
 	      (sign_extend:DI
 		(vec_select:HI
 		  (match_dup 2)
-		  (parallel [(match_operand:SI 7 "imm_2_3_operand" " C02, C03, C03, C02")])))))))]
+		  (parallel [(match_operand:SI 7 "imm_2_3_operand" " c02, c03, c03, c02")])))))))]
   "TARGET_ZPSF && TARGET_64BIT"
   "@
    smalbb\t%0, %1, %2
@@ -4677,10 +4677,10 @@
 	  (sign_extend:SI
 	     (vec_select:HI
 	       (match_operand:RVPV2HI 1 "register_operand"         "   r,   r,   r,   r")
-	       (parallel [(match_operand:SI 3 "imm_0_1_operand" " C00, C00, C01, C01")])))
+	       (parallel [(match_operand:SI 3 "imm_0_1_operand" " c00, c00, c01, c01")])))
 	  (sign_extend:SI (vec_select:HI
 	       (match_operand:RVPV2HI 2 "register_operand"         "   r,   r,   r,   r")
-	       (parallel [(match_operand:SI 4 "imm_0_1_operand" " C00, C01, C01, C00")])))))]
+	       (parallel [(match_operand:SI 4 "imm_0_1_operand" " c00, c01, c01, c00")])))))]
   "TARGET_ZPN && !TARGET_64BIT"
 {
   const char *pats[] = { "smbb16\t%0, %1, %2",
@@ -4735,13 +4735,13 @@
 	 (sign_extend:RVPV2SI
 	  (vec_select:RVPV2HI
 	   (match_operand:RVPV4HI 1 "register_operand" "r, r, r")
-	   (parallel [(match_operand:SI 3 "imm2u_operand" " C00, C00, C01")
-		      (match_operand:SI 4 "imm2u_operand" " C02, C02, C03")])))
+	   (parallel [(match_operand:SI 3 "imm2u_operand" " c00, c00, c01")
+		      (match_operand:SI 4 "imm2u_operand" " c02, c02, c03")])))
 	 (sign_extend:RVPV2SI
 	  (vec_select:RVPV2HI
 	   (match_operand:RVPV4HI 2 "register_operand" "r, r, r")
-	   (parallel [(match_operand:SI 5 "imm2u_operand" " C00, C01, C01")
-		      (match_operand:SI 6 "imm2u_operand" " C02, C03, C03")])))))]
+	   (parallel [(match_operand:SI 5 "imm2u_operand" " c00, c01, c01")
+		      (match_operand:SI 6 "imm2u_operand" " c02, c03, c03")])))))]
   "TARGET_ZPN && TARGET_64BIT"
   "@
    smbb16\t%0, %1, %2
@@ -4793,10 +4793,10 @@
 	  (sign_extend:DI
 	     (vec_select:SI
 	       (match_operand:RVPV2SI 1 "register_operand"         "   r,   r,   r,   r")
-	       (parallel [(match_operand:SI 3 "imm_0_1_operand" " C00, C00, C01, C01")])))
+	       (parallel [(match_operand:SI 3 "imm_0_1_operand" " c00, c00, c01, c01")])))
 	  (sign_extend:DI (vec_select:SI
 	       (match_operand:RVPV2SI 2 "register_operand"         "   r,   r,   r,   r")
-	       (parallel [(match_operand:SI 4 "imm_0_1_operand" " C00, C01, C01, C00")])))))]
+	       (parallel [(match_operand:SI 4 "imm_0_1_operand" " c00, c01, c01, c00")])))))]
   "TARGET_ZPRV && TARGET_64BIT"
 {
   const char *pats[] = { "smbb32\t%0, %1, %2",
@@ -5087,7 +5087,7 @@
 	      (sign_extend:DI
 	        (vec_select:HI
 		  (match_operand:RVPV2HI 2 "register_operand"           "  r,   r")
-		  (parallel [(match_operand:SI 3 "imm_0_1_operand"   "C00, C01")]))))
+		  (parallel [(match_operand:SI 3 "imm_0_1_operand"   "c00, c01")]))))
 	    (const_int 16))))]
   "TARGET_ZPN && !TARGET_64BIT"
 {
@@ -5135,7 +5135,7 @@
 		(sign_extend:DI
 		  (vec_select:HI
 		    (match_operand:RVPV4HI 2 "register_operand"           "  r,   r")
-		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "C00, C01")]))))
+		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "c00, c01")]))))
 	      (const_int 16)))
 	  (truncate:SI
 	    (lshiftrt:DI
@@ -5147,7 +5147,7 @@
 		(sign_extend:DI
 		  (vec_select:HI
 		    (match_dup 2)
-		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "C02, C03")]))))
+		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "c02, c03")]))))
 	      (const_int 16)))))]
   "TARGET_ZPN && TARGET_64BIT"
 {
@@ -5190,7 +5190,7 @@
 		 (sign_extend:DI
 		   (vec_select:HI
 		     (match_operand:RVPV2HI 2 "register_operand"           "   r,   r")
-		     (parallel [(match_operand:SI 3 "imm_0_1_operand"   " C00, C01")]))))]
+		     (parallel [(match_operand:SI 3 "imm_0_1_operand"   " c00, c01")]))))]
 	      UNSPEC_ROUND)
 	    (const_int 16))))]
   "TARGET_ZPN && !TARGET_64BIT"
@@ -5239,7 +5239,7 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_operand:RVPV4HI 2 "register_operand"           "  r,   r")
-		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "C00, C01")]))))]
+		      (parallel [(match_operand:SI 3 "imm_0_1_operand"   "c00, c01")]))))]
 	        UNSPEC_ROUND)
 	      (const_int 16)))
 	  (truncate:SI
@@ -5253,7 +5253,7 @@
 		  (sign_extend:DI
 		    (vec_select:HI
 		      (match_dup 2)
-		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "C02, C03")]))))]
+		      (parallel [(match_operand:SI 4 "imm_2_3_operand"   "c02, c03")]))))]
 	        UNSPEC_ROUND)
 	      (const_int 16)))))]
   "TARGET_ZPN && TARGET_64BIT"
@@ -6753,22 +6753,22 @@
 		(sign_extend:SI
 		  (vec_select:HI
 		    (match_operand:RVPV4HI 1 "register_operand"          "   r,   r,   r,   r")
-		    (parallel [(match_operand:SI 3 "imm_0_1_operand"  " C00, C00, C01, C01")])))
+		    (parallel [(match_operand:SI 3 "imm_0_1_operand"  " c00, c00, c01, c01")])))
 		(sign_extend:SI
 		  (vec_select:HI
 		    (match_operand:RVPV4HI 2 "register_operand"          "   r,   r,   r,   r")
-		    (parallel [(match_operand:SI 4 "imm_0_1_operand"  " C00, C01, C01, C00")]))))
+		    (parallel [(match_operand:SI 4 "imm_0_1_operand"  " c00, c01, c01, c00")]))))
 	      (const_int 1))
 	    (ashift:SI
 	      (mult:SI
 		(sign_extend:SI
 		  (vec_select:HI
 		    (match_dup 1)
-		    (parallel [(match_operand:SI 5 "imm_2_3_operand"  " C02, C02, C03, C03")])))
+		    (parallel [(match_operand:SI 5 "imm_2_3_operand"  " c02, c02, c03, c03")])))
 		(sign_extend:SI
 		  (vec_select:HI
 		    (match_dup 2)
-		    (parallel [(match_operand:SI 6 "imm_2_3_operand"  " C02, C03, C03, C02")]))))
+		    (parallel [(match_operand:SI 6 "imm_2_3_operand"  " c02, c03, c03, c02")]))))
 	      (const_int 1)))
 	  (match_operand:RVPV2SI 7 "register_operand"                    "   0,   0,   0,   0")))]
   "TARGET_ZPRV && TARGET_64BIT"
@@ -6859,11 +6859,11 @@
 	    (sign_extend:DI
 	      (vec_select:SI
 		(match_operand:RVPV2SI 1 "register_operand"         "   r,   r,   r,   r")
-	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " C00, C00, C01, C01")])))
+	        (parallel [(match_operand:SI 3 "imm_0_1_operand" " c00, c00, c01, c01")])))
 	    (sign_extend:DI
 	      (vec_select:SI
 	        (match_operand:RVPV2SI 2 "register_operand"         "   r,   r,   r,   r")
-	        (parallel [(match_operand:SI 4 "imm_0_1_operand" " C00, C01, C01, C00")]))))
+	        (parallel [(match_operand:SI 4 "imm_0_1_operand" " c00, c01, c01, c00")]))))
 	  (match_operand:DI 5 "register_operand"                 "   0,   0,   0,   0")))]
   "TARGET_ZPRV && TARGET_64BIT"
   "@

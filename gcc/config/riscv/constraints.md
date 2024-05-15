@@ -45,6 +45,11 @@
   (and (match_code "const_int")
        (match_test "ival == 0")))
 
+(define_constraint "c00"
+  "Constant value 0"
+  (and (match_code "const_int")
+       (match_test "ival == 0")))
+
 (define_constraint "c01"
   "Constant value 1."
   (and (match_code "const_int")
@@ -55,15 +60,35 @@
   (and (match_code "const_int")
        (match_test "ival == 2")))
 
+(define_constraint "c03"
+  "Constant value 3"
+  (and (match_code "const_int")
+       (match_test "ival == 3")))
+
 (define_constraint "c04"
   "Constant value 4"
   (and (match_code "const_int")
        (match_test "ival == 4")))
 
+(define_constraint "c05"
+  "Unsigned immediate 5-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < 15 && ival > -16 && ival != 0")))
+
 (define_constraint "c08"
   "Constant value 8"
   (and (match_code "const_int")
        (match_test "ival == 8")))
+
+(define_constraint "c15"
+  "Constant value 15"
+  (and (match_code "const_int")
+       (match_test "ival == 15")))
+
+(define_constraint "c16"
+  "Constant value 16"
+  (and (match_code "const_int")
+       (match_test "ival == 16")))
 
 (define_constraint "K"
   "A 5-bit unsigned immediate for CSR access instructions."
@@ -158,10 +183,6 @@
        (and (match_test "IN_RANGE (ival, 0, 1073741823)")
             (match_test "exact_log2 (ival + 1) != -1"))))
 
-(define_constraint "C05"
-  "Unsigned immediate 5-bit value"
-  (and (match_code "const_int")
-       (match_test "ival < 15 && ival > -16 && ival != 0")))
 
 ;; Vector constraints.
 
@@ -283,47 +304,7 @@
   (and (match_code "const_int")
        (match_test "ival < (1 << 6) && ival >= 0")))
 
-(define_constraint "C00"
-  "Constant value 0"
-  (and (match_code "const_int")
-       (match_test "ival == 0")))
-
-(define_constraint "C01"
-  "Constant value 1"
-  (and (match_code "const_int")
-       (match_test "ival == 1")))
-
-(define_constraint "C02"
-  "Constant value 2"
-  (and (match_code "const_int")
-       (match_test "ival == 2")))
-
-(define_constraint "C03"
-  "Constant value 3"
-  (and (match_code "const_int")
-       (match_test "ival == 3")))
-
-(define_constraint "C04"
-  "Constant value 4"
-  (and (match_code "const_int")
-       (match_test "ival == 4")))
-
-(define_constraint "C08"
-  "Constant value 8"
-  (and (match_code "const_int")
-       (match_test "ival == 8")))
-
 (define_constraint "D07"
   "A constraint that matches the integers 2^(0...7)."
   (and (match_code "const_int")
        (match_test "(unsigned) exact_log2 (ival) <= 7")))
-
-(define_constraint "C15"
-  "Constant value 15"
-  (and (match_code "const_int")
-       (match_test "ival == 15")))
-
-(define_constraint "C16"
-  "Constant value 16"
-  (and (match_code "const_int")
-       (match_test "ival == 16")))

@@ -618,7 +618,7 @@
 
 (define_predicate "imm5z_operand"
   (and (match_operand 0 "const_int_operand")
-       (match_test "satisfies_constraint_C05 (op)")))
+       (match_test "satisfies_constraint_c05 (op)")))
 
 (define_predicate "xxlcz_branching_operator"
   (match_code "eq,ne")
@@ -665,10 +665,10 @@
 
 (define_predicate "imm_1_2_4_8_operand"
   (and (match_operand 0 "const_int_operand")
-       (ior (ior (match_test "satisfies_constraint_C01 (op)")
-		 (match_test "satisfies_constraint_C02 (op)"))
-	    (ior (match_test "satisfies_constraint_C04 (op)")
-		 (match_test "satisfies_constraint_C08 (op)")))))
+       (ior (ior (match_test "satisfies_constraint_c01 (op)")
+		 (match_test "satisfies_constraint_c02 (op)"))
+	    (ior (match_test "satisfies_constraint_c04 (op)")
+		 (match_test "satisfies_constraint_c08 (op)")))))
 
 (define_predicate "pwr_7_operand"
   (and (match_code "const_int")
@@ -677,20 +677,20 @@
 
 (define_predicate "imm_0_1_operand"
   (and (match_operand 0 "const_int_operand")
-       (ior (match_test "satisfies_constraint_C00 (op)")
-	    (match_test "satisfies_constraint_C01 (op)"))))
+       (ior (match_test "satisfies_constraint_c00 (op)")
+	    (match_test "satisfies_constraint_c01 (op)"))))
 
 (define_predicate "imm_1_2_operand"
   (and (match_operand 0 "const_int_operand")
-       (ior (match_test "satisfies_constraint_C01 (op)")
-	    (match_test "satisfies_constraint_C02 (op)"))))
+       (ior (match_test "satisfies_constraint_c01 (op)")
+	    (match_test "satisfies_constraint_c02 (op)"))))
 
 (define_predicate "imm_2_3_operand"
   (and (match_operand 0 "const_int_operand")
-       (ior (match_test "satisfies_constraint_C02 (op)")
-	    (match_test "satisfies_constraint_C03 (op)"))))
+       (ior (match_test "satisfies_constraint_c02 (op)")
+	    (match_test "satisfies_constraint_c03 (op)"))))
 
 (define_predicate "imm_15_16_operand"
   (and (match_operand 0 "const_int_operand")
-       (ior (match_test "satisfies_constraint_C15 (op)")
-	    (match_test "satisfies_constraint_C16 (op)"))))
+       (ior (match_test "satisfies_constraint_c15 (op)")
+	    (match_test "satisfies_constraint_c16 (op)"))))
