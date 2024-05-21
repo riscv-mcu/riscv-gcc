@@ -400,6 +400,8 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"xxldspn2x",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"xxldspn3x",   ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"zilsd",   ISA_SPEC_CLASS_NONE, 0, 81},
+  {"zcmlsd",  ISA_SPEC_CLASS_NONE, 0, 81},
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
 };
@@ -1781,6 +1783,9 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   {"xxldspn1x",  &gcc_options::x_riscv_rvp_subext, MASK_XXLDSPN1X},
   {"xxldspn2x",  &gcc_options::x_riscv_rvp_subext, MASK_XXLDSPN2X},
   {"xxldspn3x",  &gcc_options::x_riscv_rvp_subext, MASK_XXLDSPN3X},
+
+  {"zilsd",    &gcc_options::x_riscv_zilsd_subext, MASK_ZILSD},
+  {"zcmlsd",   &gcc_options::x_riscv_zilsd_subext, MASK_ZCMLSD},
 
   {NULL, NULL, 0}
 };
