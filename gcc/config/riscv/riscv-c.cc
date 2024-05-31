@@ -227,6 +227,11 @@ riscv_cpu_cpp_builtins (cpp_reader *pfile)
     builtin_define ("__riscv_zpsf");
   }
 
+  if (TARGET_ZBA && TARGET_ZBB && TARGET_ZBC && TARGET_ZBS)
+  {
+    builtin_define ("__riscv_bitmanip");
+  }
+  
   /* Define architecture extension test macros.  */
   builtin_define_with_int_value ("__riscv_arch_test", 1);
 
