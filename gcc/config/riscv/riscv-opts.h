@@ -58,7 +58,13 @@ enum riscv_microarchitecture_type {
   sifive_p400,
   sifive_p600,
   xiangshan,
-  generic_ooo
+  generic_ooo,
+  nuclei_100,
+  nuclei_200,
+  nuclei_300,
+  nuclei_600,
+  nuclei_900,
+  nuclei_1000
 };
 extern enum riscv_microarchitecture_type riscv_microarchitecture;
 

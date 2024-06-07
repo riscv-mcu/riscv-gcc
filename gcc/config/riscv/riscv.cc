@@ -595,6 +595,84 @@ static const struct riscv_tune_param generic_ooo_tune_info = {
   NULL,						/* loop_align */
 };
 
+/* Costs to use when optimizing for Nuclei 100 Series. */
+static const struct riscv_tune_param nuclei_100_tune_info = {
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* int_mul */
+  {COSTS_N_INSNS (34), COSTS_N_INSNS (64)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  5,						/* memory_cost */
+  true,					/* slow_unaligned_access */
+};
+
+/* Costs to use when optimizing for Nuclei 200 Series. */
+static const struct riscv_tune_param nuclei_200_tune_info = {
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* int_mul */
+  {COSTS_N_INSNS (34), COSTS_N_INSNS (64)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  5,						/* memory_cost */
+  true,						/* slow_unaligned_access */
+};
+
+/* Costs to use when optimizing for Nuclei 300 Series. */
+static const struct riscv_tune_param nuclei_300_tune_info = {
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_add */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* int_mul */
+  {COSTS_N_INSNS (17), COSTS_N_INSNS (33)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  5,						/* memory_cost */
+  true,						/* slow_unaligned_access */
+};
+
+/* Costs to use when optimizing for Nuclei 600 Series. */
+static const struct riscv_tune_param nuclei_600_tune_info = {
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_add */
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* int_mul */
+  {COSTS_N_INSNS (17), COSTS_N_INSNS (33)},	/* int_div */
+  1,						/* issue_rate */
+  3,						/* branch_cost */
+  true,						/* slow_unaligned_access */
+};
+
+/* Costs to use when optimizing for Nuclei 900 Series. */
+static const struct riscv_tune_param nuclei_900_tune_info = {
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_add */
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_mul */
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},	/* fp_div */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* int_mul */
+  {COSTS_N_INSNS (17), COSTS_N_INSNS (33)},	/* int_div */
+  2,						/* issue_rate */
+  3,						/* branch_cost */
+  3,						/* memory_cost */
+  true,						/* slow_unaligned_access */
+};
+
+/* Costs to use when optimizing for a nuclei 1000 profile.  */
+static const struct riscv_tune_param nuclei_1000_tune_info = {
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_add */
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)},	/* fp_mul */
+  {COSTS_N_INSNS (16), COSTS_N_INSNS (16)},	/* fp_div */
+  {COSTS_N_INSNS (2), COSTS_N_INSNS (2)},	/* int_mul */
+  {COSTS_N_INSNS (16), COSTS_N_INSNS (16)},	/* int_div */
+  2,						/* issue_rate */
+  3,						/* branch_cost */
+  3,						/* memory_cost */
+  3,						/* fmv_cost */
+  true,					/* slow_unaligned_access */
+};
+
 /* Costs to use when optimizing for size.  */
 static const struct riscv_tune_param optimize_size_tune_info = {
   {COSTS_N_INSNS (1), COSTS_N_INSNS (1)},	/* fp_add */
@@ -10014,7 +10092,7 @@ riscv_sched_adjust_cost (rtx_insn *, int, rtx_insn *insn, int cost,
 			 unsigned int)
 {
   /* Only do adjustments for the generic out-of-order scheduling model.  */
-  if (!TARGET_VECTOR || riscv_microarchitecture != generic_ooo)
+  if (!TARGET_VECTOR || (riscv_microarchitecture != generic_ooo && riscv_microarchitecture != nuclei_1000))
     return cost;
 
   if (recog_memoized (insn) < 0)
