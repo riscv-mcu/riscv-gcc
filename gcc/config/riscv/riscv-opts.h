@@ -157,6 +157,23 @@ enum riscv_tls_type {
   TLS_DESCRIPTORS
 };
 
+/* P extension subset */
+#define MASK_ZPN        (1 << 0)
+#define MASK_ZPRV       (1 << 1)
+#define MASK_ZPSF       (1 << 2)
+#define MASK_XXLDSP     (1 << 3)
+#define MASK_XXLDSPN1X  (1 << 4)
+#define MASK_XXLDSPN2X  (1 << 5)
+#define MASK_XXLDSPN3X  (1 << 6)
+
+#define TARGET_ZPN        ((riscv_rvp_subext & MASK_XXLDSP) != 0)
+#define TARGET_ZPRV       ((riscv_rvp_subext & MASK_XXLDSP) != 0)
+#define TARGET_ZPSF       ((riscv_rvp_subext & MASK_XXLDSP) != 0)
+#define TARGET_XXLDSP     ((riscv_rvp_subext & MASK_XXLDSP) != 0)
+#define TARGET_XXLDSPN1X  ((riscv_rvp_subext & MASK_XXLDSPN1X) != 0)
+#define TARGET_XXLDSPN2X  ((riscv_rvp_subext & MASK_XXLDSPN2X) != 0)
+#define TARGET_XXLDSPN3X  ((riscv_rvp_subext & MASK_XXLDSPN3X) != 0)
+
 /* On some microarchitectures, vector segment loads and stores are excessively
    expensive, so predicate the generation of those instrunctions.  */
 #define TARGET_VECTOR_AUTOVEC_SEGMENT					       \

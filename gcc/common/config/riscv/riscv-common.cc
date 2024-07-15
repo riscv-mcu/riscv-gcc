@@ -223,6 +223,12 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"sstc", "zicsr"},
 
   {"xsfvcp", "zve32x"},
+  {"xxldspn3x", "xxldsp"},
+  {"xxldspn3x", "xxldspn1x"},
+  {"xxldspn3x", "xxldspn2x"},
+  {"xxldspn2x", "xxldsp"},
+  {"xxldspn2x", "xxldspn1x"},
+  {"xxldspn1x", "xxldsp"},
 
   {NULL, NULL}
 };
@@ -429,6 +435,14 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
 
   {"xsfvcp",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"xsfcease", ISA_SPEC_CLASS_NONE, 1, 0},
+  {"zpn",   ISA_SPEC_CLASS_NONE, 0, 94},
+  {"zprv",  ISA_SPEC_CLASS_NONE, 0, 94},
+  {"zpsf",  ISA_SPEC_CLASS_NONE, 0, 94},
+
+  {"xxldsp",      ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxldspn1x",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxldspn2x",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxldspn3x",   ISA_SPEC_CLASS_NONE, 1, 0},
 
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
@@ -1758,6 +1772,13 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
 
   RISCV_EXT_FLAG_ENTRY ("xsfvcp",   x_riscv_sifive_subext, MASK_XSFVCP),
   RISCV_EXT_FLAG_ENTRY ("xsfcease", x_riscv_sifive_subext, MASK_XSFCEASE),
+
+  RISCV_EXT_FLAG_ENTRY ("zpn",       x_riscv_rvp_subext, MASK_ZPN),
+  RISCV_EXT_FLAG_ENTRY ("zprv",      x_riscv_rvp_subext, MASK_ZPRV),
+  RISCV_EXT_FLAG_ENTRY ("xxldsp",    x_riscv_rvp_subext, MASK_XXLDSP),
+  RISCV_EXT_FLAG_ENTRY ("xxldspn1x", x_riscv_rvp_subext, MASK_XXLDSPN1X),
+  RISCV_EXT_FLAG_ENTRY ("xxldspn2x", x_riscv_rvp_subext, MASK_XXLDSPN2X),
+  RISCV_EXT_FLAG_ENTRY ("xxldspn3x", x_riscv_rvp_subext, MASK_XXLDSPN3X),
 
   {NULL, NULL, NULL, 0}
 };

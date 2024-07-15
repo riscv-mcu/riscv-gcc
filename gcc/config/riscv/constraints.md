@@ -45,6 +45,11 @@
   (and (match_code "const_int")
        (match_test "ival == 0")))
 
+(define_constraint "c00"
+  "Constant value 0"
+  (and (match_code "const_int")
+       (match_test "ival == 0")))
+
 (define_constraint "c01"
   "Constant value 1."
   (and (match_code "const_int")
@@ -65,10 +70,25 @@
   (and (match_code "const_int")
        (match_test "ival == 4")))
 
+(define_constraint "c05"
+  "Unsigned immediate 5-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < 15 && ival > -16 && ival != 0")))
+
 (define_constraint "c08"
   "Constant value 8"
   (and (match_code "const_int")
        (match_test "ival == 8")))
+
+(define_constraint "c15"
+  "Constant value 15"
+  (and (match_code "const_int")
+       (match_test "ival == 15")))
+
+(define_constraint "c16"
+  "Constant value 16"
+  (and (match_code "const_int")
+       (match_test "ival == 16")))
 
 (define_constraint "P"
   "A 5-bit signed immediate for vmv.v.i."
@@ -118,6 +138,14 @@
   "@internal"
   (and (match_code "const_int")
        (match_test "SINGLE_BIT_MASK_OPERAND (~ival)")))
+
+(define_constraint "D03"
+  "0, 1, 2 or 3 immediate"
+  (match_test "IN_RANGE (ival, 0, 3)"))
+
+(define_constraint "DsA"
+  "0 - 10 immediate"
+  (match_test "IN_RANGE (ival, 0, 10)"))
 
 ;; Floating-point constant +0.0, used for FCVT-based moves when FMV is
 ;; not available in RV32.
@@ -295,3 +323,33 @@
   "Shifting immediate for SIMD shufflei3."
   (and (match_code "const_int")
        (match_test "IN_RANGE (ival, -64, -1)")))
+
+(define_constraint "u02"
+  "Unsigned immediate 2-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 2) && ival >= 0")))
+
+(define_constraint "u03"
+  "Unsigned immediate 3-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 3) && ival >= 0")))
+
+(define_constraint "u04"
+  "Unsigned immediate 4-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 4) && ival >= 0")))
+
+(define_constraint "u05"
+  "Unsigned immediate 5-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 5) && ival >= 0")))
+
+(define_constraint "u06"
+  "Unsigned immediate 6-bit value"
+  (and (match_code "const_int")
+       (match_test "ival < (1 << 6) && ival >= 0")))
+
+(define_constraint "D07"
+  "A constraint that matches the integers 2^(0...7)."
+  (and (match_code "const_int")
+       (match_test "(unsigned) exact_log2 (ival) <= 7")))
