@@ -229,6 +229,15 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"xxldspn2x", "xxldsp"},
   {"xxldspn2x", "xxldspn1x"},
   {"xxldspn1x", "xxldsp"},
+  {"xxlcz", "xxlczpstinc"},
+  {"xxlcz", "xxlczbmrk"},
+  {"xxlcz", "xxlczbitop"},
+  {"xxlcz", "xxlczslet"},
+  {"xxlcz", "xxlczabs"},
+  {"xxlcz", "xxlczmac"},
+  {"xxlcz", "xxlczbri"},
+  {"xxlcz", "xxlczbitrev"},
+  {"xxlcz", "xxlczgp"},
 
   {NULL, NULL}
 };
@@ -443,6 +452,16 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"xxldspn1x",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"xxldspn2x",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"xxldspn3x",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlcz",       ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczpstinc", ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbmrk",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbitop",  ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczslet",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczabs",    ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczmac",    ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbri",    ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczbitrev", ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlczgp",     ISA_SPEC_CLASS_NONE, 1, 0},
 
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
@@ -1779,6 +1798,15 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("xxldspn1x", x_riscv_rvp_subext, MASK_XXLDSPN1X),
   RISCV_EXT_FLAG_ENTRY ("xxldspn2x", x_riscv_rvp_subext, MASK_XXLDSPN2X),
   RISCV_EXT_FLAG_ENTRY ("xxldspn3x", x_riscv_rvp_subext, MASK_XXLDSPN3X),
+  RISCV_EXT_FLAG_ENTRY ("xxlczpstinc", x_riscv_xxlcz_subext, MASK_XXLCZPSTINC),
+  RISCV_EXT_FLAG_ENTRY ("xxlczbmrk",   x_riscv_xxlcz_subext, MASK_XXLCZBMRK),
+  RISCV_EXT_FLAG_ENTRY ("xxlczbitop",  x_riscv_xxlcz_subext, MASK_XXLCZBITOP),
+  RISCV_EXT_FLAG_ENTRY ("xxlczslet",   x_riscv_xxlcz_subext, MASK_XXLCZSLET),
+  RISCV_EXT_FLAG_ENTRY ("xxlczabs",    x_riscv_xxlcz_subext, MASK_XXLCZABS),
+  RISCV_EXT_FLAG_ENTRY ("xxlczmac",    x_riscv_xxlcz_subext, MASK_XXLCZMAC),
+  RISCV_EXT_FLAG_ENTRY ("xxlczbri",    x_riscv_xxlcz_subext, MASK_XXLCZBRI),
+  RISCV_EXT_FLAG_ENTRY ("xxlczbitrev", x_riscv_xxlcz_subext, MASK_XXLCZBITREV),
+  RISCV_EXT_FLAG_ENTRY ("xxlczgp",     x_riscv_xxlcz_subext, MASK_XXLCZGP),
 
   {NULL, NULL, NULL, 0}
 };

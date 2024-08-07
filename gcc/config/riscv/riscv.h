@@ -828,6 +828,10 @@ extern enum riscv_cc get_riscv_cc (const rtx use);
    : (TRAMPOLINE_CODE_SIZE + POINTER_SIZE * 2))
 #define TRAMPOLINE_ALIGNMENT POINTER_SIZE
 
+#define HAVE_POST_INCREMENT TARGET_XXLCZPSTINC
+#define HAVE_POST_DECREMENT TARGET_XXLCZPSTINC
+#define HAVE_POST_MODIFY_REG TARGET_XXLCZPSTINC
+
 /* Addressing modes, and classification of registers for them.  */
 
 #define REGNO_OK_FOR_INDEX_P(REGNO) \
@@ -1271,7 +1275,7 @@ extern void riscv_remove_unneeded_save_restore_calls (void);
    e.g. RVVMF64BI vs RVVMF1BI on zvl512b, which is [1, 1] vs [64, 64].  */
 #define MAX_POLY_VARIANT 64
 
-#define HAVE_POST_MODIFY_DISP TARGET_XTHEADMEMIDX
+#define HAVE_POST_MODIFY_DISP (TARGET_XTHEADMEMIDX || TARGET_XXLCZPSTINC)
 #define HAVE_PRE_MODIFY_DISP  TARGET_XTHEADMEMIDX
 
 /* Check TLS Descriptors mechanism is selected.  */

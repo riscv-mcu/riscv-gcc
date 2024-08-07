@@ -1,0 +1,51 @@
+/* Definitions for xxlcz builtins.
+
+This file is part of GCC.
+
+GCC is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+GCC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
+
+DIRECT_BUILTIN1(xl_bclrsi4,        bclr,   RISCV_SI_FTYPE_USI_UQI_UQI,    xxlczbitop)
+DIRECT_BUILTIN1(xl_bclrsi3_reg,    bclr_r, RISCV_SI_FTYPE_USI_UHI,        xxlczbitop)
+
+DIRECT_BUILTIN1(xl_bsetsi4,        bset,   RISCV_SI_FTYPE_USI_UQI_UQI,    xxlczbitop)
+DIRECT_BUILTIN1(xl_bsetsi3_reg,    bset_r, RISCV_SI_FTYPE_USI_UHI,        xxlczbitop)
+
+DIRECT_BUILTIN1(xl_extractsi4,      extract,    RISCV_SI_FTYPE_USI_UQI_UQI,   xxlczbitop)
+DIRECT_BUILTIN1(xl_extractsi3_reg,  extract_r,  RISCV_SI_FTYPE_USI_UHI,       xxlczbitop)
+
+DIRECT_BUILTIN1(xl_extractusi4,     extractu,   RISCV_USI_FTYPE_USI_UQI_UQI,  xxlczbitop)
+DIRECT_BUILTIN1(xl_extractusi3_reg, extractu_r, RISCV_USI_FTYPE_USI_UHI,      xxlczbitop)
+
+DIRECT_BUILTIN1(xl_insertsi4,       insert,     RISCV_SI_FTYPE_USI_UQI_UQI,   xxlczbitop)
+
+DIRECT_BUILTIN1(xl_fl1si2,     fl1,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
+DIRECT_BUILTIN1(xl_ff1si2,     ff1,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
+
+DIRECT_BUILTIN1(xl_fl0si2,     fl0,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
+DIRECT_BUILTIN1(xl_ff0si2,     ff0,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
+
+DIRECT_BUILTIN1(xl_clbsi2,     clb,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
+
+DIRECT_BUILTIN1(xl_sletsi3,    slet,    RISCV_USI_FTYPE_SI_SI, xxlczslet)
+DIRECT_BUILTIN1(xl_sletusi3,   slet_u,  RISCV_USI_FTYPE_USI_USI, xxlczslet)
+
+DIRECT_BUILTIN1(xl_mulisi3,    muli,   RISCV_INT_FTYPE_INT_SHORT, xxlczmac)
+
+DIRECT_BUILTIN1(xl_bitrevsi4,  bitrev, RISCV_USI_FTYPE_USI_UQI_UQI, xxlczbitrev)
+
+DIRECT_BUILTIN1(xl_nzmsksi2,   nzmsk,  RISCV_USI_FTYPE_USI, xxlczbmrk)
+DIRECT_BUILTIN1(xl_ffnzsi2,    ffnz,   RISCV_UQI_FTYPE_USI, xxlczbmrk)
+DIRECT_BUILTIN2(xl_addrchksi3, addrchk,RISCV_VOID_FTYPE_SI_SI_SI, xxlczbmrk)
+DIRECT_BUILTIN2(xl_bezmsi3,    bezm,   RISCV_VOID_FTYPE_SI_SI_SI, xxlczbmrk)
