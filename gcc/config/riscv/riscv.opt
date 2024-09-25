@@ -538,6 +538,11 @@ Mask(ZILSD)      Var(riscv_zilsd_subext)
 
 Mask(ZCLSD)      Var(riscv_zilsd_subext)
 
+TargetVariable
+int riscv_xxlvqmacc_subext
+
+Mask(XXLVQMACC) Var(riscv_xxlvqmacc_subext)
+
 Enum
 Name(isa_spec_class) Type(enum riscv_isa_spec_class)
 Supported ISA specs (for use with the -misa-spec= option):

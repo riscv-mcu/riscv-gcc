@@ -238,6 +238,7 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"xxlcz", "xxlczbri"},
   {"xxlcz", "xxlczbitrev"},
   {"xxlcz", "xxlczgp"},
+  {"xxlvqmacc", "zve32x"},
 
   {NULL, NULL}
 };
@@ -462,6 +463,7 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"xxlczbri",    ISA_SPEC_CLASS_NONE, 1, 0},
   {"xxlczbitrev", ISA_SPEC_CLASS_NONE, 1, 0},
   {"xxlczgp",     ISA_SPEC_CLASS_NONE, 1, 0},
+  {"xxlvqmacc",   ISA_SPEC_CLASS_NONE, 1, 0},
 
   {"zilsd",   ISA_SPEC_CLASS_NONE, 0, 10},
   {"zclsd",   ISA_SPEC_CLASS_NONE, 0, 10},
@@ -1811,6 +1813,8 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("xxlczgp",     x_riscv_xxlcz_subext, MASK_XXLCZGP),
   RISCV_EXT_FLAG_ENTRY ("zilsd", x_riscv_zilsd_subext, MASK_ZILSD),
   RISCV_EXT_FLAG_ENTRY ("zclsd", x_riscv_zilsd_subext, MASK_ZCLSD),
+
+  RISCV_EXT_FLAG_ENTRY ("xxlvqmacc", x_riscv_xxlvqmacc_subext, MASK_XXLVQMACC),
 
   {NULL, NULL, NULL, 0}
 };
