@@ -531,6 +531,13 @@ Mask(XSFCEASE) Var(riscv_sifive_subext)
 TargetVariable
 int riscv_xxlcz_subext
 
+TargetVariable
+int riscv_zilsd_subext
+
+Mask(ZILSD)      Var(riscv_zilsd_subext)
+
+Mask(ZCLSD)      Var(riscv_zilsd_subext)
+
 Enum
 Name(isa_spec_class) Type(enum riscv_isa_spec_class)
 Supported ISA specs (for use with the -misa-spec= option):
