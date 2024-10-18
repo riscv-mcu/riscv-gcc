@@ -1637,6 +1637,7 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("zicsr",    x_riscv_zi_subext, MASK_ZICSR),
   RISCV_EXT_FLAG_ENTRY ("zifencei", x_riscv_zi_subext, MASK_ZIFENCEI),
   RISCV_EXT_FLAG_ENTRY ("zicond",   x_riscv_zi_subext, MASK_ZICOND),
+  RISCV_EXT_FLAG_ENTRY ("zilsd",    x_riscv_zi_subext, MASK_ZILSD),
 
   RISCV_EXT_FLAG_ENTRY ("za64rs",  x_riscv_za_subext, MASK_ZA64RS),
   RISCV_EXT_FLAG_ENTRY ("za128rs", x_riscv_za_subext, MASK_ZA128RS),
@@ -1753,6 +1754,7 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("zcd",  x_riscv_zc_subext, MASK_ZCD),
   RISCV_EXT_FLAG_ENTRY ("zcmp", x_riscv_zc_subext, MASK_ZCMP),
   RISCV_EXT_FLAG_ENTRY ("zcmt", x_riscv_zc_subext, MASK_ZCMT),
+  RISCV_EXT_FLAG_ENTRY ("zclsd", x_riscv_zc_subext, MASK_ZCLSD),
 
   RISCV_EXT_FLAG_ENTRY ("svinval", x_riscv_sv_subext, MASK_SVINVAL),
   RISCV_EXT_FLAG_ENTRY ("svnapot", x_riscv_sv_subext, MASK_SVNAPOT),

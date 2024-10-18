@@ -2689,7 +2689,7 @@
 (define_insn "*movdi_32bit"
   [(set (match_operand:DI 0 "nonimmediate_operand" "=r,r,r,m,  *f,*f,*r,*f,*m,r")
 	(match_operand:DI 1 "move_operand"         " r,i,m,r,*J*r,*m,*f,*f,*f,vp"))]
-  "!TARGET_64BIT
+  "(!TARGET_64BIT && !TARGET_ZILSD)
    && (register_operand (operands[0], DImode)
        || reg_or_0_operand (operands[1], DImode))"
   { return riscv_output_move (operands[0], operands[1]); }
@@ -2701,7 +2701,7 @@
 (define_insn "*movdi_64bit"
   [(set (match_operand:DI 0 "nonimmediate_operand" "=r,r,r, m,  *f,*f,*r,*f,*m,r")
 	(match_operand:DI 1 "move_operand"         " r,T,m,rJ,*r*J,*m,*f,*f,*f,vp"))]
-  "TARGET_64BIT
+  "(TARGET_64BIT || TARGET_ZILSD)
    && (register_operand (operands[0], DImode)
        || reg_or_0_operand (operands[1], DImode))"
   { return riscv_output_move (operands[0], operands[1]); }
@@ -2924,7 +2924,7 @@
   [(set (match_operand:MOVE64 0 "nonimmediate_operand")
 	(match_operand:MOVE64 1 "move_operand"))]
   "reload_completed
-   && riscv_split_64bit_move_p (operands[0], operands[1])"
+   && (riscv_split_64bit_move_p (operands[0], operands[1]) || TARGET_ZILSD)"
   [(const_int 0)]
 {
   riscv_split_doubleword_move (operands[0], operands[1]);

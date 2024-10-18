@@ -66,3 +66,103 @@
               (set (match_dup 2)
                    (match_dup 3))])]
 )
+
+(define_peephole2 ; ld
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 2 "memory_operand" ""))
+   (set (match_operand:SI 1 "register_operand" "")
+	(match_operand:SI 3 "memory_operand" ""))]
+  "TARGET_ZILSD"
+  [(parallel [(set (match_dup 0) (match_dup 2))
+	      (set (match_dup 1) (match_dup 3))])]
+{
+  if (!riscv_fix_operands_ld_sd (operands, true, false, false))
+    FAIL;
+})
+
+(define_peephole2 ; sd
+  [(set (match_operand:SI 2 "memory_operand" "")
+	(match_operand:SI 0 "register_operand" ""))
+   (set (match_operand:SI 3 "memory_operand" "")
+	(match_operand:SI 1 "register_operand" ""))]
+  "TARGET_ZILSD"
+  [(parallel [(set (match_dup 2) (match_dup 0))
+	      (set (match_dup 3) (match_dup 1))])]
+{
+  if (!riscv_fix_operands_ld_sd (operands, false, false, false))
+    FAIL;
+})
+
+;; The following peepholes reorder registers to enable LD/SD.
+(define_peephole2 ; sd of constants
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 4 "const_int_operand" ""))
+   (set (match_operand:SI 2 "memory_operand" "")
+	(match_dup 0))
+   (set (match_operand:SI 1 "register_operand" "")
+	(match_operand:SI 5 "const_int_operand" ""))
+   (set (match_operand:SI 3 "memory_operand" "")
+	(match_dup 1))]
+  "TARGET_ZILSD"
+  [(set (match_dup 0) (match_dup 4))
+   (set (match_dup 1) (match_dup 5))
+   (parallel [(set (match_dup 2) (match_dup 0))
+	      (set (match_dup 3) (match_dup 1))])]
+{
+  if (!riscv_fix_operands_ld_sd (operands, false, true, false))
+    FAIL;
+})
+
+(define_peephole2 ; sd of constants
+  [(set (match_operand:SI 0 "register_operand" "")
+	(match_operand:SI 4 "const_int_operand" ""))
+   (set (match_operand:SI 1 "register_operand" "")
+	(match_operand:SI 5 "const_int_operand" ""))
+   (set (match_operand:SI 2 "memory_operand" "")
+	(match_dup 0))
+   (set (match_operand:SI 3 "memory_operand" "")
+	(match_dup 1))]
+  "TARGET_ZILSD"
+  [(set (match_dup 0) (match_dup 4))
+   (set (match_dup 1) (match_dup 5))
+   (parallel [(set (match_dup 2) (match_dup 0))
+	      (set (match_dup 3) (match_dup 1))])]
+{
+  if (!riscv_fix_operands_ld_sd (operands, false, true, false))
+     FAIL;
+})
+
+;; insns matching the LD/SD patterns that will get created by the above peepholes.
+(define_insn "*riscv_ld"
+  [(parallel [(set (match_operand:SI 0 "register_operand" "=r")
+		   (match_operand:SI 2 "memory_operand" "m"))
+	      (set (match_operand:SI 1 "register_operand" "=r")
+		   (match_operand:SI 3 "memory_operand" "m"))])]
+  "TARGET_ZILSD && reload_completed
+  && riscv_valid_operands_ld_sd (operands)"
+  {
+    rtx op[2];
+    op[0] = gen_rtx_REG (DImode, REGNO (operands[0]));
+    op[1] = adjust_address (operands[2], DImode, 0);
+    return riscv_output_move_double (op);
+  }
+  [(set_attr "length" "4")
+   (set_attr "type" "load")]
+)
+
+(define_insn "*riscv_sd"
+  [(parallel [(set (match_operand:SI 2 "memory_operand" "=m")
+		   (match_operand:SI 0 "register_operand" "r"))
+	      (set (match_operand:SI 3 "memory_operand" "=m")
+		   (match_operand:SI 1 "register_operand" "r"))])]
+  "TARGET_ZILSD && reload_completed
+  && riscv_valid_operands_ld_sd (operands)"
+  {
+    rtx op[2];
+    op[0] = adjust_address (operands[2], DImode, 0);
+    op[1] = gen_rtx_REG (DImode, REGNO (operands[0]));
+    return riscv_output_move_double (op);
+  }
+  [(set_attr "length" "4")
+   (set_attr "type" "store")]
+)

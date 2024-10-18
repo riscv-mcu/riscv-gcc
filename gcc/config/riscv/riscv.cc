@@ -4556,6 +4556,12 @@ riscv_split_64bit_move_p (rtx dest, rtx src)
 	  || (FP_REG_RTX_P (dest) && src == CONST0_RTX (GET_MODE (src)))))
     return false;
 
+  if (TARGET_ZILSD
+      && (reload_in_progress || reload_completed)
+      && ((GP_REG_RTX_P (src) && ((REGNO(src) % 2) == 0) && MEM_P (dest))
+	  || (GP_REG_RTX_P (dest) && ((REGNO(dest) % 2) == 0) && MEM_P (src))))
+    return false;
+
   return true;
 }
 
@@ -9725,6 +9731,327 @@ riscv_hard_regno_mode_ok (unsigned int regno, machine_mode mode)
     }
 
   return true;
+}
+
+/* Checks whether the operands are valid for use in an LD/SD instruction.
+   Assumes that RT, RT2 are REG.  This is guaranteed by the patterns.
+   Assumes that the address in the base register RN is word aligned.  Pattern
+   guarantees that both memory accesses use the same base register,
+   the offsets are constants within the range, and the gap between the offsets is 4.
+   If preload complete then check that registers are legal. */
+static bool
+riscv_operands_ok_ld_sd (rtx rt, rtx rt2, HOST_WIDE_INT offset)
+{
+  unsigned int t, t2;
+
+  if (!reload_completed)
+    return true;
+
+  if ((offset > 4095) || (offset < -4095))
+    return false;
+
+  t = REGNO (rt);
+  t2 = REGNO (rt2);
+
+  if ((t % 2 != 0)   /* First destination register is not even.  */
+      || (t2 != t + 1))
+    return false;
+
+  return true;
+}
+
+/* Helper for riscv_fix_operands_ld_sd.  Returns true iff the memory
+   operand MEM's address contains an immediate offset from the base
+   register and has no side effects, in which case it sets BASE,
+   OFFSET and ALIGN accordingly.  */
+static bool
+riscv_mem_ok_for_ld_sd (rtx mem, rtx *base, rtx *offset, HOST_WIDE_INT *align)
+{
+  rtx addr;
+
+  gcc_assert (base != NULL && offset != NULL);
+
+  if (side_effects_p (mem))
+    return false;
+
+  /* Can't deal with subregs.  */
+  if (SUBREG_P (mem))
+    return false;
+
+  gcc_assert (MEM_P (mem));
+
+  *offset = const0_rtx;
+  *align = MEM_ALIGN (mem);
+
+  addr = XEXP (mem, 0);
+
+  /* If addr isn't valid for DImode, then we can't handle it.  */
+  if (!riscv_legitimate_address_p (DImode, addr,
+				   reload_in_progress || reload_completed))
+    return false;
+
+  if (REG_P (addr))
+    {
+      *base = addr;
+      return true;
+    }
+  else if (GET_CODE (addr) == PLUS)
+    {
+      *base = XEXP (addr, 0);
+      *offset = XEXP (addr, 1);
+      return (REG_P (*base) && CONST_INT_P (*offset));
+    }
+
+  return false;
+}
+
+/* Called from a peephole2 to replace two word-size accesses with a
+   single LD/SD instruction.  Returns true iff we can generate a
+   new instruction sequence.  That is, both accesses use the same base
+   register and the gap between constant offsets is 4.  This function
+   may reorder its operands to match ld/sd RTL templates.
+   OPERANDS are the operands found by the peephole matcher;
+   OPERANDS[0,1] are register operands, and OPERANDS[2,3] are the
+   corresponding memory operands.  LOAD indicaates whether the access
+   is load or store.  CONST_STORE indicates a store of constant
+   integer values held in OPERANDS[4,5] and assumes that the pattern
+   is of length 4 insn, for the purpose of checking dead registers.
+   COMMUTE indicates that register operands may be reordered.  */
+bool
+riscv_fix_operands_ld_sd (rtx *operands, bool load,
+			  bool const_store, bool commute)
+{
+  int nops = 2;
+  HOST_WIDE_INT offsets[2], offset, align[2];
+  rtx base = NULL_RTX;
+  rtx cur_base, cur_offset, tmp;
+  int i, gap;
+  HARD_REG_SET regset;
+
+  gcc_assert (!const_store || !load);
+  /* Check that the memory references are immediate offsets from the
+     same base register.  Extract the base register, the destination
+     registers, and the corresponding memory offsets.  */
+  for (i = 0; i < nops; i++)
+    {
+      if (!riscv_mem_ok_for_ld_sd (operands[nops+i], &cur_base, &cur_offset,
+				   &align[i]))
+        return false;
+
+      if (i == 0)
+        base = cur_base;
+      else if (REGNO (base) != REGNO (cur_base))
+        return false;
+
+      offsets[i] = INTVAL (cur_offset);
+      if (GET_CODE (operands[i]) == SUBREG)
+        {
+          tmp = SUBREG_REG (operands[i]);
+          gcc_assert (GET_MODE (operands[i]) == GET_MODE (tmp));
+          operands[i] = tmp;
+        }
+    }
+
+  /* Make sure there is no dependency between the individual loads.  */
+  if (load && REGNO (operands[0]) == REGNO (base))
+    return false; /* RAW */
+
+  if (load && REGNO (operands[0]) == REGNO (operands[1]))
+    return false; /* WAW */
+
+  /* If the same input register is used in both stores
+     when storing different constants, try to find a free register.
+     For example, the code
+	mv r0, 0
+	sw r0, 0(r2)
+	mv r0, 1
+	sw r0, 4(r2)
+     can be transformed into
+	mv r1, 0
+	mv r0, 1
+	sd r0, 0(r2)
+     assuming that r1 is free. */
+  if (const_store
+      && REGNO (operands[0]) == REGNO (operands[1])
+      && INTVAL (operands[4]) != INTVAL (operands[5]))
+    {
+      int regno = REGNO (operands[0]);
+      if (!peep2_reg_dead_p (4, operands[0]))
+	{
+	  /* When the input register is even and is not dead after the
+	     pattern, it has to hold the second constant but we cannot
+	     form a legal SD with this register as the second register.  */
+	  if (regno % 2 == 0)
+	    return false;
+
+	  /* Is regno-1 free? */
+	  SET_HARD_REG_SET (regset);
+	  CLEAR_HARD_REG_BIT(regset, regno - 1);
+	  tmp = peep2_find_free_register (0, 4, "r", SImode, &regset);
+	  if (tmp == NULL_RTX)
+	    return false;
+
+	  operands[0] = tmp;
+	}
+      else
+	{
+	  /* Can we use the input register to form a DI register?  */
+	  SET_HARD_REG_SET (regset);
+	  CLEAR_HARD_REG_BIT(regset,
+			     regno % 2 == 0 ? regno + 1 : regno - 1);
+	  tmp = peep2_find_free_register (0, 4, "r", SImode, &regset);
+	  if (tmp == NULL_RTX)
+	    return false;
+	  operands[regno % 2 == 1 ? 0 : 1] = tmp;
+	}
+
+      gcc_assert (operands[0] != NULL_RTX);
+      gcc_assert (operands[1] != NULL_RTX);
+      gcc_assert (REGNO (operands[0]) % 2 == 0);
+      gcc_assert (REGNO (operands[1]) == REGNO (operands[0]) + 1);
+    }
+
+  /* Make sure the instructions are ordered with lower memory access first.  */
+  if (offsets[0] > offsets[1])
+    {
+      gap = offsets[0] - offsets[1];
+      offset = offsets[1];
+
+      /* Swap the instructions such that lower memory is accessed first.  */
+      std::swap (operands[0], operands[1]);
+      std::swap (operands[2], operands[3]);
+      std::swap (align[0], align[1]);
+      if (const_store)
+        std::swap (operands[4], operands[5]);
+    }
+  else
+    {
+      gap = offsets[1] - offsets[0];
+      offset = offsets[0];
+    }
+
+  /* Make sure accesses are to consecutive memory locations.  */
+  if (gap != GET_MODE_SIZE (SImode))
+    return false;
+
+  /* Make sure we generate legal instructions.  */
+  if (riscv_operands_ok_ld_sd (operands[0], operands[1], offset))
+    return true;
+
+  if (load && commute)
+    {
+      /* Try reordering registers.  */
+      std::swap (operands[0], operands[1]);
+      if (riscv_operands_ok_ld_sd (operands[0], operands[1], offset))
+        return true;
+    }
+
+  if (const_store)
+    {
+      /* If input registers are dead after this pattern, they can be
+         reordered or replaced by other registers that are free in the
+         current pattern.  */
+      if (!peep2_reg_dead_p (4, operands[0])
+          || !peep2_reg_dead_p (4, operands[1]))
+        return false;
+
+      /* Try to reorder the input registers.  */
+      /* For example, the code
+           mv r0, 0
+           mv r1, 1
+           sw r1, 0(r2)
+           sw r0, 4(r2)
+         can be transformed into
+           mv r1, 0
+           mv r0, 1
+           sd r0, 0(r2)
+      */
+      if (riscv_operands_ok_ld_sd (operands[1], operands[0], offset))
+        {
+          std::swap (operands[0], operands[1]);
+          return true;
+        }
+    }
+
+  return false;
+}
+
+/* Return true if parallel execution of the two word-size accesses provided
+   could be satisfied with a single LD/SD instruction.  Two word-size
+   accesses are represented by the OPERANDS array, where OPERANDS[0,1] are
+   register operands and OPERANDS[2,3] are the corresponding memory operands.
+   */
+bool
+riscv_valid_operands_ld_sd (rtx *operands)
+{
+  int nops = 2;
+  HOST_WIDE_INT offsets[2], offset, align[2];
+  rtx base = NULL_RTX;
+  rtx cur_base, cur_offset;
+  int i, gap;
+
+  /* Check that the memory references are immediate offsets from the
+     same base register.  Extract the base register, the destination
+     registers, and the corresponding memory offsets.  */
+  for (i = 0; i < nops; i++)
+    {
+      if (!riscv_mem_ok_for_ld_sd (operands[nops+i], &cur_base, &cur_offset,
+				   &align[i]))
+	return false;
+
+      if (i == 0)
+	base = cur_base;
+      else if (REGNO (base) != REGNO (cur_base))
+	return false;
+
+      offsets[i] = INTVAL (cur_offset);
+      if (GET_CODE (operands[i]) == SUBREG)
+	return false;
+    }
+
+  if (offsets[0] > offsets[1])
+    return false;
+
+  gap = offsets[1] - offsets[0];
+  offset = offsets[0];
+
+  /* Make sure accesses are to consecutive memory locations.  */
+  if (gap != GET_MODE_SIZE (SImode))
+    return false;
+
+  return riscv_operands_ok_ld_sd (operands[0], operands[1], offset);
+}
+
+/* Output a move between double words.  It must be REG<-MEM
+   or MEM<-REG.  */
+const char *
+riscv_output_move_double (rtx *operands)
+{
+  enum rtx_code code0 = GET_CODE (operands[0]);
+  enum rtx_code code1 = GET_CODE (operands[1]);
+
+  if (code0 == REG)
+    {
+      unsigned int reg0 = REGNO (operands[0]);
+
+      /* Constraints should ensure this.  */
+      gcc_assert (code1 == MEM);
+      gcc_assert (reg0 % 2 == 0);
+
+      output_asm_insn ("ld\t%0, %1", operands);
+    }
+  else /* It is a store */
+    {
+      unsigned int reg1 = REGNO (operands[1]);
+
+      /* Constraints should ensure this.  */
+      gcc_assert (code0 == MEM && code1 == REG);
+      gcc_assert (reg1 % 2 == 0);
+
+      output_asm_insn ("sd\t%z1, %0", operands);
+    }
+
+  return "";
 }
 
 /* Implement TARGET_MODES_TIEABLE_P.

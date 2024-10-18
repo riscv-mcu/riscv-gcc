@@ -400,6 +400,7 @@ ASM_MISA_SPEC
   TEST_HARD_REG_BIT (reg_class_contents[SIBCALL_REGS], REGNO)
 
 #define FP_REG_RTX_P(X) (REG_P (X) && FP_REG_P (REGNO (X)))
+#define GP_REG_RTX_P(X) (REG_P (X) && GP_REG_P (REGNO (X)))
 
 /* Use s0 as the frame pointer if it is so requested.  */
 #define HARD_FRAME_POINTER_REGNUM 8
