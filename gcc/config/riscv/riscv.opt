@@ -526,6 +526,8 @@ int riscv_xxl_subext
 
 Mask(XXLFBF)      Var(riscv_xxl_subext)
 
+Mask(XXLVFBF)      Var(riscv_xxl_subext)
+
 TargetVariable
 int riscv_sifive_subext
 
