@@ -154,6 +154,14 @@ bfloat16_type (int lmul_log2, unsigned nf)
 }
 
 std::string
+xl_bfloat16_type (unsigned sew, int lmul_log2)
+{
+  if (sew != 16)
+    return "INVALID";
+  return bfloat16_type(lmul_log2);
+}
+
+std::string
 floattype (unsigned sew, int lmul_log2)
 {
   if (!valid_type (sew, lmul_log2, /*float_t*/ true))
@@ -266,6 +274,7 @@ main (int argc, const char **argv)
       fprintf (fp, "  /*DOUBLE_TRUNC_BFLOAT*/ INVALID,\n");
       fprintf (fp, "  /*DOUBLE_TRUNC_FLOAT*/ INVALID,\n");
       fprintf (fp, "  /*FLOAT*/ INVALID,\n");
+      fprintf (fp, "  /*BFLOAT*/ INVALID,\n");
       fprintf (fp, "  /*LMUL1*/ INVALID,\n");
       fprintf (fp, "  /*WLMUL1*/ INVALID,\n");
       fprintf (fp, "  /*QLMUL1*/ INVALID,\n");
@@ -350,12 +359,12 @@ main (int argc, const char **argv)
 					    false)
 			 .c_str ());
 	    fprintf (fp, "  /*DOUBLE_TRUNC_BFLOAT_SCALAR*/ INVALID,\n");
-	    fprintf (fp, "  /*DOUBLE_TRUNC_BFLOAT*/ INVALID,\n");
+	    fprintf (fp, "  /*DOUBLE_TRUNC_BFLOAT*/ %s,\n",same_ratio_eew_bf16_type (sew, lmul_log2).c_str ());
 	    fprintf (fp, "  /*DOUBLE_TRUNC_FLOAT*/ %s,\n",
 		     same_ratio_eew_type (sew, lmul_log2, sew / 2, false, true)
 		       .c_str ());
-	    fprintf (fp, "  /*FLOAT*/ %s,\n",
-		     floattype (sew, lmul_log2).c_str ());
+	    fprintf (fp, "  /*FLOAT*/ %s,\n",floattype (sew, lmul_log2).c_str ());
+	    fprintf (fp, "  /*BFLOAT*/ %s,\n",xl_bfloat16_type(sew, lmul_log2).c_str ());
 	    fprintf (fp, "  /*LMUL1*/ %s,\n",
 		     inttype (sew, /*lmul_log2*/ 0, unsigned_p).c_str ());
 	    fprintf (fp, "  /*WLMUL1*/ %s,\n",
@@ -440,6 +449,7 @@ main (int argc, const char **argv)
 	fprintf (fp, "  /*DOUBLE_TRUNC_FLOAT*/ %s,\n",
 		 same_ratio_eew_type (16, lmul_log2, 8, false, true).c_str ());
 	fprintf (fp, "  /*FLOAT*/ INVALID,\n");
+	fprintf (fp, "  /*BFLOAT*/ INVALID,\n");
 	fprintf (fp, "  /*LMUL1*/ %s,\n",
 		 bfloat16_type (/*lmul_log2*/ 0).c_str ());
 	fprintf (fp, "  /*WLMUL1*/ %s,\n",
@@ -515,6 +525,7 @@ main (int argc, const char **argv)
 		   same_ratio_eew_type (sew, lmul_log2, sew / 2, false, true)
 		     .c_str ());
 	  fprintf (fp, "  /*FLOAT*/ INVALID,\n");
+	  fprintf (fp, "  /*BFLOAT*/ INVALID,\n");
 	  fprintf (fp, "  /*LMUL1*/ %s,\n",
 		   floattype (sew, /*lmul_log2*/ 0).c_str ());
 	  fprintf (fp, "  /*WLMUL1*/ %s,\n",

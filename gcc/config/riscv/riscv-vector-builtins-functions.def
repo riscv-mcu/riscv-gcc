@@ -762,4 +762,5 @@ DEF_RVV_FUNCTION (vfwmaccbf16, alu, full_preds, f32_wwfv_ops)
 DEF_RVV_FUNCTION (vfwmaccbf16_frm, alu_frm, full_preds, f32_wwvv_ops)
 DEF_RVV_FUNCTION (vfwmaccbf16_frm, alu_frm, full_preds, f32_wwfv_ops)
 #undef REQUIRED_EXTENSIONS
+
 #undef DEF_RVV_FUNCTION

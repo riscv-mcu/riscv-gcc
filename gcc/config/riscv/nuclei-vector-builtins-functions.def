@@ -42,7 +42,82 @@ DEF_RVV_FUNCTION (xl_vqmacc, xl_vqmacc, none_tu_preds, i_qqvv_ops)
 DEF_RVV_FUNCTION (xl_vqmaccu, xl_vqmacc, none_tu_preds, u_qqvv_ops)
 DEF_RVV_FUNCTION (xl_vqmaccsu, xl_vqmacc, none_tu_preds, i_su_qqvv_ops)
 DEF_RVV_FUNCTION (xl_vqmaccus, xl_vqmacc, none_tu_preds, i_us_qqvv_ops)
+#undef REQUIRED_EXTENSIONS
 
+
+/* Xxlvfbf */
+#define REQUIRED_EXTENSIONS XXLVFBF_EXT
+// 13.3. Vector Widening Floating-Point Add/Subtract Instructions
+DEF_RVV_FUNCTION (xl_vfwadd, widen_alu, full_preds, xl_bf16_wvv_ops)
+DEF_RVV_FUNCTION (xl_vfwadd, widen_alu, full_preds, xl_bf16_wvf_ops)
+DEF_RVV_FUNCTION (xl_vfwsub, widen_alu, full_preds, xl_bf16_wvv_ops)
+DEF_RVV_FUNCTION (xl_vfwsub, widen_alu, full_preds, xl_bf16_wvf_ops)
+DEF_RVV_FUNCTION (xl_vfwadd, widen_alu, full_preds, xl_bf16_wwv_ops)
+DEF_RVV_FUNCTION (xl_vfwadd, widen_alu, full_preds, xl_bf16_wwf_ops)
+DEF_RVV_FUNCTION (xl_vfwsub, widen_alu, full_preds, xl_bf16_wwv_ops)
+DEF_RVV_FUNCTION (xl_vfwsub, widen_alu, full_preds, xl_bf16_wwf_ops)
+DEF_RVV_FUNCTION (xl_vfwadd_frm, widen_alu_frm, full_preds, xl_bf16_wvv_ops)
+DEF_RVV_FUNCTION (xl_vfwadd_frm, widen_alu_frm, full_preds, xl_bf16_wvf_ops)
+DEF_RVV_FUNCTION (xl_vfwsub_frm, widen_alu_frm, full_preds, xl_bf16_wvv_ops)
+DEF_RVV_FUNCTION (xl_vfwsub_frm, widen_alu_frm, full_preds, xl_bf16_wvf_ops)
+DEF_RVV_FUNCTION (xl_vfwadd_frm, widen_alu_frm, full_preds, xl_bf16_wwv_ops)
+DEF_RVV_FUNCTION (xl_vfwadd_frm, widen_alu_frm, full_preds, xl_bf16_wwf_ops)
+DEF_RVV_FUNCTION (xl_vfwsub_frm, widen_alu_frm, full_preds, xl_bf16_wwv_ops)
+DEF_RVV_FUNCTION (xl_vfwsub_frm, widen_alu_frm, full_preds, xl_bf16_wwf_ops)
+
+// 13.5. Vector Widening Floating-Point Multiply
+DEF_RVV_FUNCTION (xl_vfwmul, alu, full_preds, xl_bf16_wvv_ops)
+DEF_RVV_FUNCTION (xl_vfwmul, alu, full_preds, xl_bf16_wvf_ops)
+DEF_RVV_FUNCTION (xl_vfwmul_frm, alu_frm, full_preds, xl_bf16_wvv_ops)
+DEF_RVV_FUNCTION (xl_vfwmul_frm, alu_frm, full_preds, xl_bf16_wvf_ops)
+
+// 13.7. Vector Widening Floating-Point Fused Multiply-Add Instructions
+DEF_RVV_FUNCTION (xl_vfwmacc, alu, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwmacc, alu, full_preds, f32_wwfv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmacc, alu, full_preds,f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmacc, alu, full_preds,f32_wwfv_ops)
+DEF_RVV_FUNCTION (xl_vfwmsac, alu, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwmsac, alu, full_preds, f32_wwfv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmsac, alu, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmsac, alu, full_preds, f32_wwfv_ops)
+
+DEF_RVV_FUNCTION (xl_vfwmacc_frm, alu_frm, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwmacc_frm, alu_frm, full_preds, f32_wwfv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmacc_frm, alu_frm, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmacc_frm, alu_frm, full_preds, f32_wwfv_ops)
+DEF_RVV_FUNCTION (xl_vfwmsac_frm, alu_frm, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwmsac_frm, alu_frm, full_preds, f32_wwfv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmsac_frm, alu_frm, full_preds, f32_wwvv_ops)
+DEF_RVV_FUNCTION (xl_vfwnmsac_frm, alu_frm, full_preds, f32_wwfv_ops)
+
+// 13.14. Vector Floating-Point Classify Instruction
+DEF_RVV_FUNCTION (xl_vfclass, alu, full_preds, xl_bf16_to_u_v_ops)
+
+// 13.17. Single-Width Floating-Point/Integer Type-Convert Instructions
+DEF_RVV_FUNCTION (xl_vfcvt_x, alu, full_preds, xl_bf16_to_i_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfcvt_xu, alu, full_preds, xl_bf16_to_u_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfcvt_rtz_x, alu, full_preds, xl_bf16_to_i_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfcvt_rtz_xu, alu, full_preds, xl_bf16_to_u_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfcvt_x_frm, alu_frm, full_preds, xl_bf16_to_i_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfcvt_xu_frm, alu_frm, full_preds, xl_bf16_to_u_f_v_ops)
+
+// 13.18. Widening Floating-Point/Integer Type-Convert Instructions
+DEF_RVV_FUNCTION (xl_vfwcvt_x, alu, full_preds, xl_bf16_to_wi_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfwcvt_xu, alu, full_preds, xl_bf16_to_wu_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfwcvt_rtz_x, alu, full_preds, xl_bf16_to_wi_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfwcvt_rtz_xu, alu, full_preds, xl_bf16_to_wu_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfwcvt_x_frm, alu_frm, full_preds, xl_bf16_to_wi_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfwcvt_xu_frm, alu_frm, full_preds, xl_bf16_to_wu_f_v_ops)
+DEF_RVV_FUNCTION (xl_vfwcvt_f, alu, full_preds, bf16_to_f32_f_v_ops)
+
+// 13.19. Narrowing Floating-Point/Integer Type-Convert Instructions
+DEF_RVV_FUNCTION (xl_vfncvt_f, narrow_alu, full_preds, xl_i_to_nbf16_x_w_ops)
+DEF_RVV_FUNCTION (xl_vfncvt_f, narrow_alu, full_preds, xl_u_to_nbf16_xu_w_ops)
+DEF_RVV_FUNCTION (xl_vfncvt_f, narrow_alu, full_preds, f32_to_bf16_f_w_ops)
+DEF_RVV_FUNCTION (xl_vfncvt_rod_f, narrow_alu, full_preds, f32_to_bf16_f_w_ops)
+DEF_RVV_FUNCTION (xl_vfncvt_f_frm, narrow_alu_frm, full_preds, xl_i_to_nbf16_x_w_ops)
+DEF_RVV_FUNCTION (xl_vfncvt_f_frm, narrow_alu_frm, full_preds, xl_u_to_nbf16_xu_w_ops)
+DEF_RVV_FUNCTION (xl_vfncvt_f_frm, narrow_alu_frm, full_preds, f32_to_bf16_f_w_ops)
 #undef REQUIRED_EXTENSIONS
 
 #undef DEF_RVV_FUNCTION

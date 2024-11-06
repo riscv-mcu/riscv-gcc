@@ -78,6 +78,13 @@ build_one (function_builder &b, const function_group_info &group,
 			 argument_types, group.required_extensions);
 }
 
+static bool
+supports_vbf16(const function_instance &instance){
+  int index = instance.type.index;
+  if(index < VECTOR_TYPE_vbfloat16mf4_t || index > VECTOR_TYPE_vbfloat16m8_t)
+    return false;
+  return true;
+}
 /* Determine whether the intrinsic supports the currently
    processed vector type */
 static bool
@@ -97,7 +104,18 @@ supports_vectype_p (const function_group_info &group, unsigned int vec_type_idx)
       || *group.shape == shapes::fault_load
       || *group.shape == shapes::seg_loadstore
       || *group.shape == shapes::seg_indexed_loadstore
-      || *group.shape == shapes::seg_fault_load)
+      || *group.shape == shapes::seg_fault_load
+      || (*group.shape == shapes::alu && TARGET_XXLVFBF)
+      || (*group.shape == shapes::alu_frm && TARGET_XXLVFBF)
+      || (*group.shape == shapes::return_mask && TARGET_XXLVFBF)
+      || (*group.shape == shapes::no_mask_policy && TARGET_XXLVFBF)
+      || (*group.shape == shapes::move && TARGET_XXLVFBF)
+      || (*group.shape == shapes::scalar_move && TARGET_XXLVFBF)
+      || (*group.shape == shapes::reduc_alu && TARGET_XXLVFBF)
+      || (*group.shape == shapes::reduc_alu_frm && TARGET_XXLVFBF)
+      || (*group.shape == shapes::narrow_alu && TARGET_XXLVFBF)
+      || (*group.shape == shapes::narrow_alu_frm && TARGET_XXLVFBF)
+    )
     return true;
   return false;
 }
@@ -389,8 +407,11 @@ struct alu_def : public build_base
     /* Return nullptr if it can not be overloaded.  */
     if (overloaded_p && !instance.base->can_be_overloaded_p (instance.pred))
       return nullptr;
-
-    b.append_base_name (instance.base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
+      b.append_base_name (instance.base_name);
 
     /* vop<sew>_<op> --> vop<sew>_<op>_<type>.  */
     if (!overloaded_p)
@@ -472,7 +493,11 @@ struct alu_frm_def : public build_frm_base
 
     normalize_base_name (base_name, instance.base_name, sizeof (base_name));
 
-    b.append_base_name (base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(base_name);
+    }else
+      b.append_base_name (base_name);
 
     /* vop<sew>_<op> --> vop<sew>_<op>_<type>.  */
     if (!overloaded_p)
@@ -542,7 +567,11 @@ struct narrow_alu_frm_def : public build_frm_base
 
     normalize_base_name (base_name, instance.base_name, sizeof (base_name));
 
-    b.append_base_name (base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(base_name);
+    }else
+      b.append_base_name (base_name);
 
     if (!overloaded_p)
       {
@@ -580,7 +609,11 @@ struct reduc_alu_frm_def : public build_frm_base
 
     normalize_base_name (base_name, instance.base_name, sizeof (base_name));
 
-    b.append_base_name (base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(base_name);
+    }else
+      b.append_base_name (base_name);
 
     /* vop_<op> --> vop<sew>_<op>_<type>.  */
     if (!overloaded_p)
@@ -641,7 +674,11 @@ struct no_mask_policy_def : public build_base
   char *get_name (function_builder &b, const function_instance &instance,
 		  bool overloaded_p) const override
   {
-    b.append_base_name (instance.base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
+      b.append_base_name (instance.base_name);
 
     if (!overloaded_p)
       b.append_name (operand_suffixes[instance.op_info->op]);
@@ -662,7 +699,11 @@ struct return_mask_def : public build_base
   char *get_name (function_builder &b, const function_instance &instance,
 		  bool overloaded_p) const override
   {
-    b.append_base_name (instance.base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
+      b.append_base_name (instance.base_name);
 
     if (!overloaded_p)
       b.append_name (operand_suffixes[instance.op_info->op]);
@@ -689,7 +730,11 @@ struct narrow_alu_def : public build_base
   char *get_name (function_builder &b, const function_instance &instance,
 		  bool overloaded_p) const override
   {
-    b.append_base_name (instance.base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
+      b.append_base_name (instance.base_name);
 
     if (!overloaded_p)
       {
@@ -737,7 +782,11 @@ struct move_def : public build_base
 	&& overloaded_p && instance.pred == PRED_TYPE_none)
       return nullptr;
 
-    b.append_base_name (instance.base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
+      b.append_base_name (instance.base_name);
 
     if (!overloaded_p)
       {
@@ -789,6 +838,10 @@ struct reduc_alu_def : public build_base
   char *get_name (function_builder &b, const function_instance &instance,
 		  bool overloaded_p) const override
   {
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
     b.append_base_name (instance.base_name);
 
     /* vop_<op> --> vop<sew>_<op>_<type>.  */
@@ -833,7 +886,11 @@ struct scalar_move_def : public build_base
   char *get_name (function_builder &b, const function_instance &instance,
 		  bool overloaded_p) const override
   {
-    b.append_base_name (instance.base_name);
+    if(supports_vbf16(instance) && TARGET_XXLVFBF){
+      b.append_name("__riscv_xl_");
+      b.append_name(instance.base_name);
+    }else
+      b.append_base_name (instance.base_name);
     if (overloaded_p)
       return b.finish_name ();
     b.append_name (operand_suffixes[instance.op_info->op]);

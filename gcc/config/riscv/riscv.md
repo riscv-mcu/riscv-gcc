@@ -784,13 +784,13 @@
 			  vfredo,vfredu,vfwredo,vfwredu,
 			  vfslide1up,vfslide1down")
 	 (and (eq_attr "mode" "RVVM8HF,RVVM4HF,RVVM2HF,RVVM1HF,RVVMF2HF,RVVMF4HF")
-	      (match_test "!TARGET_ZVFH")))
+	      (match_test "!TARGET_ZVFH && !TARGET_XXLVFBF")))
     (const_string "yes")
 
     ;; The mode records as QI for the FP16 <=> INT8 instruction.
     (and (eq_attr "type" "vfncvtftoi,vfwcvtitof")
 	 (and (eq_attr "mode" "RVVM4QI,RVVM2QI,RVVM1QI,RVVMF2QI,RVVMF4QI,RVVMF8QI")
-	      (match_test "!TARGET_ZVFH")))
+	      (match_test "!TARGET_ZVFH && !TARGET_XXLVFBF")))
     (const_string "yes")
   ]
   (const_string "no")))
@@ -4821,6 +4821,7 @@
 (include "vector.md")
 (include "vector-crypto.md")
 (include "vector-bfloat16.md")
+(include "xl-vbfloat16.md")
 (include "zicond.md")
 (include "sfb.md")
 (include "zc.md")

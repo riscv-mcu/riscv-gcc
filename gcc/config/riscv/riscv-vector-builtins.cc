@@ -232,6 +232,30 @@ static const rvv_type_info convert_u_ops[] = {
 #include "riscv-vector-builtins-types.def"
   {NUM_VECTOR_TYPES, 0}};
 
+/* A list of all unsigned integer will be registered for intrinsic functions.  */
+static const rvv_type_info u16_ops[] = {
+#define DEF_RVV_U16_OPS(TYPE, REQUIRE) {VECTOR_TYPE_##TYPE, REQUIRE},
+#include "riscv-vector-builtins-types.def"
+  {NUM_VECTOR_TYPES, 0}};
+
+/* A list of all unsigned integer will be registered for intrinsic functions.  */
+static const rvv_type_info i16_ops[] = {
+#define DEF_RVV_I16_OPS(TYPE, REQUIRE) {VECTOR_TYPE_##TYPE, REQUIRE},
+#include "riscv-vector-builtins-types.def"
+  {NUM_VECTOR_TYPES, 0}};
+
+/* A list of all unsigned integer will be registered for intrinsic functions.  */
+static const rvv_type_info u32_ops[] = {
+#define DEF_RVV_U32_OPS(TYPE, REQUIRE) {VECTOR_TYPE_##TYPE, REQUIRE},
+#include "riscv-vector-builtins-types.def"
+  {NUM_VECTOR_TYPES, 0}};
+
+/* A list of all unsigned integer will be registered for intrinsic functions.  */
+static const rvv_type_info i32_ops[] = {
+#define DEF_RVV_I32_OPS(TYPE, REQUIRE) {VECTOR_TYPE_##TYPE, REQUIRE},
+#include "riscv-vector-builtins-types.def"
+  {NUM_VECTOR_TYPES, 0}};
+
 /* A list of all signed integer will be registered for intrinsic functions.  */
 static const rvv_type_info wconvert_i_ops[] = {
 #define DEF_RVV_WCONVERT_I_OPS(TYPE, REQUIRE) {VECTOR_TYPE_##TYPE, REQUIRE},
@@ -763,6 +787,10 @@ static CONSTEXPR const rvv_arg_type_info f_v_args[]
   = {rvv_arg_type_info (RVV_BASE_float_vector), rvv_arg_type_info_end};
 
 /* A list of args for vector_type func (vector_type) function.  */
+static CONSTEXPR const rvv_arg_type_info bf16_v_args[]
+  = {rvv_arg_type_info (RVV_BASE_bfloat_vector), rvv_arg_type_info_end};
+
+/* A list of args for vector_type func (vector_type) function.  */
 static CONSTEXPR const rvv_arg_type_info trunc_f_v_args[]
   = {rvv_arg_type_info (RVV_BASE_double_trunc_float_vector),
      rvv_arg_type_info_end};
@@ -823,6 +851,12 @@ static CONSTEXPR const rvv_arg_type_info vf2_args[]
 static CONSTEXPR const rvv_arg_type_info wvv_args[]
   = {rvv_arg_type_info (RVV_BASE_double_trunc_vector),
      rvv_arg_type_info (RVV_BASE_double_trunc_vector), rvv_arg_type_info_end};
+
+/* A list of args for BF16 vector_type func (double demote type, double demote type)
+ * function.  */
+static CONSTEXPR const rvv_arg_type_info bf16_wvv_args[]
+  = {rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector),
+     rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector), rvv_arg_type_info_end};
 
 /* A list of args for vector_type func (vector_type, double demote type, double
  * demote type) function.  */
@@ -898,6 +932,12 @@ static CONSTEXPR const rvv_arg_type_info wvx_args[]
   = {rvv_arg_type_info (RVV_BASE_double_trunc_vector),
      rvv_arg_type_info (RVV_BASE_double_trunc_scalar), rvv_arg_type_info_end};
 
+/* A list of args for BF16 vector_type func (double demote type, double demote type)
+ * function.  */
+static CONSTEXPR const rvv_arg_type_info bf16_wvx_args[]
+  = {rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector),
+     rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_scalar), rvv_arg_type_info_end};
+
 /* A list of args for vector_type func (signed double demote type, unsigned
  * double demote type) function.  */
 static CONSTEXPR const rvv_arg_type_info su_wvx_args[]
@@ -916,6 +956,16 @@ static CONSTEXPR const rvv_arg_type_info wwv_args[]
 static CONSTEXPR const rvv_arg_type_info wwx_args[]
   = {rvv_arg_type_info (RVV_BASE_vector),
      rvv_arg_type_info (RVV_BASE_double_trunc_scalar), rvv_arg_type_info_end};
+
+/*A list of  func args for xl_vfwadd.wv func(vector type, double_trunc_vector type)*/
+static CONSTEXPR const rvv_arg_type_info bf16_wwv_args[]
+  = {rvv_arg_type_info (RVV_BASE_vector),
+     rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector), rvv_arg_type_info_end};
+
+/*A list of  func args for xl_vfwadd.wf func(vector type, double_trunc_scalar type)*/
+static CONSTEXPR const rvv_arg_type_info bf16_wwx_args[]
+  = {rvv_arg_type_info (RVV_BASE_vector),
+     rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_scalar), rvv_arg_type_info_end};
 
 /* A list of args for vector_type func (quad demote type) function.  */
 static CONSTEXPR const rvv_arg_type_info vf4_args[]
@@ -2917,6 +2967,83 @@ static CONSTEXPR const rvv_op_info u_vvvv_crypto_sew64_ops
      rvv_arg_type_info (RVV_BASE_vector), /* Return type */
      vvv_args /* Args */};
 
+/* xl_vfwadd/xl_vfwsub/xl_vfwmul .vv args */
+static CONSTEXPR const rvv_op_info xl_bf16_wvv_ops
+  = {f32_ops,				  /* Types */
+     OP_TYPE_vv,			  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_wvv_args /* Args */};
+
+/* xl_vfwadd/xl_vfwsub/xl_vfwmul .vf args */
+static CONSTEXPR const rvv_op_info xl_bf16_wvf_ops
+  = {f32_ops,				  /* Types */
+     OP_TYPE_vf,			  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_wvx_args /* Args */};
+
+/* xl_vfwadd/xl_vfwsub .wv args */
+static CONSTEXPR const rvv_op_info xl_bf16_wwv_ops
+  = {f32_ops,				  /* Types */
+     OP_TYPE_wv,			  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_wwv_args /* Args */};
+
+/* xl_vfwadd/xl_vfwsub .wf args */
+static CONSTEXPR const rvv_op_info xl_bf16_wwf_ops
+  = {f32_ops,				  /* Types */
+     OP_TYPE_wf,			  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_wwx_args /* Args */};
+
+/* xl_vfclass args */
+static CONSTEXPR const rvv_op_info xl_bf16_to_u_v_ops
+  = {u16_ops,			  /* Types */
+     OP_TYPE_v,				  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_v_args /* Args */};
+
+/* xl_vfcvt_x/xl_vfcvt_rtz_x args */
+static CONSTEXPR const rvv_op_info xl_bf16_to_i_f_v_ops
+  = {i16_ops,			  /* Types */
+     OP_TYPE_f_v,				  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_v_args /* Args */};
+
+/* xl_vfcvt_xu/xl_vfcvt_rtz_xu args */
+static CONSTEXPR const rvv_op_info xl_bf16_to_u_f_v_ops
+  = {u16_ops,			  /* Types */
+     OP_TYPE_f_v,				  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf16_v_args /* Args */};
+
+/* xl_vfwcvt_x/xl_vfwcvt_rtz_x args */
+static CONSTEXPR const rvv_op_info xl_bf16_to_wi_f_v_ops
+  = {i32_ops,			  /* Types */
+     OP_TYPE_f_v,				  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf_w_v_args /* Args */};
+
+/* xl_vfwcvt_xu/xl_vfwcvt_rtz_xu args */
+static CONSTEXPR const rvv_op_info xl_bf16_to_wu_f_v_ops
+  = {u32_ops,			  /* Types */
+     OP_TYPE_f_v,			  /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     bf_w_v_args /* Args */};
+
+/* xl_vfncvt_f_x_w Args*/
+static CONSTEXPR const rvv_op_info xl_i_to_nbf16_x_w_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_x_w,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector), /* Return type */
+     v_args /* Args */};
+
+/* xl_vfncvt_f_xu_w Args*/
+static CONSTEXPR const rvv_op_info xl_u_to_nbf16_xu_w_ops
+  = {u32_ops,		 			     /* Types */
+     OP_TYPE_xu_w,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector), /* Return type */
+     v_args /* Args */};
+
 /* A list of all RVV base function types.  */
 static CONSTEXPR const function_type_info function_types[] = {
 #define DEF_RVV_TYPE_INDEX(                                                    \
@@ -2924,7 +3051,7 @@ static CONSTEXPR const function_type_info function_types[] = {
   EEW64_INDEX, SHIFT, DOUBLE_TRUNC, QUAD_TRUNC, QUAD_EMUL,QUAD_EMUL_UNSIGNED,  \
   OCT_TRUNC, DOUBLE_TRUNC_SCALAR, DOUBLE_TRUNC_SIGNED, DOUBLE_TRUNC_UNSIGNED,  \
   DOUBLE_TRUNC_UNSIGNED_SCALAR, DOUBLE_TRUNC_BFLOAT_SCALAR,DOUBLE_TRUNC_BFLOAT,\
-  DOUBLE_TRUNC_FLOAT, FLOAT,LMUL1,WLMUL1,QLMUL1,QLMUL1_UNSIGNED,               \
+  DOUBLE_TRUNC_FLOAT,FLOAT,BFLOAT,LMUL1,WLMUL1,QLMUL1,QLMUL1_UNSIGNED,         \
   EEW8_INTERPRET, EEW16_INTERPRET, EEW32_INTERPRET, EEW64_INTERPRET,           \
   BOOL1_INTERPRET, BOOL2_INTERPRET, BOOL4_INTERPRET, BOOL8_INTERPRET,          \
   BOOL16_INTERPRET, BOOL32_INTERPRET, BOOL64_INTERPRET,                        \
@@ -2967,6 +3094,7 @@ static CONSTEXPR const function_type_info function_types[] = {
     VECTOR_TYPE_##DOUBLE_TRUNC_BFLOAT,						\
     VECTOR_TYPE_##DOUBLE_TRUNC_FLOAT,                                          \
     VECTOR_TYPE_##FLOAT,                                                       \
+    VECTOR_TYPE_##BFLOAT,                                                      \
     VECTOR_TYPE_##LMUL1,                                                       \
     VECTOR_TYPE_##WLMUL1,                                                      \
     VECTOR_TYPE_##QLMUL1,                                                      \

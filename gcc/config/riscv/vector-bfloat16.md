@@ -50,7 +50,7 @@
        (float_truncate:<V_FP32TOBF16_TRUNC>
           (match_operand:VWEXTF_ZVFBF 3 "register_operand"          "  0,  0,  0,  0,   vr,   vr"))
        (match_operand:<V_FP32TOBF16_TRUNC> 2 "vector_merge_operand" " vu,  0, vu,  0,   vu,    0")))]
-  "TARGET_ZVFBFMIN"
+  "TARGET_ZVFBFMIN && !TARGET_XXLVFBF"
   "vfncvtbf16.f.f.w\t%0,%3%p1"
   [(set_attr "type" "vfncvtbf16")
    (set_attr "mode" "<V_FP32TOBF16_TRUNC>")
@@ -71,7 +71,7 @@
       (float_extend:VWEXTF_ZVFBF
          (match_operand:<V_FP32TOBF16_TRUNC> 3 "register_operand" "   vr,   vr"))
       (match_operand:VWEXTF_ZVFBF 2 "vector_merge_operand"        "   vu,    0")))]
-  "TARGET_ZVFBFMIN"
+  "TARGET_ZVFBFMIN && !TARGET_XXLVFBF"
   "vfwcvtbf16.f.f.v\t%0,%3%p1"
   [(set_attr "type" "vfwcvtbf16")
    (set_attr "mode" "<V_FP32TOBF16_TRUNC>")])
