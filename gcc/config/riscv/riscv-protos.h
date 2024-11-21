@@ -160,6 +160,7 @@ extern bool riscv_can_use_return_insn (void);
 extern rtx riscv_function_value (const_tree, const_tree, enum machine_mode);
 extern bool riscv_store_data_bypass_p (rtx_insn *, rtx_insn *);
 extern bool riscv_fix_operands_ld_sd (rtx *operands, bool load, bool const_store, bool commute);
+extern bool riscv_rvp_autovec_enable(void);
 extern bool riscv_valid_operands_ld_sd (rtx *operands);
 extern const char *riscv_output_move_double (rtx *operands);
 extern rtx riscv_gen_gpr_save_insn (struct riscv_frame_info *);

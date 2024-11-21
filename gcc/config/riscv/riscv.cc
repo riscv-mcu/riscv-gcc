@@ -304,6 +304,9 @@ struct riscv_tune_param
 
 /* Global variables for machine-dependent things.  */
 
+/*nuclei rvp autovec flags*/
+bool riscv_rvp_autovec_p = false;
+
 /* Whether unaligned accesses execute very slowly.  */
 bool riscv_slow_unaligned_access_p;
 
@@ -12518,10 +12521,20 @@ riscv_mode_priority (int, int n)
   return n;
 }
 
+bool riscv_rvp_autovec_enable(void)
+{
+  return riscv_rvp_autovec_p;
+}
+
 /* Implement TARGET_VECTORIZE_AUTOVECTORIZE_VECTOR_MODES.  */
 unsigned int
 riscv_autovectorize_vector_modes (vector_modes *modes, bool all)
 {
+  if(TARGET_ZPN || TARGET_ZPRV || TARGET_ZPSF || TARGET_XXLDSP || TARGET_XXLDSPN1X || TARGET_XXLDSPN2X || TARGET_XXLDSPN3X)
+  {
+    riscv_rvp_autovec_p = true;
+  }
+
   if (TARGET_VECTOR && !TARGET_XTHEADVECTOR)
     return riscv_vector::autovectorize_vector_modes (modes, all);
 

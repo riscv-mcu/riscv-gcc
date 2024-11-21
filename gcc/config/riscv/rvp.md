@@ -3141,25 +3141,46 @@
   [(set_attr "type" "simd")])
 
 ;; MADDR32, MSUBR32
-(define_insn "maddr32"
+(define_insn "*maddr32_vec"
   [(set (match_operand:SI 0 "register_operand"                   "=r")
 	(plus:SI (mult:SI (match_operand:SI 1 "register_operand" " r")
 			  (match_operand:SI 2 "register_operand" " r"))
 		 (match_operand:SI 3 "register_operand"          " 0")))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && riscv_rvp_autovec_enable()"
   "maddr32\t%0, %1, %2"
   [(set_attr "type"   "mac")
    (set_attr "length"   "4")])
 
-(define_insn "msubr32"
+(define_insn "maddr32<mode>"
+  [(set (match_operand:VSHI 0 "register_operand"                   "=r")
+	(plus:VSHI (mult:VSHI (match_operand:VSHI 1 "register_operand" " r")
+			  (match_operand:VSHI 2 "register_operand" " r"))
+		 (match_operand:VSHI 3 "register_operand"          " 0")))]
+  "TARGET_ZPN"
+  "maddr32\t%0, %1, %2"
+  [(set_attr "type"   "mac")
+   (set_attr "length"   "4")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "msubr32<mode>"
+  [(set (match_operand:VSHI 0 "register_operand"                    "=r")
+	(minus:VSHI (match_operand:VSHI 3 "register_operand"          " 0")
+		  (mult:VSHI (match_operand:VSHI 1 "register_operand" " r")
+			   (match_operand:VSHI 2 "register_operand" " r"))))]
+  "TARGET_ZPN"
+  "msubr32\t%0, %1, %2"
+  [(set_attr "type"   "dsp")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "*msubr32_vec"
   [(set (match_operand:SI 0 "register_operand"                    "=r")
 	(minus:SI (match_operand:SI 3 "register_operand"          " 0")
 		  (mult:SI (match_operand:SI 1 "register_operand" " r")
 			   (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPN"
+  "TARGET_ZPN && riscv_rvp_autovec_enable()"
   "msubr32\t%0, %1, %2"
   [(set_attr "type"   "dsp")
-   (set_attr "mode"   "SI")])
+   (set_attr "length"   "4")])
 
 ;; MAXW, MINW
 (define_insn "psmaxsi3"
@@ -3203,9 +3224,18 @@
 ;; MULR64, MULSR64
 (define_insn "rvp_umulsidi3"
   [(set (match_operand:DI 0 "register_operand"                          "=r")
+	(unspec:DI [(match_operand:SI 1 "register_operand" " r")
+		      (match_operand:SI 2 "register_operand" " r")]
+			  UNSPEC_MULR64))]
+  "TARGET_ZPSF && TARGET_64BIT"
+  "mulr64\t%0, %1, %2"
+  [(set_attr "type"   "dsp")])
+			 
+(define_insn "*umulsidi3_vec"
+  [(set (match_operand:DI 0 "register_operand"                          "=r")
 	(mult:DI (zero_extend:DI (match_operand:SI 1 "register_operand" " r"))
 		 (zero_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPSF && TARGET_64BIT"
+  "TARGET_ZPSF && TARGET_64BIT && riscv_rvp_autovec_enable()"
   "mulr64\t%0, %1, %2"
   [(set_attr "type"   "dsp")
    (set_attr "mode"   "DI")])
@@ -4314,7 +4344,7 @@
 	    (any_extend:DI
 	      (match_operand:SI 2 "register_operand"  " r")))
 	  (match_operand:DI 3 "register_operand"      " 0")))]
-  "TARGET_ZPSF && !TARGET_64BIT"
+  "TARGET_ZPSF && !TARGET_64BIT && riscv_rvp_autovec_enable()"
   "<su>m<add_sub>r64\t%0, %1, %2"
   [(set_attr "type"   "dsp64")
    (set_attr "mode"   "DI")])
