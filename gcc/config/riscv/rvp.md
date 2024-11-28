@@ -3146,7 +3146,7 @@
 	(plus:SI (mult:SI (match_operand:SI 1 "register_operand" " r")
 			  (match_operand:SI 2 "register_operand" " r"))
 		 (match_operand:SI 3 "register_operand"          " 0")))]
-  "TARGET_ZPN && riscv_rvp_autovec_enable()"
+  "TARGET_ZPN && riscv_rvp_autovec_enable() && TARGET_NUCLEI_DSP_AUTOVEC"
   "maddr32\t%0, %1, %2"
   [(set_attr "type"   "mac")
    (set_attr "length"   "4")])
@@ -3177,7 +3177,7 @@
 	(minus:SI (match_operand:SI 3 "register_operand"          " 0")
 		  (mult:SI (match_operand:SI 1 "register_operand" " r")
 			   (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPN && riscv_rvp_autovec_enable()"
+  "TARGET_ZPN && riscv_rvp_autovec_enable() && TARGET_NUCLEI_DSP_AUTOVEC"
   "msubr32\t%0, %1, %2"
   [(set_attr "type"   "dsp")
    (set_attr "length"   "4")])
@@ -3235,7 +3235,7 @@
   [(set (match_operand:DI 0 "register_operand"                          "=r")
 	(mult:DI (zero_extend:DI (match_operand:SI 1 "register_operand" " r"))
 		 (zero_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPSF && TARGET_64BIT && riscv_rvp_autovec_enable()"
+  "TARGET_ZPSF && TARGET_64BIT && riscv_rvp_autovec_enable() &&TARGET_NUCLEI_DSP_AUTOVEC"
   "mulr64\t%0, %1, %2"
   [(set_attr "type"   "dsp")
    (set_attr "mode"   "DI")])
@@ -4344,7 +4344,7 @@
 	    (any_extend:DI
 	      (match_operand:SI 2 "register_operand"  " r")))
 	  (match_operand:DI 3 "register_operand"      " 0")))]
-  "TARGET_ZPSF && !TARGET_64BIT && riscv_rvp_autovec_enable()"
+  "TARGET_ZPSF && !TARGET_64BIT && riscv_rvp_autovec_enable() &&TARGET_NUCLEI_DSP_AUTOVEC"
   "<su>m<add_sub>r64\t%0, %1, %2"
   [(set_attr "type"   "dsp64")
    (set_attr "mode"   "DI")])

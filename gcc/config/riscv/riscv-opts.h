@@ -205,4 +205,7 @@ enum riscv_tls_type {
 #define TARGET_VECTOR_AUTOVEC_SEGMENT					       \
   (TARGET_VECTOR && riscv_mautovec_segment)
 
+#define TARGET_NUCLEI_DSP_AUTOVEC					       \
+  ((TARGET_ZPN || TARGET_ZPRV || TARGET_ZPSF || TARGET_XXLDSP || TARGET_XXLDSPN1X || TARGET_XXLDSPN2X || TARGET_XXLDSPN3X) && riscv_mautovec_dsp)
+
 #endif /* ! GCC_RISCV_OPTS_H */
