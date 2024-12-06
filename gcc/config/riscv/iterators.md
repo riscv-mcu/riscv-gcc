@@ -98,7 +98,8 @@
 ;; Iterator for hardware-supported floating-point modes.
 (define_mode_iterator ANYF [(SF "TARGET_HARD_FLOAT || TARGET_ZFINX")
 			    (DF "TARGET_DOUBLE_FLOAT || TARGET_ZDINX")
-			    (HF "TARGET_ZFH || TARGET_ZHINX")])
+			    (HF "TARGET_ZFH || TARGET_ZHINX")
+			    (BF "TARGET_XXLFBF")])
 
 ;; Iterator for hardware-supported load/store floating-point modes.
 (define_mode_iterator ANYLSF [(SF "TARGET_HARD_FLOAT || TARGET_ZFINX")
@@ -147,7 +148,7 @@
 (define_mode_attr reg [(SI "d") (DI "d") (CC "d")])
 
 ;; This attribute gives the format suffix for floating-point operations.
-(define_mode_attr fmt [(HF "h") (SF "s") (DF "d")])
+(define_mode_attr fmt [(BF "h") (HF "h") (SF "s") (DF "d")])
 
 ;; This attribute gives the integer suffix for floating-point conversions.
 (define_mode_attr ifmt [(SI "w") (DI "l")])
@@ -160,7 +161,7 @@
 
 ;; This attribute gives the upper-case mode name for one unit of a
 ;; floating-point mode.
-(define_mode_attr UNITMODE [(HF "HF") (SF "SF") (DF "DF")])
+(define_mode_attr UNITMODE [(BF "HF") (HF "HF") (SF "SF") (DF "DF")])
 
 ;; This attribute gives the integer mode that has half the size of
 ;; the controlling mode.
