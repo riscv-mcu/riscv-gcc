@@ -127,6 +127,7 @@ enum required_ext
   XTHEADVECTOR_EXT,	/* XTheadVector extension */
   ZVFBFMIN_EXT,		/* Zvfbfmin extension */
   ZVFBFWMA_EXT,		/* Zvfbfwma extension */
+  XXLVQMACC_EXT,	/* XXLVQMACC extension */
   /* Please update below to isa_name func when add or remove enum type(s).  */
 };
 
@@ -160,6 +161,8 @@ static inline const char * required_ext_to_isa_name (enum required_ext required)
       return "zvfbfmin";
     case ZVFBFWMA_EXT:
       return "zvfbfwma";
+    case XXLVQMACC_EXT:
+      return "xxlvqmacc";
     default:
       gcc_unreachable ();
   }
@@ -197,6 +200,8 @@ static inline bool required_extensions_specified (enum required_ext required)
       return TARGET_ZVFBFMIN;
     case ZVFBFWMA_EXT:
       return TARGET_ZVFBFWMA;
+    case XXLVQMACC_EXT:
+      return TARGET_XXLVQMACC;
     default:
       gcc_unreachable ();
   }
@@ -337,6 +342,8 @@ struct function_group_info
 	return TARGET_ZVFBFMIN;
       case ZVFBFWMA_EXT:
 	return TARGET_ZVFBFWMA;
+      case XXLVQMACC_EXT:
+       return TARGET_XXLVQMACC;
       default:
         gcc_unreachable ();
     }

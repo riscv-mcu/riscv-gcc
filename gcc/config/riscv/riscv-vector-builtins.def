@@ -70,10 +70,10 @@ along with GCC; see the file COPYING3.  If not see
 #ifndef DEF_RVV_TYPE_INDEX
 #define DEF_RVV_TYPE_INDEX(                                                    \
   VECTOR, MASK, SIGNED, UNSIGNED, EEW8_INDEX, EEW16_INDEX, EEW32_INDEX,        \
-  EEW64_INDEX, SHIFT, DOUBLE_TRUNC, QUAD_TRUNC, OCT_TRUNC,                     \
-  DOUBLE_TRUNC_SCALAR, DOUBLE_TRUNC_SIGNED, DOUBLE_TRUNC_UNSIGNED,             \
-  DOUBLE_TRUNC_UNSIGNED_SCALAR, DOUBLE_TRUNC_BFLOAT_SCALAR,			\
-  DOUBLE_TRUNC_BFLOAT, DOUBLE_TRUNC_FLOAT, FLOAT, LMUL1, WLMUL1,		\
+  EEW64_INDEX, SHIFT, DOUBLE_TRUNC, QUAD_TRUNC, QUAD_EMUL, QUAD_EMUL_UNSIGNED, \
+  OCT_TRUNC, DOUBLE_TRUNC_SCALAR, DOUBLE_TRUNC_SIGNED, DOUBLE_TRUNC_UNSIGNED,  \
+  DOUBLE_TRUNC_UNSIGNED_SCALAR, DOUBLE_TRUNC_BFLOAT_SCALAR,DOUBLE_TRUNC_BFLOAT,\
+  DOUBLE_TRUNC_FLOAT, FLOAT, LMUL1, WLMUL1,QLMUL1, QLMUL1_UNSIGNED,            \
   EEW8_INTERPRET, EEW16_INTERPRET, EEW32_INTERPRET, EEW64_INTERPRET,           \
   BOOL1_INTERPRET, BOOL2_INTERPRET, BOOL4_INTERPRET, BOOL8_INTERPRET,          \
   BOOL16_INTERPRET, BOOL32_INTERPRET, BOOL64_INTERPRET,                        \
@@ -634,6 +634,7 @@ DEF_RVV_OP_TYPE (xu_v)
 DEF_RVV_OP_TYPE (f_w)
 DEF_RVV_OP_TYPE (xu_w)
 DEF_RVV_OP_TYPE (s)
+DEF_RVV_OP_TYPE (4x4x4)
 
 DEF_RVV_PRED_TYPE (ta)
 DEF_RVV_PRED_TYPE (tu)
@@ -676,6 +677,8 @@ DEF_RVV_BASE_TYPE (eew64_index, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (shift_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (double_trunc_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (quad_trunc_vector, get_vector_type (type_idx))
+DEF_RVV_BASE_TYPE (quad_emul_vector, get_vector_type (type_idx))
+DEF_RVV_BASE_TYPE (quad_emul_unsigned_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (oct_trunc_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (double_trunc_scalar, get_scalar_type (type_idx))
 DEF_RVV_BASE_TYPE (double_trunc_signed_vector, get_vector_type (type_idx))
@@ -687,6 +690,8 @@ DEF_RVV_BASE_TYPE (double_trunc_float_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (float_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (lmul1_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (widen_lmul1_vector, get_vector_type (type_idx))
+DEF_RVV_BASE_TYPE (quad_lmul1_vector, get_vector_type (type_idx))
+DEF_RVV_BASE_TYPE (quad_lmul1_unsigned_vector, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (eew8_interpret, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (eew16_interpret, get_vector_type (type_idx))
 DEF_RVV_BASE_TYPE (eew32_interpret, get_vector_type (type_idx))

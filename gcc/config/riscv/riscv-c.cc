@@ -282,7 +282,8 @@ riscv_pragma_intrinsic (cpp_reader *)
   const char *name = TREE_STRING_POINTER (x);
 
   if (strcmp (name, "vector") == 0
-      || strcmp (name, "xtheadvector") == 0)
+      || strcmp (name, "xtheadvector") == 0
+      || strcmp (name, "xxlvqmacc"))
     {
       struct pragma_intrinsic_flags backup_flags;
 
