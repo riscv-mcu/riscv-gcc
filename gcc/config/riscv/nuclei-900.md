@@ -1,135 +1,107 @@
+;;(define_automaton "nuclei_100")
+
 (define_automaton "nuclei_900")
+(define_cpu_unit "nuclei_900_alu" "nuclei_900")
+(define_cpu_unit "nuclei_900_imuldiv" "nuclei_900")
+(define_cpu_unit "nuclei_900_fdivsqrt" "nuclei_900")
 
-(define_cpu_unit "nuclei_900_pipe_any" "nuclei_900")
-;; Dual-issue (load + store), but not (load + load) or (store + store)
-(define_cpu_unit "nuclei_900_load" "nuclei_900")
-(define_cpu_unit "nuclei_900_store" "nuclei_900")
-
-;; Single-issue branch instructions
-(define_cpu_unit "nuclei_900_branch" "nuclei_900")
-
-;; imul can be piped, but idiv cannot
-(define_cpu_unit "nuclei_900_imul" "nuclei_900")
-(define_cpu_unit "nuclei_900_idiv" "nuclei_900")
-
-;; fmisc/fmac can be piped, but fdiv cannot
-(define_cpu_unit "nuclei_900_fmisc" "nuclei_900")
-(define_cpu_unit "nuclei_900_fmac" "nuclei_900")
-(define_cpu_unit "nuclei_900_fdiv" "nuclei_900")
-
-;; DSP cannot be piped
-(define_cpu_unit "nuclei_900_dsp" "nuclei_900")
-
-;; ALU instructions
-(define_insn_reservation "nuclei_900_alu_insn" 1
+(define_insn_reservation "nuclei_900_alu" 1
   (and (eq_attr "tune" "nuclei_900")
-    (eq_attr "type" "unknown,arith,shift,slt,multi,logical,move,bitmanip,\
-			rotate,min,max,minu,maxu,clz,ctz,atomic,condmove,mvpair,zicond"))
-  "nuclei_900_pipe_any")
+       (eq_attr "type" "unknown,const,arith,shift,slt,multi,auipc,nop,logical,\
+			move,bitmanip,min,max,minu,maxu,clz,ctz,rotate,atomic,\
+			condmove,crypto,mvpair,zicond"))
+  "nuclei_900_alu")
 
-;; Load
-(define_insn_reservation "nuclei_900_load_insn" 3
+(define_insn_reservation "nuclei_900_load" 3
   (and (eq_attr "tune" "nuclei_900")
-     (eq_attr "type" "load"))
-  "nuclei_900_pipe_any + nuclei_900_load")
+       (eq_attr "type" "load,fpload"))
+  "nuclei_900_alu")
 
-
-;; Stroe, defer to tune info
-(define_insn_reservation "nuclei_900_store_insn" 0
+(define_insn_reservation "nuclei_900_store" 0
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "store"))
-  "nuclei_900_pipe_any + nuclei_900_store")
+       (eq_attr "type" "store,fpstore"))
+  "nuclei_900_alu")
 
-;; Branch, defer to tune info
-(define_insn_reservation "nuclei_900_branch_insn" 0
+(define_insn_reservation "nuclei_900_xfer" 4
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "branch,ret,trap"))
-  "nuclei_900_pipe_any + nuclei_900_branch")
+       (eq_attr "type" "mfc,mtc,fcvt,fcvt_i2f,fcvt_f2i,fmove,fcmp"))
+  "nuclei_900_alu")
 
-
-(define_insn_reservation "nuclei_900_jump" 1
+(define_insn_reservation "nuclei_900_branch" 1
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "jump,call,jalr"))
-  "nuclei_900_pipe_any + nuclei_900_branch")
+       (eq_attr "type" "branch,jump,call,jalr,ret,trap"))
+  "nuclei_900_alu")
 
-;; Integer multiplication, defer to tune info
-(define_insn_reservation "nuclei_900_imul_insn" 4
+(define_insn_reservation "nuclei_900_sfb_alu" 2
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "imul"))
-  "nuclei_900_pipe_any + nuclei_900_imul")
+       (eq_attr "type" "sfb_alu"))
+  "nuclei_900_alu")
 
-;; Integer division, 32 bits, defer to tune info
-(define_insn_reservation "nuclei_900_idiv_si_insn" 4
+(define_insn_reservation "nuclei_900_imul" 10
+  (and (eq_attr "tune" "nuclei_900")
+       (eq_attr "type" "imul,clmul,cpop"))
+  "nuclei_900_imuldiv*10")
+
+(define_insn_reservation "nuclei_900_idivsi" 33
   (and (eq_attr "tune" "nuclei_900")
        (and (eq_attr "type" "idiv")
-            (eq_attr "mode" "SI")))
-  "nuclei_900_pipe_any + nuclei_900_idiv, nuclei_900_idiv * 3")
+	    (eq_attr "mode" "SI")))
+  "nuclei_900_imuldiv*33")
 
-;; Integer division, 64 bits, defer to tune info
-(define_insn_reservation "nuclei_900_idiv_di_insn" 4
+(define_insn_reservation "nuclei_900_idivdi" 66
   (and (eq_attr "tune" "nuclei_900")
        (and (eq_attr "type" "idiv")
-            (eq_attr "mode" "DI")))
-  "nuclei_900_pipe_any + nuclei_900_idiv, nuclei_900_idiv * 3")
+	    (eq_attr "mode" "DI")))
+  "nuclei_900_imuldiv*66")
 
-;; FPU misc
-(define_insn_reservation "nuclei_900_fmisc_insn" 3
+(define_insn_reservation "nuclei_900_fmul_half" 4
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "mfc, mtc, fcvt, fmove"))
-  "nuclei_900_pipe_any + nuclei_900_fmisc")
+       (and (eq_attr "type" "fadd,fmul,fmadd")
+	    (eq_attr "mode" "HF")))
+  "nuclei_900_alu")
 
-;; Float mul/add/cmp, defer to tune info
-(define_insn_reservation "nuclei_900_fmac_insn" 5
+(define_insn_reservation "nuclei_900_fmul_single" 4
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "fmul, fadd, fcmp, fmadd"))
-  "nuclei_900_pipe_any + nuclei_900_fmac")
+       (and (eq_attr "type" "fadd,fmul,fmadd")
+	    (eq_attr "mode" "SF")))
+  "alu")
 
-;; Float division/sqrt, 32 bits, defer to tune info
-(define_insn_reservation "nuclei_900_fdiv_sf_insn" 20
+(define_insn_reservation "nuclei_900_fmul_double" 8
   (and (eq_attr "tune" "nuclei_900")
-       (and (eq_attr "type" "fdiv, fsqrt")
-            (eq_attr "mode" "SF")))
-  "nuclei_900_pipe_any + nuclei_900_fdiv, nuclei_900_fdiv * 19")
+       (and (eq_attr "type" "fadd,fmul,fmadd")
+	    (eq_attr "mode" "DF")))
+  "nuclei_900_alu")
 
-;; Float division/sqrt, 64 bits, defer to tune info
-(define_insn_reservation "nuclei_900_fdiv_df_insn" 34
+(define_insn_reservation "nuclei_900_fdiv" 20
   (and (eq_attr "tune" "nuclei_900")
-       (and (eq_attr "type" "fdiv, fsqrt")
-            (eq_attr "mode" "DF")))
-  "nuclei_900_pipe_any + nuclei_900_fdiv, nuclei_900_fdiv * 33")
+       (eq_attr "type" "fdiv"))
+  "nuclei_900_fdivsqrt*20")
 
-;; Float load
-(define_insn_reservation "nuclei_900_fpload_insn" 4
+(define_insn_reservation "nuclei_900_fsqrt" 25
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "fpload"))
-  "nuclei_900_pipe_any + nuclei_900_load")
-
-;; Float store, defer to tune info
-(define_insn_reservation "nuclei_900_fpstore_insn" 0
-  (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "fpstore"))
-  "nuclei_900_pipe_any + nuclei_900_store")
+       (eq_attr "type" "fsqrt"))
+  "nuclei_900_fdivsqrt*25")
 
 ;; DSP SIMD
 (define_insn_reservation "nuclei_900_dsp_simd_insn" 2
   (and (eq_attr "tune" "nuclei_900")
        (eq_attr "type" "simd"))
-  "nuclei_900_pipe_any + nuclei_900_dsp, nuclei_900_dsp")
+  "nuclei_900_alu")
 
 ;; DSP Partial SIMD
 (define_insn_reservation "nuclei_900_dsp_psimd_insn" 3
   (and (eq_attr "tune" "nuclei_900")
        (eq_attr "type" "psimd"))
-  "nuclei_900_pipe_any + nuclei_900_dsp, nuclei_900_dsp * 2")
+  "nuclei_900_alu")
 
 ;; DSP Others
 (define_insn_reservation "nuclei_900_dsp_other_insn" 3
   (and (eq_attr "tune" "nuclei_900")
        (eq_attr "type" "dsp, dsp64"))
-  "nuclei_900_pipe_any + nuclei_900_dsp, nuclei_900_dsp * 2")
+  "nuclei_900_alu")
 
 ;; BMU
 (define_insn_reservation "nuclei_900_bitmanip_insn" 1
   (and (eq_attr "tune" "nuclei_900")
        (eq_attr "type" "bitmanip"))
-  "nuclei_900_pipe_any")
+  "nuclei_900_alu")

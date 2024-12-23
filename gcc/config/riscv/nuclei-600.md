@@ -1,12 +1,10 @@
 (define_automaton "nuclei_600")
 
-(define_cpu_unit "nuclei_600_pipe0" "nuclei_600")
-
 (define_cpu_unit "nuclei_600_load" "nuclei_600")
 (define_cpu_unit "nuclei_600_store" "nuclei_600")
 
+(define_cpu_unit "nuclei_600_pipe0" "nuclei_600")
 ;; imul can be piped, but idiv cannot
-(define_cpu_unit "nuclei_600_imul" "nuclei_600")
 (define_cpu_unit "nuclei_600_idiv" "nuclei_600")
 
 ;; fmisc/fmac can be piped, but fdiv cannot
@@ -28,14 +26,14 @@
 (define_insn_reservation "nuclei_600_load_insn" 3
   (and (eq_attr "tune" "nuclei_600")
      (eq_attr "type" "load"))
-  "nuclei_600_pipe0 + nuclei_600_load")
+  "nuclei_600_load")
 
 
 ;; Stroe, defer to tune info
 (define_insn_reservation "nuclei_600_store_insn" 0
   (and (eq_attr "tune" "nuclei_600")
        (eq_attr "type" "store"))
-  "nuclei_600_pipe0 + nuclei_600_store")
+  "nuclei_600_store")
 
 ;; Branch, defer to tune info
 (define_insn_reservation "nuclei_600_branch_insn" 0
@@ -50,10 +48,10 @@
   "nuclei_600_pipe0")
 
 ;; Integer multiplication, defer to tune info
-(define_insn_reservation "nuclei_600_imul_insn" 4
+(define_insn_reservation "nuclei_600_imul_insn" 3
   (and (eq_attr "tune" "nuclei_600")
        (eq_attr "type" "imul"))
-  "nuclei_600_pipe0 + nuclei_600_imul")
+  "nuclei_600_pipe0")
 
 ;; Integer division, 32 bits, defer to tune info
 (define_insn_reservation "nuclei_600_idiv_si_insn" 4

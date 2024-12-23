@@ -1,13 +1,12 @@
 (define_automaton "nuclei_200")
 
+(define_cpu_unit "nuclei_200_load" "nuclei_200")
+(define_cpu_unit "nuclei_200_store" "nuclei_200")
+
 (define_cpu_unit "nuclei_200_pipe0" "nuclei_200")
 
 ;; imul can be piped, but idiv cannot
-(define_cpu_unit "nuclei_200_imul" "nuclei_200")
 (define_cpu_unit "nuclei_200_idiv" "nuclei_200")
-
-(define_cpu_unit "nuclei_200_load" "nuclei_200")
-(define_cpu_unit "nuclei_200_store" "nuclei_200")
 
 ;; fmisc/fmac can be piped, but fdiv cannot
 (define_cpu_unit "nuclei_200_fmisc" "nuclei_200")
@@ -28,7 +27,7 @@
 (define_insn_reservation "nuclei_200_load_insn" 2
   (and (eq_attr "tune" "nuclei_200")
        (eq_attr "type" "load"))
-  "nuclei_200_pipe0 + nuclei_200_load")
+  "nuclei_200_load")
 
 ;; Store
 (define_insn_reservation "nuclei_200_store_insn" 1
@@ -52,7 +51,7 @@
 (define_insn_reservation "nuclei_200_imul_insn" 1
   (and (eq_attr "tune" "nuclei_200")
        (eq_attr "type" "imul"))
-  "nuclei_200_pipe0 + nuclei_200_imul")
+  "nuclei_200_pipe0")
 
 ;; Integer division, 32 bits, defer to tune info
 (define_insn_reservation "nuclei_200_idiv_si_insn" 33

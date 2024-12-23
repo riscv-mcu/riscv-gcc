@@ -64,7 +64,8 @@ enum riscv_microarchitecture_type {
   nuclei_300,
   nuclei_600,
   nuclei_900,
-  nuclei_1000
+  nuclei_1000_3w,
+  nuclei_1000_4w
 };
 extern enum riscv_microarchitecture_type riscv_microarchitecture;
 
