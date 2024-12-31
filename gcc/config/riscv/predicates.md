@@ -753,9 +753,3 @@
   (and (match_operand 0 "const_int_operand")
        (ior (match_test "satisfies_constraint_c15 (op)")
 	    (match_test "satisfies_constraint_c16 (op)"))))
-(define_predicate "xxlcz_branching_operator"
-  (match_code "eq,ne")
-{
-  return TARGET_XXLCZBRI;
-})
-

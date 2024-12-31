@@ -1,5 +1,43 @@
 ;; Post modified load and store
 
+
+;; xlczbri Instructions
+(define_insn "*xl_branch<mode>"
+  [(set (pc)
+    (if_then_else
+     (match_operator 1 "equality_operator"
+             [(match_operand:X 2 "register_operand" "r")
+              (match_operand:X 3 "const_int5s_operand" "xl_bi_sign5")])
+     (label_ref (match_operand 0 "" ""))
+     (pc)))]
+  "TARGET_XXLCZBRI"
+{
+  if (get_attr_length (insn) == 12)
+    return "xl.b%N1\t%2,%z3,1f; jump\t%l0,ra; 1:";
+
+  return "xl.b%C1i\t%2,%3,%0";
+}
+  [(set_attr "type" "branch")
+   (set_attr "mode" "none")])
+
+(define_insn "*branch<mode>"
+  [(set (pc)
+        (if_then_else
+         (match_operator 1 "ordered_comparison_operator"
+                         [(match_operand:X 2 "register_operand" "r")
+                          (match_operand:X 3 "reg_or_0_operand" "rJ")])
+         (label_ref (match_operand 0 "" ""))
+         (pc)))]
+  "TARGET_XXLCZBRI"
+{
+  if (get_attr_length (insn) == 12)
+    return "b%N1\t%2,%z3,1f; jump\t%l0,ra; 1:";
+
+  return "b%C1\t%2,%z3,%l0";
+}
+  [(set_attr "type" "branch")
+   (set_attr "mode" "none")])
+   
 (define_insn "load<mode>_ind_postinc"
   [(set (match_operand:SUBDISF 0 "register_operand" "=r")
         (mem:SUBDISF (post_inc:SI (match_operand:SI 1 "register_operand" "+r")))
@@ -77,7 +115,7 @@
 ;; Bitop insns
 
 (define_insn "xl_bclrsi4"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:QI 2 "immediate_operand" "i")
                 (match_operand:QI 3 "immediate_operand" "i")]
@@ -89,7 +127,7 @@
 )
 
 (define_insn "xl_bclrsi3_reg"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:HI 2 "register_operand" "r")]
   UNSPEC_XXLCZ_BCLRR))]
@@ -100,7 +138,7 @@
 )
 
 (define_insn "xl_bsetsi4"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:QI 2 "immediate_operand" "i")
                 (match_operand:QI 3 "immediate_operand" "i")]
@@ -112,7 +150,7 @@
 )
 
 (define_insn "xl_bsetsi3_reg"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:HI 2 "register_operand" "r")]
   UNSPEC_XXLCZ_BSETR))]
@@ -123,7 +161,7 @@
 )
 
 (define_insn "xl_extractsi4"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:QI 2 "immediate_operand" "i")
                 (match_operand:QI 3 "immediate_operand" "i")]
@@ -135,7 +173,7 @@
 )
 
 (define_insn "xl_extractsi3_reg"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:HI 2 "register_operand" "r")]
   UNSPEC_XXLCZ_EXTRACTR))]
@@ -146,7 +184,7 @@
 )
 
 (define_insn "xl_extractusi4"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:QI 2 "immediate_operand" "i")
                 (match_operand:QI 3 "immediate_operand" "i")]
@@ -169,7 +207,7 @@
 )
 
 (define_insn "xl_insertsi4"
-  [(set	(match_operand:SI 0 "register_operand" "=r")
+  [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
                 (match_operand:QI 2 "immediate_operand" "i")
                 (match_operand:QI 3 "immediate_operand" "i")]
@@ -258,19 +296,6 @@
   "xl.bitrev\t%0,%1,%2,%3"
   [(set_attr "type" "bitmanip")
   (set_attr "mode" "SI")])
-
-(define_insn "*xxlcz_branching<mode>"
-  [(set (pc)
-	(if_then_else
-	 (match_operator 1 "xxlcz_branching_operator"
-			 [(match_operand:X 2 "register_operand" "r")
-			  (match_operand:X 3 "imm5z_operand" "c05")])
-	 (label_ref (match_operand 0 "" ""))
-	 (pc)))]
-  "TARGET_XXLCZBRI"
-  "xl.b%C1i\t%2,%z3,%0"
-  [(set_attr "type" "branch")
-   (set_attr "mode" "none")])
 
 (define_insn "xl_nzmsksi2"
   [(set (match_operand:SI 0 "register_operand" "=r")

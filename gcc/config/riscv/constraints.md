@@ -353,3 +353,10 @@
   "A constraint that matches the integers 2^(0...7)."
   (and (match_code "const_int")
        (match_test "(unsigned) exact_log2 (ival) <= 7")))
+
+(define_constraint "xl_bi_sign5"
+  "@internal
+   A 5-bit signed immediate for XLCZ Immediate Branch."
+  (and (match_code "const_int")
+       (match_test "IN_RANGE (ival, -16, 15)")))
+

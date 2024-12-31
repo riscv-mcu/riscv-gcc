@@ -5050,28 +5050,6 @@ riscv_sign_extend_if_not_subreg_prom (rtx *op)
     *op = gen_rtx_SIGN_EXTEND (word_mode, *op);
 }
 
-/* Return true if the the constant operand can meet
-  the requirement of bnei, beqi instructions in zcea.
-*/
-
-static bool
-xxlcz_branching_imm_operand (const enum rtx_code code, const rtx *op1)
-{
-  if (!CONSTANT_P (*op1) || !TARGET_XXLCZBRI)
-    return false;
-
-  if (code != EQ && code != NE)
-    return false;
-
-  if (code == EQ && !TARGET_XXLCZBRI)
-    return false;
-
-  if (code == NE && !TARGET_XXLCZBRI)
-    return false;
-
-  return imm5z_operand (*op1, VOIDmode);
-}
-
 /* Sign- or zero-extend OP0 and OP1 for integer comparisons.  */
 
 static void
@@ -5105,9 +5083,6 @@ riscv_extend_comparands (rtx_code code, rtx *op0, rtx *op1)
 
 	  if (*op1 != const0_rtx)
 	    riscv_sign_extend_if_not_subreg_prom (op1);
-	  *op0 = gen_rtx_SIGN_EXTEND (word_mode, *op0);
-	  if (*op1 != const0_rtx && !xxlcz_branching_imm_operand (code, op1))
-	    *op1 = gen_rtx_SIGN_EXTEND (word_mode, *op1);
 	}
     }
 }
@@ -5182,7 +5157,7 @@ riscv_emit_int_compare (enum rtx_code *code, rtx *op0, rtx *op1,
   riscv_extend_comparands (*code, op0, op1);
 
   *op0 = force_reg (word_mode, *op0);
-  if (*op1 != const0_rtx && !xxlcz_branching_imm_operand (*code, op1))
+  if (*op1 != const0_rtx)
     *op1 = force_reg (word_mode, *op1);
 }
 
