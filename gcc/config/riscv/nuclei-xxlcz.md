@@ -1,42 +1,6 @@
 ;; Post modified load and store
 
 
-;; xlczbri Instructions
-(define_insn "*xl_branch<mode>"
-  [(set (pc)
-    (if_then_else
-     (match_operator 1 "equality_operator"
-             [(match_operand:X 2 "register_operand" "r")
-              (match_operand:X 3 "const_int5s_operand" "xl_bi_sign5")])
-     (label_ref (match_operand 0 "" ""))
-     (pc)))]
-  "TARGET_XXLCZBRI"
-{
-  if (get_attr_length (insn) == 12)
-    return "xl.b%N1\t%2,%z3,1f; jump\t%l0,ra; 1:";
-
-  return "xl.b%C1i\t%2,%3,%0";
-}
-  [(set_attr "type" "branch")
-   (set_attr "mode" "none")])
-
-(define_insn "*branch<mode>"
-  [(set (pc)
-        (if_then_else
-         (match_operator 1 "ordered_comparison_operator"
-                         [(match_operand:X 2 "register_operand" "r")
-                          (match_operand:X 3 "reg_or_0_operand" "rJ")])
-         (label_ref (match_operand 0 "" ""))
-         (pc)))]
-  "TARGET_XXLCZBRI"
-{
-  if (get_attr_length (insn) == 12)
-    return "b%N1\t%2,%z3,1f; jump\t%l0,ra; 1:";
-
-  return "b%C1\t%2,%z3,%l0";
-}
-  [(set_attr "type" "branch")
-   (set_attr "mode" "none")])
    
 (define_insn "load<mode>_ind_postinc"
   [(set (match_operand:SUBDISF 0 "register_operand" "=r")
