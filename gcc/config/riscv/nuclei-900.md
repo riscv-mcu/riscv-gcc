@@ -1,107 +1,135 @@
-;;(define_automaton "nuclei_100")
-
 (define_automaton "nuclei_900")
-(define_cpu_unit "nuclei_900_alu" "nuclei_900")
-(define_cpu_unit "nuclei_900_imuldiv" "nuclei_900")
-(define_cpu_unit "nuclei_900_fdivsqrt" "nuclei_900")
 
-(define_insn_reservation "nuclei_900_alu" 1
-  (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "unknown,const,arith,shift,slt,multi,auipc,nop,logical,\
-			move,bitmanip,min,max,minu,maxu,clz,ctz,rotate,atomic,\
-			condmove,crypto,mvpair,zicond"))
-  "nuclei_900_alu")
+(define_cpu_unit "nuclei_900_A" "nuclei_900")
+(define_cpu_unit "nuclei_900_B" "nuclei_900")
+
+(define_cpu_unit "nuclei_900_idiv" "nuclei_900")
+(define_cpu_unit "nuclei_900_fpu" "nuclei_900")
 
 (define_insn_reservation "nuclei_900_load" 3
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "load,fpload"))
-  "nuclei_900_alu")
+       (eq_attr "type" "load"))
+  "nuclei_900_A")
 
-(define_insn_reservation "nuclei_900_store" 0
+(define_insn_reservation "nuclei_900_fpload" 2
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "store,fpstore"))
-  "nuclei_900_alu")
+       (eq_attr "type" "fpload"))
+  "nuclei_900_A")
 
-(define_insn_reservation "nuclei_900_xfer" 4
+(define_insn_reservation "nuclei_900_store" 1
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "mfc,mtc,fcvt,fcvt_i2f,fcvt_f2i,fmove,fcmp"))
-  "nuclei_900_alu")
+       (eq_attr "type" "store"))
+  "nuclei_900_A")
+
+(define_insn_reservation "nuclei_900_fpstore" 1
+  (and (eq_attr "tune" "nuclei_900")
+       (eq_attr "type" "fpstore"))
+  "nuclei_900_A")
 
 (define_insn_reservation "nuclei_900_branch" 1
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "branch,jump,call,jalr,ret,trap"))
-  "nuclei_900_alu")
+       (eq_attr "type" "branch,ret,trap"))
+  "nuclei_900_B")
 
 (define_insn_reservation "nuclei_900_sfb_alu" 2
   (and (eq_attr "tune" "nuclei_900")
        (eq_attr "type" "sfb_alu"))
-  "nuclei_900_alu")
+  "nuclei_900_A+nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_imul" 10
+(define_insn_reservation "nuclei_900_jump" 1
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "imul,clmul,cpop"))
-  "nuclei_900_imuldiv*10")
+       (eq_attr "type" "jump,call,jalr"))
+  "nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_idivsi" 33
+(define_insn_reservation "nuclei_900_mul" 10
   (and (eq_attr "tune" "nuclei_900")
-       (and (eq_attr "type" "idiv")
-	    (eq_attr "mode" "SI")))
-  "nuclei_900_imuldiv*33")
+       (eq_attr "type" "imul"))
+  "nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_idivdi" 66
+(define_insn_reservation "nuclei_900_div" 16
   (and (eq_attr "tune" "nuclei_900")
-       (and (eq_attr "type" "idiv")
-	    (eq_attr "mode" "DI")))
-  "nuclei_900_imuldiv*66")
+       (eq_attr "type" "idiv"))
+  "nuclei_900_B,nuclei_900_idiv*15")
 
-(define_insn_reservation "nuclei_900_fmul_half" 4
+(define_insn_reservation "nuclei_900_alu" 2
+  (and (eq_attr "tune" "nuclei_900")
+       (eq_attr "type" "unknown,arith,shift,slt,multi,logical,move,bitmanip,\
+			rotate,min,max,minu,maxu,clz,ctz,atomic,condmove,mvpair,zicond"))
+  "nuclei_900_A|nuclei_900_B")
+
+(define_insn_reservation "nuclei_900_load_immediate" 1
+  (and (eq_attr "tune" "nuclei_900")
+       (eq_attr "type" "nop,const,auipc"))
+  "nuclei_900_A|nuclei_900_B")
+
+(define_insn_reservation "nuclei_900_hfma" 5
   (and (eq_attr "tune" "nuclei_900")
        (and (eq_attr "type" "fadd,fmul,fmadd")
 	    (eq_attr "mode" "HF")))
-  "nuclei_900_alu")
+  "nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_fmul_single" 4
+(define_insn_reservation "nuclei_900_sfma" 5
   (and (eq_attr "tune" "nuclei_900")
        (and (eq_attr "type" "fadd,fmul,fmadd")
 	    (eq_attr "mode" "SF")))
-  "alu")
+  "nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_fmul_double" 8
+(define_insn_reservation "nuclei_900_dfma" 7
   (and (eq_attr "tune" "nuclei_900")
        (and (eq_attr "type" "fadd,fmul,fmadd")
 	    (eq_attr "mode" "DF")))
-  "nuclei_900_alu")
+  "nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_fdiv" 20
+(define_insn_reservation "nuclei_900_fp_other" 3
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "fdiv"))
-  "nuclei_900_fdivsqrt*20")
+       (eq_attr "type" "fcvt,fcvt_i2f,fcvt_f2i,fcmp,fmove"))
+  "nuclei_900_B")
 
-(define_insn_reservation "nuclei_900_fsqrt" 25
+(define_insn_reservation "nuclei_900_fdiv_s" 33
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "fsqrt"))
-  "nuclei_900_fdivsqrt*25")
+       (eq_attr "type" "fdiv,fsqrt")
+       (eq_attr "mode" "SF"))
+  "nuclei_900_B,nuclei_900_fpu*32")
 
-;; DSP SIMD
-(define_insn_reservation "nuclei_900_dsp_simd_insn" 2
+(define_insn_reservation "nuclei_900_fdiv_d" 66
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "simd"))
-  "nuclei_900_alu")
+       (eq_attr "type" "fdiv,fsqrt")
+       (eq_attr "mode" "DF"))
+  "nuclei_900_B,nuclei_900_fpu*65")
 
-;; DSP Partial SIMD
-(define_insn_reservation "nuclei_900_dsp_psimd_insn" 3
+(define_insn_reservation "nuclei_900_i2f" 3
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "psimd"))
-  "nuclei_900_alu")
+       (eq_attr "type" "mtc"))
+  "nuclei_900_A")
 
-;; DSP Others
-(define_insn_reservation "nuclei_900_dsp_other_insn" 3
+(define_insn_reservation "nuclei_900_f2i" 3
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "dsp, dsp64"))
-  "nuclei_900_alu")
+       (eq_attr "type" "mfc"))
+  "nuclei_900_A")
 
-;; BMU
-(define_insn_reservation "nuclei_900_bitmanip_insn" 1
+;; Popcount and clmul.
+(define_insn_reservation "nuclei_900_popcount" 2
   (and (eq_attr "tune" "nuclei_900")
-       (eq_attr "type" "bitmanip"))
-  "nuclei_900_alu")
+       (eq_attr "type" "cpop,clmul"))
+  "nuclei_900_A")
+
+(define_bypass 1 "nuclei_900_load,nuclei_900_alu,nuclei_900_mul,nuclei_900_f2i,nuclei_900_sfb_alu"
+  "nuclei_900_alu,nuclei_900_branch")
+
+(define_bypass 1 "nuclei_900_alu,nuclei_900_sfb_alu"
+  "nuclei_900_sfb_alu")
+
+(define_bypass 1 "nuclei_900_load,nuclei_900_alu,nuclei_900_mul,nuclei_900_f2i,nuclei_900_sfb_alu"
+  "nuclei_900_store" "riscv_store_data_bypass_p")
+
+(define_bypass 2 "nuclei_900_i2f"
+  "nuclei_900_sfma,nuclei_900_dfma,nuclei_900_fp_other,nuclei_900_fdiv_s,nuclei_900_fdiv_d")
+
+(define_bypass 2 "nuclei_900_fp_other"
+  "nuclei_900_sfma,nuclei_900_dfma,nuclei_900_fp_other,nuclei_900_fdiv_s,nuclei_900_fdiv_d")
+
+(define_bypass 2 "nuclei_900_fp_other"
+  "nuclei_900_alu,nuclei_900_branch")
+
+(define_bypass 2 "nuclei_900_fp_other"
+  "nuclei_900_store" "riscv_store_data_bypass_p")
