@@ -720,6 +720,14 @@
 ;; psimd  partial-simd data processing instructions
 ;; dsp    instructions for increasing the DSP processing capabilities
 ;; dsp64  as the same as dsp, but RV64P only
+;; vdsop  xxlvw extension vector dynamic scaling instructions
+;; vcpack xxlvw extension vector complex image unpacking instructions
+;; vlsb   xxlvw extension vector leading sign bits instructions
+;; vperm  xxlvw extension vector permutation instructions
+;; vfsop  xxlvw extension vector funnel shift left/right instructions
+;; vlnlp  xxlvw extension vector load nonlinear parameter instruction
+;; vconvert xxlvw extension format conversion instructions
+
 (define_attr "type"
   "unknown,branch,jump,jalr,ret,call,load,fpload,store,fpstore,mac,
    mtc,mfc,const,arith,logical,shift,slt,imul,idiv,move,fmove,fadd,fmul,
@@ -731,7 +739,7 @@
    vlsegde,vssegte,vlsegds,vssegts,vlsegdux,vlsegdox,vssegtux,vssegtox,vlsegdff,
    vialu,viwalu,vext,vicalu,vshift,vnshift,vicmp,viminmax,
    vimul,vidiv,viwmul,vimuladd,xl_vqmacc,viwmuladd,vimerge,vimov,
-   vsalu,vaalu,vsmul,vsshift,vnclip,
+   vsalu,vaalu,vsmul,vsshift,vnclip,vdsop,vcpack,vlsb,vperm,vfsop,vlnlp,vconvert,
    vfalu,vfwalu,vfmul,vfdiv,vfwmul,vfmuladd,vfwmuladd,vfsqrt,vfrecp,
    vfcmp,vfminmax,vfsgnj,vfclass,vfmerge,vfmov,
    vfcvtitof,vfcvtftoi,vfwcvtitof,vfwcvtftoi,
@@ -4852,6 +4860,7 @@
 (include "vector-crypto.md")
 (include "vector-bfloat16.md")
 (include "xl-vbfloat16.md")
+(include "xl-zvw.md")
 (include "zicond.md")
 (include "sfb.md")
 (include "zc.md")

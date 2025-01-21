@@ -60,6 +60,9 @@ extern const function_shape *const crypto_vv;
 extern const function_shape *const crypto_vi;
 extern const function_shape *const crypto_vv_no_op_type;
 extern const function_shape *const xl_vqmacc;
+extern const function_shape *const vdsmul;
+extern const function_shape *const xxlvw;
+extern const function_shape *const xl_vlsb;
 }
 
 } // end namespace riscv_vector

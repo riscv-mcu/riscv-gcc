@@ -129,6 +129,7 @@ enum required_ext
   ZVFBFWMA_EXT,		/* Zvfbfwma extension */
   XXLVQMACC_EXT,	/* XXLVQMACC extension */
   XXLVFBF_EXT,          /* Xxlvfbf extension */
+  XXLVW_EXT,        /*Xxlvw extension */
   /* Please update below to isa_name func when add or remove enum type(s).  */
 };
 
@@ -166,6 +167,8 @@ static inline const char * required_ext_to_isa_name (enum required_ext required)
       return "xxlvqmacc";
     case XXLVFBF_EXT:
       return "xxlvfbf";
+    case XXLVW_EXT:
+      return "xxlvw";
     default:
       gcc_unreachable ();
   }
@@ -207,6 +210,8 @@ static inline bool required_extensions_specified (enum required_ext required)
       return TARGET_XXLVQMACC;
     case XXLVFBF_EXT:
       return TARGET_XXLVFBF;
+    case XXLVW_EXT:
+      return TARGET_XXLVW;
     default:
       gcc_unreachable ();
   }
@@ -351,6 +356,8 @@ struct function_group_info
        return TARGET_XXLVQMACC;
       case XXLVFBF_EXT:
        return TARGET_XXLVFBF;
+      case XXLVW_EXT:
+       return TARGET_XXLVW;
       default:
         gcc_unreachable ();
     }

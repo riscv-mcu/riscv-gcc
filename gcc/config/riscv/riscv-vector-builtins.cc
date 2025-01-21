@@ -186,6 +186,13 @@ static const rvv_type_info wi_ops[] = {
 #include "riscv-vector-builtins-types.def"
   {NUM_VECTOR_TYPES, 0}};
 
+/* A list of all signed integer can be widened will be registered for intrinsic
+ * functions.  */
+static const rvv_type_info vlen_ops[] = {
+#define DEF_RVV_VLEN_OPS(TYPE, REQUIRE) {VECTOR_TYPE_##TYPE, REQUIRE},
+#include "riscv-vector-builtins-types.def"
+  {NUM_VECTOR_TYPES, 0}};
+
 /* A list of all unsigned integer can be widened will be registered for
  * intrinsic functions.  */
 static const rvv_type_info wu_ops[] = {
@@ -746,6 +753,10 @@ static CONSTEXPR const rvv_arg_type_info shift_wv_args[]
 /* A list of args for vector_type func (vector_type) function.  */
 static CONSTEXPR const rvv_arg_type_info v_args[]
   = {rvv_arg_type_info (RVV_BASE_vector), rvv_arg_type_info_end};
+
+/* A list of args for vector_type func (vector_type) function.  */
+static CONSTEXPR const rvv_arg_type_info s_args[]
+  = {rvv_arg_type_info (RVV_BASE_scalar), rvv_arg_type_info_end};
 
 /* A list of args for vector_type func (vector_type) function.  */
 static CONSTEXPR const rvv_arg_type_info v_x2_trunc_args[]
@@ -3042,6 +3053,116 @@ static CONSTEXPR const rvv_op_info xl_u_to_nbf16_xu_w_ops
   = {u32_ops,		 			     /* Types */
      OP_TYPE_xu_w,					     /* Suffix */
      rvv_arg_type_info (RVV_BASE_double_trunc_bfloat_vector), /* Return type */
+     v_args /* Args */};
+
+/*xxlvw extension*/
+static CONSTEXPR const rvv_op_info xxlvw_vv_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_vv,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vv_args /* Args */};
+
+static CONSTEXPR const rvv_op_info xxlvw_vs_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_vs,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vv_args /* Args */};
+
+static CONSTEXPR const rvv_op_info xxlvw_vi_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_vi,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vx_args /* Args */};
+
+/* vcpack.vv/vcunpackr.v/vcunpacki.v Args*/
+static CONSTEXPR const rvv_op_info i32_vv_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_vv,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vv_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_vs_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_vs,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vv_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_v_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info vds_v_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info vds_x_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_x,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     x_args /* Args */};
+
+static CONSTEXPR const rvv_op_info xxlvw_v_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info xxlvw_vx_ops
+  = {wi_ops,		 			     /* Types */
+     OP_TYPE_vx,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vx_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_s_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_s,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     s_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i16_v_ops
+  = {i16_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     w_v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_quad_v_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vf4_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_double_trunc_v_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
+     vf2_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i16_i8_v_ops
+  = {i16_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_double_trunc_vector), /* Return type */
+     v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_i8_v_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_quad_trunc_vector), /* Return type */
+     v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info i32_i16_v_ops
+  = {i32_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_double_trunc_vector), /* Return type */
+     v_args /* Args */};
+
+static CONSTEXPR const rvv_op_info vlnlp_v_ops
+  = {vlen_ops,		 			     /* Types */
+     OP_TYPE_v,					     /* Suffix */
+     rvv_arg_type_info (RVV_BASE_vector), /* Return type */
      v_args /* Args */};
 
 /* A list of all RVV base function types.  */

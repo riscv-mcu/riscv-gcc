@@ -380,6 +380,179 @@ public:
   }
 };
 
+template<int UNSPEC>
+class vds_binop : public function_base
+{
+public:
+  bool may_require_frm_p () const override { return true; }
+
+  rtx expand (function_expander &e) const override
+  {
+    if (e.op_info->op == OP_TYPE_vv)
+      return e.use_exact_insn (code_for_pred_vds_vv (UNSPEC, e.vector_mode ()));
+    if (e.op_info->op == OP_TYPE_vs)
+      return e.use_exact_insn (code_for_pred_vds_vs (UNSPEC, e.vector_mode ()));
+    gcc_unreachable ();
+  }
+};
+
+class vcpack : public function_base
+{
+public:
+  bool may_require_frm_p () const override { return true; }
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vcpack (e.vector_mode ()));
+  }
+};
+
+class vcunpackr : public function_base
+{
+public:
+  bool may_require_frm_p () const override { return true; }
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vcunpackr (e.vector_mode ()));
+  }
+};
+
+class vcunpacki : public function_base
+{
+public:
+  bool may_require_frm_p () const override { return true; }
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vcunpacki (e.vector_mode ()));
+  }
+};
+
+/* Implements  vdsmacini.v/vdsmacini.s/vdsmacini.i */
+class vdsmacini : public function_base
+{
+public:
+  bool can_be_overloaded_p (enum predication_type_index pred) const override
+  {
+    return false;
+  }
+  rtx expand (function_expander &e) const override
+  {
+    switch (e.op_info->op)
+      {
+      case OP_TYPE_v:
+	return e.use_exact_insn (code_for_pred_vdsmacini_v (e.vector_mode ()));
+      case OP_TYPE_x:
+	return e.use_exact_insn (code_for_pred_vdsmacini_x (e.vector_mode ()));
+      default:
+	gcc_unreachable ();
+      }
+  }
+};
+
+template<int UNSPEC>
+class xxlvw_uniop : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_v (UNSPEC, e.vector_mode ()));
+  }
+};
+
+class vdsredsumn : public function_base
+{
+public:
+  bool can_be_overloaded_p (enum predication_type_index pred) const override
+  {
+    return false;
+  }
+  rtx expand (function_expander &e) const override
+  {
+    switch (e.op_info->op)
+    {
+      case OP_TYPE_vx:
+	      return e.use_exact_insn (code_for_pred_vdsredsumn_vx (e.vector_mode ()));
+      case OP_TYPE_vi:
+	      return e.use_exact_insn (code_for_pred_vdsredsumn_vi (e.vector_mode ()));
+      default:
+	      gcc_unreachable ();
+    }
+  }
+};
+
+template<int UNSPEC>
+class xxlvw_binop : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+    switch (e.op_info->op)
+    {
+      case OP_TYPE_vv:
+	      return e.use_exact_insn (code_for_pred_v_vv (UNSPEC, e.vector_mode ()));
+      case OP_TYPE_vs:
+	      return e.use_exact_insn (code_for_pred_v_vs (UNSPEC, e.vector_mode ()));
+      default:
+	      gcc_unreachable ();
+    }
+  }
+};
+
+class vperm : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vperm_vi (e.vector_mode ()));
+  }
+};
+
+template<int UNSPEC>
+class vlnlp : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vlnlp_v (UNSPEC,e.vector_mode ()));
+  }
+};
+template<int UNSPEC>
+class xxlvw_vfs : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vfs_vv (UNSPEC, e.vector_mode ()));
+  }
+};
+
+template<int UNSPEC>
+class xxlvw_vfcvt : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vfcvt (UNSPEC, e.vector_mode ()));
+  }
+};
+
+class vfcvt_b2w : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vfcvt_b2w (e.vector_mode ()));
+  }
+};
+
+class xl_vfcvt_w2b : public function_base
+{
+public:
+  rtx expand (function_expander &e) const override
+  {
+      return e.use_exact_insn (code_for_pred_vfcvt_w2b (e.vector_mode ()));
+  }
+};
+
 static CONSTEXPR const xl_vqmacc xl_vqmacc_obj;
 static CONSTEXPR const xl_vqmaccu xl_vqmaccu_obj;
 static CONSTEXPR const xl_vqmaccsu xl_vqmaccsu_obj;
@@ -416,7 +589,49 @@ static CONSTEXPR const xl_vfwcvt_f xl_vfwcvt_f_obj;
 static CONSTEXPR const xl_vfncvt_f<NO_FRM> xl_vfncvt_f_obj;
 static CONSTEXPR const xl_vfncvt_f<HAS_FRM> xl_vfncvt_f_frm_obj;
 static CONSTEXPR const xl_vfncvt_rod_f xl_vfncvt_rod_f_obj;
-
+static CONSTEXPR const vds_binop<UNSPEC_VDS_MUL> vdsmul_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_MACO> vdsmaco_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMUL> vdscmul_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULJ> vdscmulj_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACO> vdscmaco_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACJO> vdscmacjo_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACOR> vdscmacor_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACOI> vdscmacoi_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACJOR> vdscmacjor_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACJOI> vdscmacjoi_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULR> vdscmulr_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULI> vdscmuli_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULJR> vdscmuljr_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULJI> vdscmulji_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_MAC> vdsmac_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMAC> vdscmac_obj;
+static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACJ> vdscmacj_obj;
+static CONSTEXPR const vcpack vcpack_obj;
+static CONSTEXPR const vcunpackr vcunpackr_obj;
+static CONSTEXPR const vcunpacki vcunpacki_obj;
+static CONSTEXPR const vdsmacini vdsmacini_obj;
+static CONSTEXPR const xxlvw_uniop<UNSPEC_VLSB> xl_vlsb_obj;
+static CONSTEXPR const xxlvw_uniop<UNSPEC_VCONJ> vconj_obj;
+static CONSTEXPR const xxlvw_uniop<UNSPEC_VDS_CREDSUM> vdscredsum_obj;
+static CONSTEXPR const xxlvw_uniop<UNSPEC_VDS_REDSUM> vdsredsum_obj;
+static CONSTEXPR const vdsredsumn vdsredsumn_obj;
+static CONSTEXPR const xxlvw_binop<UNSPEC_VREDMAXI> vredmaxi_obj;
+static CONSTEXPR const xxlvw_binop<UNSPEC_VREDMINI> vredmini_obj;
+static CONSTEXPR const xxlvw_binop<UNSPEC_VNLE> vnle_obj;
+static CONSTEXPR const xxlvw_binop<UNSPEC_VNLM> vnlm_obj;
+static CONSTEXPR const vperm vperm_obj;
+static CONSTEXPR const xxlvw_vfs<UNSPEC_VFSL> vfsl_obj;
+static CONSTEXPR const xxlvw_vfs<UNSPEC_VFSR> vfsr_obj;
+static CONSTEXPR const vlnlp<UNSPEC_VLNLP0> vlnlp0_obj;
+static CONSTEXPR const vlnlp<UNSPEC_VLNLP1> vlnlp1_obj;
+static CONSTEXPR const xxlvw_vfcvt<UNSPEC_VFCVT_B2H> vfcvt_b2h_obj;
+static CONSTEXPR const vfcvt_b2w vfcvt_b2w_obj;
+static CONSTEXPR const xxlvw_vfcvt<UNSPEC_VFCVT_H2W> vfcvt_h2w_obj;
+static CONSTEXPR const xxlvw_vfcvt<UNSPEC_VFCVT_H2B> xl_vfcvt_h2b_obj;
+static CONSTEXPR const xl_vfcvt_w2b xl_vfcvt_w2b_obj;
+static CONSTEXPR const xxlvw_vfcvt<UNSPEC_VFCVT_W2H> xl_vfcvt_w2h_obj;
+static CONSTEXPR const xxlvw_vfcvt<UNSPEC_VFCVT_P2C> vfcvt_p2c_obj;
+static CONSTEXPR const xxlvw_vfcvt<UNSPEC_VFCVT_C2P> xl_vfcvt_c2p_obj;
 
 /* Declare the function base NAME, pointing it to an instance
    of class <NAME>_obj.  */
@@ -460,5 +675,48 @@ BASE (xl_vfwcvt_f)
 BASE (xl_vfncvt_f)
 BASE (xl_vfncvt_f_frm)
 BASE (xl_vfncvt_rod_f)
-
+/*xxlvw extension*/
+BASE (vdsmul)
+BASE (vcpack)
+BASE (vcunpackr)
+BASE (vcunpacki)
+BASE (vdsmacini)
+BASE (xl_vlsb)
+BASE (vconj)
+BASE (vdscmul)
+BASE (vdscmulj)
+BASE (vdscredsum)
+BASE (vdscmaco)
+BASE (vdscmacjo)
+BASE (vdscmacor)
+BASE (vdscmacoi)
+BASE (vdscmacjor)
+BASE (vdscmacjoi)
+BASE (vdscmulr)
+BASE (vdscmuli)
+BASE (vdscmuljr)
+BASE (vdscmulji)
+BASE (vdsredsum)
+BASE (vdsredsumn)
+BASE (vredmaxi)
+BASE (vredmini)
+BASE (vperm)
+BASE (vfsl)
+BASE (vfsr)
+BASE (vlnlp0)
+BASE (vlnlp1)
+BASE (vnle)
+BASE (vnlm)
+BASE (vdsmac)
+BASE (vdscmac)
+BASE (vdscmacj)
+BASE (vdsmaco)
+BASE (vfcvt_b2h)
+BASE (vfcvt_b2w)
+BASE (vfcvt_h2w)
+BASE (xl_vfcvt_h2b)
+BASE (xl_vfcvt_w2b)
+BASE (xl_vfcvt_w2h)
+BASE (vfcvt_p2c)
+BASE (xl_vfcvt_c2p)
 } // end namespace riscv_vector

@@ -117,6 +117,18 @@
   (and (match_code "const_int")
        (match_test "IN_RANGE (ival, 1, 3)")))
 
+(define_constraint "Ds4"
+  "@internal
+   1, 2 , 3 or 4 immediate"
+  (and (match_code "const_int")
+       (match_test "IN_RANGE (ival, 1, 4)")))
+
+(define_constraint "Ds8"
+  "@internal
+   [ 0-8 ] immediate"
+  (and (match_code "const_int")
+       (match_test "IN_RANGE (ival, 0, 8)")))
+
 (define_constraint "DsS"
   "@internal
    31 immediate"
