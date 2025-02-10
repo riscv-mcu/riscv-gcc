@@ -307,6 +307,8 @@ struct riscv_tune_param
 /*nuclei rvp autovec flags*/
 bool riscv_rvp_autovec_p = false;
 
+bool riscv_rvv_autovec_p = false;
+
 /* Whether unaligned accesses execute very slowly.  */
 bool riscv_slow_unaligned_access_p;
 
@@ -7559,11 +7561,12 @@ riscv_avoid_multi_push (const struct riscv_frame_info *frame)
   if (!TARGET_ZCMP || crtl->calls_eh_return || frame_pointer_needed
       || cfun->machine->interrupt_handler_p || cfun->machine->varargs_size != 0
       || crtl->args.pretend_args_size != 0
+      || (TARGET_VECTOR && riscv_rvv_autovec_p)
       || (use_shrink_wrapping_separate ()
 	  && !riscv_avoid_shrink_wrapping_separate ())
       || (frame->mask & ~MULTI_PUSH_GPR_MASK))
     return true;
-
+  
   return false;
 }
 
@@ -7787,12 +7790,12 @@ riscv_compute_frame_info (void)
 	  frame->save_libcall_adjustment = x_save_size;
 	}
 
-      if (!riscv_avoid_multi_push (frame))
+  if (!riscv_avoid_multi_push (frame))
 	{
 	  /* num(ra, s0-sx)  */
 	  unsigned num_multi_push = riscv_multi_push_regs_count (frame->mask);
-	  x_save_size = riscv_stack_align (num_multi_push * UNITS_PER_WORD);
-	  frame->multi_push_adj_base = riscv_16bytes_align (x_save_size);
+	  x_save_size = riscv_stack_align (num_multi_push * UNITS_PER_WORD);    
+    frame->multi_push_adj_base = riscv_16bytes_align (x_save_size);
 	}
     }
 
@@ -7816,9 +7819,9 @@ riscv_compute_frame_info (void)
   /* Next are the callee-saved VRs.  */
   if (frame->vmask)
     offset += riscv_stack_align (num_v_saved * UNITS_PER_V_REG);
-  frame->v_sp_offset_top = offset;
-  frame->v_sp_offset_bottom
-    = frame->v_sp_offset_top - num_v_saved * UNITS_PER_V_REG;
+    frame->v_sp_offset_top = offset;
+    frame->v_sp_offset_bottom
+      = frame->v_sp_offset_top - num_v_saved * UNITS_PER_V_REG;
   /* Next are the callee-saved FPRs. */
   if (frame->fmask)
     offset += riscv_stack_align (num_f_saved * UNITS_PER_FP_REG);
@@ -12584,6 +12587,11 @@ riscv_autovectorize_vector_modes (vector_modes *modes, bool all)
   if(TARGET_ZPN || TARGET_ZPRV || TARGET_ZPSF || TARGET_XXLDSP || TARGET_XXLDSPN1X || TARGET_XXLDSPN2X || TARGET_XXLDSPN3X)
   {
     riscv_rvp_autovec_p = true;
+  }
+
+  if(TARGET_VECTOR)
+  {
+    riscv_rvv_autovec_p = true;
   }
 
   if (TARGET_VECTOR && !TARGET_XTHEADVECTOR)
