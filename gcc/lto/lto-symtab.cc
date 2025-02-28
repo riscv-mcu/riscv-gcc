@@ -1016,7 +1016,6 @@ lto_symtab_merge_symbols (void)
 		  || node->resolution == LDPR_RESOLVED_EXEC
 		  || node->resolution == LDPR_RESOLVED_DYN))
 	    {
-	      DECL_EXTERNAL (node->decl) = 1;
 	      /* If alias to local symbol was preempted by external definition,
 		 we know it is not pointing to the local symbol.  Remove it.  */
 	      if (node->alias
@@ -1043,6 +1042,7 @@ lto_symtab_merge_symbols (void)
 		    }
 		  node->body_removed = true;
 		}
+	      DECL_EXTERNAL (node->decl) = 1;
 	    }
 
 	  if (!(cnode = dyn_cast <cgraph_node *> (node))
