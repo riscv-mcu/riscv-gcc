@@ -11650,6 +11650,67 @@ change_zero_ext (rtx pat)
   return changed;
 }
 
+
+static bool allow_volatile_insns_recog (rtx pat, rtx_insn *insn)
+{
+  /* Allow combining volatile store of subreg+any_extend
+   * as the store implies kind of any_extend operation.
+   * We check that the combination has:
+   *   1. rYYY=any_extend(rXXX#0)
+   *   2. [mem/v]=(rYYY#0 or rXXX#0)
+   *   3. REG_DEAD(rYYY)
+   */
+  if (GET_CODE (pat) == SET && MEM_P (XEXP (pat, 0))
+      && MEM_VOLATILE_P (XEXP (pat, 0))
+      && GET_CODE (XEXP (pat, 1)) == SUBREG
+      && known_eq (SUBREG_BYTE (XEXP (pat, 1)), 0)
+      && REG_P (SUBREG_REG (XEXP (pat, 1))))
+  {
+    unsigned int regno = REGNO (SUBREG_REG (XEXP (pat, 1)));
+    rtx_insn *maybe_any_extend = prev_nonnote_nondebug_insn (insn);
+    if (!maybe_any_extend)
+      return false;
+    rtx xpat = PATTERN (maybe_any_extend);
+
+    /* check that prev insn is any_extend */
+    if (GET_CODE (xpat) != SET || !REG_P (XEXP (xpat, 0)))
+      return false;
+    if (GET_CODE (XEXP (xpat, 1)) != ZERO_EXTEND && GET_CODE (XEXP (xpat, 1)) != SIGN_EXTEND)
+      return false;
+    /* and the mode of extend src and store src is the same */
+    if (GET_MODE (XEXP (pat, 1)) != GET_MODE (XEXP (XEXP (xpat, 1), 0)))
+      return false;
+
+    /* figure out which register rXXX or rYYY is the regno for store */
+    /* if regno is rXXX we expect to see rYYY to be dead */
+    if (regno != REGNO (XEXP (xpat, 0)) && REGNO (SUBREG_REG (XEXP (XEXP (xpat, 1), 0))) == regno)
+      regno = REGNO (XEXP (xpat, 0));
+
+    rtx link;
+    for (link = REG_NOTES (insn); link; link = XEXP (link, 1))
+      if (REG_NOTE_KIND (link) == REG_DEAD && REG_P (XEXP (link, 0)) && REGNO (XEXP (link, 0)) == regno)
+        return true;
+
+    /* dead notes may be not distributed here, let's find it in combined insn. */
+    for (link = REG_NOTES (maybe_any_extend); link; link = XEXP (link, 1))
+      if (REG_NOTE_KIND (link) == REG_DEAD && REG_P (XEXP (link, 0)) && REGNO (XEXP (link, 0)) == regno)
+        return true;
+  }
+
+  /* Allow combining volatile load with any_extend.
+   * As the load might imply any_extend operation.
+   */
+  if (GET_CODE (pat) == SET && REG_P (XEXP (pat, 0))
+      && (GET_CODE (XEXP (pat, 1)) == ZERO_EXTEND || GET_CODE (XEXP (pat, 1)) == SIGN_EXTEND)
+      && MEM_P (XEXP (XEXP (pat, 1), 0))
+      && MEM_VOLATILE_P (XEXP (XEXP (pat, 1), 0)))
+    {
+      return true;
+    }
+
+  return false;
+}
+
 /* Like recog, but we receive the address of a pointer to a new pattern.
    We try to match the rtx that the pointer points to.
    If that fails, we may try to modify or replace the pattern,
@@ -11670,6 +11731,7 @@ static int
 recog_for_combine (rtx *pnewpat, rtx_insn *insn, rtx *pnotes)
 {
   rtx pat = *pnewpat;
+  temporary_volatile_ok v (allow_volatile_insns_recog (pat, insn));
   int insn_code_number = recog_for_combine_1 (pnewpat, insn, pnotes);
   if (insn_code_number >= 0 || check_asm_operands (pat))
     return insn_code_number;
