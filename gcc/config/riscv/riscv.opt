@@ -554,6 +554,10 @@ Mask(ZCLSD)      Var(riscv_zilsd_subext)
 
 Mask(ZIBI) Var(riscv_zi_subext)
 
+Mask(SMDBLTRP) Var(riscv_sm_subext)
+
+Mask(SSDBLTRP) Var(riscv_ss_subext)
+
 TargetVariable
 int riscv_xxlvqmacc_subext
 

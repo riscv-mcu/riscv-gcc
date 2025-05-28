@@ -481,6 +481,9 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   
   {"zibi",   ISA_SPEC_CLASS_NONE, 0, 1},
 
+  {"smdbltrp",   ISA_SPEC_CLASS_NONE, 1, 0},
+  {"ssdbltrp",   ISA_SPEC_CLASS_NONE, 1, 0},
+
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
 };
@@ -1838,6 +1841,9 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("xxlvfbf", x_riscv_vector_elen_flags, MASK_VECTOR_ELEN_BF_16),
   RISCV_EXT_FLAG_ENTRY ("xxlvfbf",  x_riscv_xxl_subext, MASK_XXLVFBF),
   RISCV_EXT_FLAG_ENTRY ("xxlvw",    x_riscv_xxlvw_subext, MASK_XXLVW),
+  
+  RISCV_EXT_FLAG_ENTRY ("smdbltrp",    x_riscv_sm_subext, MASK_SMDBLTRP),
+  RISCV_EXT_FLAG_ENTRY ("ssdbltrp",    x_riscv_ss_subext, MASK_SSDBLTRP),
 
   {NULL, NULL, NULL, 0}
 };
