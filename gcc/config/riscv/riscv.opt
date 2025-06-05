@@ -558,6 +558,8 @@ Mask(SMDBLTRP) Var(riscv_sm_subext)
 
 Mask(SSDBLTRP) Var(riscv_ss_subext)
 
+Mask(SMRNMI) Var(riscv_sm_subext)
+
 TargetVariable
 int riscv_xxlvqmacc_subext
 

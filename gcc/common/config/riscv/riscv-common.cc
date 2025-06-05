@@ -484,6 +484,8 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"smdbltrp",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"ssdbltrp",   ISA_SPEC_CLASS_NONE, 1, 0},
 
+  {"smrnmi",   ISA_SPEC_CLASS_NONE, 1, 0},
+
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
 };
@@ -1844,6 +1846,8 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   
   RISCV_EXT_FLAG_ENTRY ("smdbltrp",    x_riscv_sm_subext, MASK_SMDBLTRP),
   RISCV_EXT_FLAG_ENTRY ("ssdbltrp",    x_riscv_ss_subext, MASK_SSDBLTRP),
+
+  RISCV_EXT_FLAG_ENTRY ("smrnmi",    x_riscv_sm_subext, MASK_SMRNMI),
 
   {NULL, NULL, NULL, 0}
 };
