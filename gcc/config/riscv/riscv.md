@@ -2021,6 +2021,16 @@
   [(set_attr "type" "fcvt")
    (set_attr "mode" "HF")])
 
+(define_insn "truncdfbf2"
+  [(set (match_operand:BF     0 "register_operand" "=f")
+       (float_truncate:BF
+           (match_operand:DF 1 "register_operand" " f")))]
+  "(TARGET_XXLFBF && TARGET_DOUBLE_FLOAT) ||
+   (TARGET_XXLFBF && TARGET_ZDINX)"
+  "fcvt.h.d\t%0,%1"
+  [(set_attr "type" "fcvt")
+   (set_attr "mode" "BF")])
+
 (define_insn "truncsfbf2"
   [(set (match_operand:BF    0 "register_operand" "=f")
 	(float_truncate:BF
@@ -2230,6 +2240,16 @@
            (match_operand:HF 1 "register_operand" " f")))]
   "(TARGET_ZFHMIN && TARGET_DOUBLE_FLOAT) ||
    (TARGET_ZHINXMIN && TARGET_ZDINX)"
+  "fcvt.d.h\t%0,%1"
+  [(set_attr "type" "fcvt")
+   (set_attr "mode" "DF")])
+
+(define_insn "extendbfdf2"
+  [(set (match_operand:DF     0 "register_operand" "=f")
+       (float_extend:DF
+           (match_operand:BF 1 "register_operand" " f")))]
+  "(TARGET_XXLFBF && TARGET_DOUBLE_FLOAT) ||
+   (TARGET_XXLFBF && TARGET_ZDINX)"
   "fcvt.d.h\t%0,%1"
   [(set_attr "type" "fcvt")
    (set_attr "mode" "DF")])

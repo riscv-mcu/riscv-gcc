@@ -114,7 +114,7 @@
 
 ;; Conversion between floating-point modes and BF16.
 ;; SF to BF16 have hardware instructions.
-(define_mode_iterator FBF [HF DF TF])
+(define_mode_iterator FBF [HF TF])
 
 ;; Iterator for xxlcz pstinc.
 (define_mode_iterator SUBDISF [QI HI SI (SF "!TARGET_HARD_FLOAT")])
