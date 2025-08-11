@@ -2518,6 +2518,12 @@ Test system has an integer register width of 64 bits.
 @item riscv_a
 Test target architecture has support for the A extension.
 
+@item riscv_b_ok
+Test target architecture can execute code with B extension enabled.
+
+@item riscv_v_ok
+Test target architecture can execute code with V extension enabled.
+
 @item riscv_zaamo
 Test target architecture has support for the zaamo extension.
 
