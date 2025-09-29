@@ -242,7 +242,7 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"xxlfbf", "zfh"},
   {"xxlfbf", "zfbfmin"},
   {"xxlvfbf","xxlfbf"},
-  {"xxlvfbf","zvfbfmin"},
+  {"xxlvfbf","zvfbfwma"},
 
   {NULL, NULL}
 };
@@ -1826,6 +1826,7 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
 
   RISCV_EXT_FLAG_ENTRY ("xxlvqmacc", x_riscv_xxlvqmacc_subext, MASK_XXLVQMACC),
   RISCV_EXT_FLAG_ENTRY ("xxlfbf",   x_riscv_xxl_subext, MASK_XXLFBF),
+  RISCV_EXT_FLAG_ENTRY ("xxlvfbf", x_riscv_vector_elen_flags, MASK_VECTOR_ELEN_BF_16),
   RISCV_EXT_FLAG_ENTRY ("xxlvfbf",  x_riscv_xxl_subext, MASK_XXLVFBF),
   RISCV_EXT_FLAG_ENTRY ("xxlvw",    x_riscv_xxlvw_subext, MASK_XXLVW),
 
