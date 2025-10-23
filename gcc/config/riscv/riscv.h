@@ -106,6 +106,7 @@ extern const char *riscv_arch_help (int argc, const char **argv);
 %{march=*} \
 %{mabi=*} \
 %{mno-relax} \
+%{mno-addibne} \
 %{mbig-endian} \
 %{mlittle-endian} \
 %(subtarget_asm_spec)" \
