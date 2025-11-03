@@ -110,6 +110,8 @@ static const riscv_implied_info_t riscv_implied_info[] =
   {"zfinx", "zicsr"},
   {"zdinx", "zicsr"},
 
+  {"zicfilp", "zicsr"},
+
   {"zk", "zkn"},
   {"zk", "zkr"},
   {"zk", "zkt"},
@@ -343,6 +345,8 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
   {"ziccif",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"zicclsm",  ISA_SPEC_CLASS_NONE, 1, 0},
   {"ziccrse",  ISA_SPEC_CLASS_NONE, 1, 0},
+
+  {"zicfilp", ISA_SPEC_CLASS_NONE, 1, 0},
 
   {"zimop", ISA_SPEC_CLASS_NONE, 1, 0},
   {"zcmop", ISA_SPEC_CLASS_NONE, 1, 0},
@@ -1682,6 +1686,8 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("ziccif",      x_riscv_zi_subext, MASK_ZICCIF),
   RISCV_EXT_FLAG_ENTRY ("zicclsm",     x_riscv_zi_subext, MASK_ZICCLSM),
   RISCV_EXT_FLAG_ENTRY ("ziccrse",     x_riscv_zi_subext, MASK_ZICCRSE),
+
+  RISCV_EXT_FLAG_ENTRY ("zicfilp", x_riscv_zi_subext, MASK_ZICFILP),
 
   RISCV_EXT_FLAG_ENTRY ("zicboz", x_riscv_zicmo_subext, MASK_ZICBOZ),
   RISCV_EXT_FLAG_ENTRY ("zicbom", x_riscv_zicmo_subext, MASK_ZICBOM),
