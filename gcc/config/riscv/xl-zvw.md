@@ -254,9 +254,9 @@
 	  (unspec:<VSI_SI>
 	     [(match_operand:VSI 3 "register_operand"     " vr, vr, vr, vr")] UNSPEC_VCUNPACKR)
 	  (match_operand:<VSI_SI> 2 "vector_merge_operand" " vu,  0, vu,  0")))]
-  "TARGET_VECTOR"
+  "TARGET_VECTOR && TARGET_XXLVW"
   "vcunpackr.v\t%0,%3%p1"
-  [(set_attr "type" "vcpack")
+  [(set_attr "type" "vcunpack")
    (set_attr "mode" "<MODE>")])
 
 ;; vcunpacki
@@ -276,7 +276,7 @@
 	  (match_operand:<VSI_SI> 2 "vector_merge_operand" " vu,  0, vu,  0")))]
   "TARGET_VECTOR && TARGET_XXLVW"
   "vcunpacki.v\t%0,%3%p1"
-  [(set_attr "type" "vcpack")
+  [(set_attr "type" "vcunpack")
    (set_attr "mode" "<MODE>")])
 
 (define_insn "@pred_vdsmacini_v<mode>"
@@ -295,7 +295,7 @@
 	   (match_operand:XL_VI       2 "vector_merge_operand"  " vu,  0,  vu,   0")))]
   "TARGET_VECTOR && TARGET_XXLVW"
   "vdsmacini.v\t%3%p1"
-  [(set_attr "type" "vdsop")
+  [(set_attr "type" "vdsmacini")
    (set_attr "mode" "<MODE>")])
 
 (define_insn "@pred_vdsmacini_x<mode>"
@@ -318,7 +318,7 @@
   vdsmacini.s\t%3
   vdsmacini.i\t%3%p1
   vdsmacini.i\t%3"
-  [(set_attr "type" "vdsop,vdsop,vdsop,vdsop")
+  [(set_attr "type" "vdsmacini")
    (set_attr "mode" "<MODE>")])
 
 (define_insn "@pred_v<zvw_op>_<mode>"

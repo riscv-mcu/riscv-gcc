@@ -725,7 +725,9 @@
 ;; dsp    instructions for increasing the DSP processing capabilities
 ;; dsp64  as the same as dsp, but RV64P only
 ;; vdsop  xxlvw extension vector dynamic scaling instructions
-;; vcpack xxlvw extension vector complex image unpacking instructions
+;; vcpack xxlvw extension vector complex packing instructions
+;; vcunpack xxlvw extension vector complex real/image unpacking instruction
+;; vdsmacini xxlvw extension vector dynamic scaling MAC initialization
 ;; vlsb   xxlvw extension vector leading sign bits instructions
 ;; vperm  xxlvw extension vector permutation instructions
 ;; vfsop  xxlvw extension vector funnel shift left/right instructions
@@ -743,7 +745,7 @@
    vlsegde,vssegte,vlsegds,vssegts,vlsegdux,vlsegdox,vssegtux,vssegtox,vlsegdff,
    vialu,viwalu,vext,vicalu,vshift,vnshift,vicmp,viminmax,
    vimul,vidiv,viwmul,vimuladd,xl_vqmacc,viwmuladd,vimerge,vimov,
-   vsalu,vaalu,vsmul,vsshift,vnclip,vdsop,vcpack,vlsb,vperm,vfsop,vlnlp,vconvert,
+   vsalu,vaalu,vsmul,vsshift,vnclip,
    vfalu,vfwalu,vfmul,vfdiv,vfwmul,vfmuladd,vfwmuladd,vfsqrt,vfrecp,
    vfcmp,vfminmax,vfsgnj,vfclass,vfmerge,vfmov,
    vfcvtitof,vfcvtftoi,vfwcvtitof,vfwcvtftoi,
@@ -753,7 +755,8 @@
    vslideup,vslidedown,vislide1up,vislide1down,vfslide1up,vfslide1down,
    vgather,vcompress,vmov,vector,vandn,vbrev,vbrev8,vrev8,vclz,vctz,vcpop,vrol,vror,vwsll,
    vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,vaeskf1,vaeskf2,vaesz,
-   vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,vsm3me,vsm3c,vfncvtbf16,vfwcvtbf16,vfwmaccbf16,simd,psimd,dsp,dsp64"
+   vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,vsm3me,vsm3c,vfncvtbf16,vfwcvtbf16,vfwmaccbf16,simd,psimd,dsp,dsp64,
+   vdsop,vcpack,vcunpack,vdsmacini,vlsb,vperm,vfsop,vlnlp,vconvert"
   (cond [(eq_attr "got" "load") (const_string "load")
 
 	 ;; If a doubleword move uses these expensive instructions,

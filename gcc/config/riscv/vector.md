@@ -55,7 +55,8 @@
 			  vssegtux,vssegtox,vlsegdff,vandn,vbrev,vbrev8,vrev8,vcpop,vclz,vctz,vrol,\
 			  vror,vwsll,vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
 			  vaeskf1,vaeskf2,vaesz,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,vsm3me,vsm3c,\
-			  vfncvtbf16,vfwcvtbf16,vfwmaccbf16")
+			  vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,vcpack,vcunpack,vdsmacini,vlsb,\
+			  vperm,vfsop,vlnlp,vconvert")
 	 (const_string "true")]
 	(const_string "false")))
 
@@ -80,7 +81,8 @@
 			  vssegtux,vssegtox,vlsegdff,vandn,vbrev,vbrev8,vrev8,vcpop,vclz,vctz,vrol,\
 			  vror,vwsll,vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
 			  vaeskf1,vaeskf2,vaesz,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,vsm3me,vsm3c,\
-			  vfncvtbf16,vfwcvtbf16,vfwmaccbf16")
+			  vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,vcpack,vcunpack,vdsmacini,vlsb,\
+			  vperm,vfsop,vlnlp,vconvert")
 	 (const_string "true")]
 	(const_string "false")))
 
@@ -488,7 +490,8 @@
 			  vandn,vbrev,vbrev8,vrev8,vcpop,vclz,vctz,vrol,vror,vwsll,\
 			  vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
 			  vaeskf1,vaeskf2,vaesz,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,\
-			  vsm3me,vsm3c,vfncvtbf16,vfwcvtbf16,vfwmaccbf16")
+			  vsm3me,vsm3c,vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,vcpack,\
+			  vcunpack,vdsmacini,vlsb,vperm,vfsop,vlnlp,vconvert")
 	   (const_int INVALID_ATTRIBUTE)
 	(and (eq_attr "type" "vlde,vste,vlsegde,vssegte,vlsegds,vssegts,\
 			       vlsegdff,vssegtux,vlsegdox,vlsegdux")
@@ -797,7 +800,8 @@
 				vslideup,vslidedown,vislide1up,vislide1down,vfslide1up,vfslide1down,\
 				vgather,vldff,viwmuladd,vfwmuladd,vlsegde,vlsegds,vlsegdux,vlsegdox,vlsegdff,\
 				vandn,vbrev,vbrev8,vrev8,vrol,vror,vwsll,vclmul,vclmulh,\
-				vfncvtbf16,vfwcvtbf16,vfwmaccbf16")
+				vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,vcpack,vcunpack,vdsmacini,\
+				vlsb,vperm,vfsop,vlnlp,vconvert")
 	       (const_int 2)
 
 	       (eq_attr "type" "vimerge,vfmerge,vcompress,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
@@ -842,7 +846,7 @@
 			  vfncvtftoi,vfncvtftof,vfclass,vimovxv,vfmovfv,vcompress,\
 			  vlsegde,vssegts,vssegtux,vssegtox,vlsegdff,vbrev,vbrev8,vrev8,\
                           vghsh,vaeskf1,vaeskf2,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm3me,vsm3c,\
-			  vfncvtbf16,vfwcvtbf16")
+			  vfncvtbf16,vfwcvtbf16,vcunpack,vdsmacini,vlsb,vlnlp,vconvert")
 	   (const_int 4)
 
 	 ;; If operands[3] of "vlds" is not vector mode, it is pred_broadcast.
@@ -858,7 +862,7 @@
 			  vfsgnj,vfmerge,vired,viwred,vfredu,vfredo,vfwredu,vfwredo,\
 			  vslideup,vslidedown,vislide1up,vislide1down,vfslide1up,vfslide1down,\
 			  vgather,viwmuladd,vfwmuladd,vlsegds,vlsegdux,vlsegdox,vandn,vrol,\
-                          vror,vwsll,vclmul,vclmulh,vfwmaccbf16")
+                          vror,vwsll,vclmul,vclmulh,vfwmaccbf16,vdsop,vcpack,vperm,vfsop")
 	   (const_int 5)
 
 	 (eq_attr "type" "vicmp,vimuladd,vfcmp,vfmuladd")
@@ -876,7 +880,7 @@
 			  vfncvtitof,vfncvtftoi,vfncvtftof,vfclass,vimovxv,vfmovfv,\
 			  vcompress,vldff,vlsegde,vlsegdff,vbrev,vbrev8,vrev8,vghsh,\
                           vaeskf1,vaeskf2,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm3me,vsm3c,\
-			  vfncvtbf16,vfwcvtbf16")
+			  vfncvtbf16,vfwcvtbf16,vcunpack,vdsmacini,vlsb,vlnlp,vconvert")
 	   (symbol_ref "riscv_vector::get_ta(operands[5])")
 
 	 ;; If operands[3] of "vlds" is not vector mode, it is pred_broadcast.
@@ -893,7 +897,7 @@
 			  vfredo,vfwredu,vfwredo,vslideup,vslidedown,vislide1up,\
 			  vislide1down,vfslide1up,vfslide1down,vgather,viwmuladd,vfwmuladd,\
 			  vlsegds,vlsegdux,vlsegdox,vandn,vrol,vror,vwsll,vclmul,vclmulh,\
-			  vfwmaccbf16")
+			  vfwmaccbf16,vdsop,vcpack,vperm,vfsop")
 	   (symbol_ref "riscv_vector::get_ta(operands[6])")
 
 	 (eq_attr "type" "vimuladd,vfmuladd")
@@ -908,7 +912,7 @@
   (cond [(eq_attr "type" "vlde,vext,vmiota,vfsqrt,vfrecp,vfcvtitof,vfcvtftoi,\
 			  vfwcvtitof,vfwcvtftoi,vfwcvtftof,vfncvtitof,vfncvtftoi,\
 			  vfncvtftof,vfclass,vldff,vlsegde,vlsegdff,vbrev,vbrev8,vrev8,\
-			  vfncvtbf16,vfwcvtbf16")
+			  vfncvtbf16,vfwcvtbf16,vcunpack,vdsmacini,vlsb,vlnlp,vconvert")
 	   (symbol_ref "riscv_vector::get_ma(operands[6])")
 
 	 ;; If operands[3] of "vlds" is not vector mode, it is pred_broadcast.
@@ -924,7 +928,7 @@
 			  vfwalu,vfwmul,vfsgnj,vfcmp,vslideup,vslidedown,\
 			  vislide1up,vislide1down,vfslide1up,vfslide1down,vgather,\
 			  viwmuladd,vfwmuladd,vlsegds,vlsegdux,vlsegdox,vandn,vrol,\
-                          vror,vwsll,vclmul,vclmulh,vfwmaccbf16")
+                          vror,vwsll,vclmul,vclmulh,vfwmaccbf16,vdsop,vcpack,vperm,vfsop")
 	   (symbol_ref "riscv_vector::get_ma(operands[7])")
 
 	 (eq_attr "type" "vimuladd,vfmuladd")
@@ -941,7 +945,7 @@
 			  vfwcvtftoi,vfwcvtftof,vfncvtitof,vfncvtftoi,vfncvtftof,\
 			  vfclass,vired,viwred,vfredu,vfredo,vfwredu,vfwredo,\
 			  vimovxv,vfmovfv,vlsegde,vlsegdff,vmiota,vbrev,vbrev8,vrev8,\
-			  vfncvtbf16,vfwcvtbf16")
+			  vfncvtbf16,vfwcvtbf16,vcunpack,vdsmacini,vlsb,vlnlp,vconvert")
 	   (const_int 7)
 	 (eq_attr "type" "vldm,vstm,vmalu,vmalu,vgmul,vaesef,vaesem,vaesdf,vaesdm,vaesz,\
                           vsm4r")
@@ -960,7 +964,7 @@
 			  vfsgnj,vfcmp,vslideup,vslidedown,vislide1up,\
 			  vislide1down,vfslide1up,vfslide1down,vgather,viwmuladd,vfwmuladd,\
 			  vlsegds,vlsegdux,vlsegdox,vandn,vrol,vror,vclmul,vclmulh,vwsll,\
-			  vfwmaccbf16")
+			  vfwmaccbf16,vdsop,vcpack,vperm,vfsop")
 	   (const_int 8)
 	 (eq_attr "type" "vstux,vstox,vssegts,vssegtux,vssegtox")
 	   (const_int 5)
