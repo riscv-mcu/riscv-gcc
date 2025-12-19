@@ -1041,6 +1041,7 @@ lto_symtab_merge_symbols (void)
 		      node->analyzed = node->definition = false;
 		      node->remove_all_references ();
 		    }
+		  node->body_removed = true;
 		}
 	    }
 
