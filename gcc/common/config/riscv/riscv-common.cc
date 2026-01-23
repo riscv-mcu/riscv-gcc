@@ -478,6 +478,8 @@ static const struct riscv_ext_version riscv_ext_version_table[] =
 
   {"zilsd",   ISA_SPEC_CLASS_NONE, 1, 0},
   {"zclsd",   ISA_SPEC_CLASS_NONE, 1, 0},
+  
+  {"zibi",   ISA_SPEC_CLASS_NONE, 1, 0},
 
   /* Terminate the list.  */
   {NULL, ISA_SPEC_CLASS_NONE, 0, 0}
@@ -1650,6 +1652,7 @@ static const riscv_ext_flag_table_t riscv_ext_flag_table[] =
   RISCV_EXT_FLAG_ENTRY ("zifencei", x_riscv_zi_subext, MASK_ZIFENCEI),
   RISCV_EXT_FLAG_ENTRY ("zicond",   x_riscv_zi_subext, MASK_ZICOND),
   RISCV_EXT_FLAG_ENTRY ("zilsd",    x_riscv_zi_subext, MASK_ZILSD),
+  RISCV_EXT_FLAG_ENTRY ("zibi",    x_riscv_zi_subext, MASK_ZIBI),
 
   RISCV_EXT_FLAG_ENTRY ("za64rs",  x_riscv_za_subext, MASK_ZA64RS),
   RISCV_EXT_FLAG_ENTRY ("za128rs", x_riscv_za_subext, MASK_ZA128RS),
