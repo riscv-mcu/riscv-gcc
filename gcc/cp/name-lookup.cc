@@ -6408,7 +6408,8 @@ handle_namespace_attrs (tree ns, tree attributes)
       tree name = get_attribute_name (d);
       tree args = TREE_VALUE (d);
 
-      if (is_attribute_p ("visibility", name))
+      if (is_attribute_p ("visibility", name)
+	  && args != error_mark_node)
 	{
 	  /* attribute visibility is a property of the syntactic block
 	     rather than the namespace as a whole, so we don't touch the
@@ -6430,7 +6431,8 @@ handle_namespace_attrs (tree ns, tree attributes)
 	  push_visibility (TREE_STRING_POINTER (x), 1);
 	  saw_vis = true;
 	}
-      else if (is_attribute_p ("abi_tag", name))
+      else if (is_attribute_p ("abi_tag", name)
+	       && args != error_mark_node)
 	{
 	  if (!DECL_NAME (ns))
 	    {
@@ -6457,7 +6459,8 @@ handle_namespace_attrs (tree ns, tree attributes)
 	    DECL_ATTRIBUTES (ns) = tree_cons (name, args,
 					      DECL_ATTRIBUTES (ns));
 	}
-      else if (is_attribute_p ("deprecated", name))
+      else if (is_attribute_p ("deprecated", name)
+	       && args != error_mark_node)
 	{
 	  if (!DECL_NAME (ns))
 	    {
