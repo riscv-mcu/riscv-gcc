@@ -690,25 +690,32 @@ static const struct riscv_tune_param nuclei_600_tune_info = {
 
 /* Costs to use when optimizing for Nuclei 900 Series. */
 static const struct riscv_tune_param nuclei_900_tune_info = {
-  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)}, /* fp_add */
-  {COSTS_N_INSNS (3), COSTS_N_INSNS (3)}, /* fp_mul */
-  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)}, /* fp_div */
-  {COSTS_N_INSNS (4), COSTS_N_INSNS (4)}, /* int_mul */
-  {COSTS_N_INSNS (17), COSTS_N_INSNS (33)}, /* int_div */
-  1,            /* issue_rate */
-  3,            /* branch_cost */
-  3,            /* memory_cost */
-  8,		/* fmv_cost */
-  true,						/* slow_unaligned_access */
-  false,					/* vector_unaligned_access */
-  false,					/* use_divmod_expansion */
-  false,					/* overlap_op_by_pieces */
-  RISCV_FUSE_NOTHING,                           /* fusible_ops */
-  NULL,						/* vector cost */
-  NULL,						/* function_align */
-  NULL,						/* jump_align */
-  NULL,						/* loop_align */
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (5)},
+  {COSTS_N_INSNS (3), COSTS_N_INSNS (5)},
+  {COSTS_N_INSNS (20), COSTS_N_INSNS (34)},
+  
+  {COSTS_N_INSNS (4), COSTS_N_INSNS (4)},
+  {COSTS_N_INSNS (17), COSTS_N_INSNS (33)},
+
+  2,
+  3,
+  7,
+  COSTS_N_INSNS (3),
+  
+  true,
+  true,
+  
+  true,
+  true,
+  
+  RISCV_FUSE_NOTHING,
+  
+  NULL,
+  NULL,
+  NULL,
+  NULL
 };
+
 
 /* Costs to use when optimizing for nuclei 1000 3w Series.  */
 static const struct riscv_tune_param nuclei_1000_3w_tune_info = {
