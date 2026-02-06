@@ -1,7 +1,5 @@
 ;; Post modified load and store
 
-
-   
 (define_insn "load<mode>_ind_postinc"
   [(set (match_operand:SUBDISF 0 "register_operand" "=r")
         (mem:SUBDISF (post_inc:SI (match_operand:SI 1 "register_operand" "+r")))
@@ -11,6 +9,189 @@
   "xl.l<size_load_store>\t%0,<size_mem>(%1)\t# load post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "<LDSTINDMODE>")]
+)
+
+(define_insn "load_di_ind_postinc"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (mem:DI (post_inc:DI (match_operand:DI 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "xl.ld\t%0,8(%1)\t# load post inc"
+  [(set_attr "type" "load")
+   (set_attr "mode" "DI")]
+)
+
+
+(define_insn "load_di_ind_postdec"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (mem:DI (post_dec:DI (match_operand:DI 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "xl.ld\t%0,-8(%1)\t# load post dec"
+  [(set_attr "type" "load")
+   (set_attr "mode" "DI")]
+)
+
+(define_insn "store_di_ind_postinc"
+  [(set (mem:DI (post_inc:DI (match_operand:DI 0 "register_operand" "+r,r")))
+        (match_operand:DI 1 "nonmemory_operand" "r,J")
+   )
+  ]
+  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "@
+   xl.sd\t%1,8(%0)\t# store post inc
+   xl.sd\tx0,8(%0)\t# store 0 post inc"
+  [(set_attr "type" "store,store")
+   (set_attr "mode" "DI")]
+)
+
+(define_insn "store_di_ind_postdec"
+  [(set (mem:DI (post_dec:DI (match_operand:DI 0 "register_operand" "+r,r")))
+        (match_operand:DI 1 "nonmemory_operand" "r,J")
+   )
+  ]
+  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "@
+   xl.sd\t%1,-8(%0)\t# store post dec
+   xl.sd\tx0,-8(%0)\t# store 0 post dec"
+  [(set_attr "type" "store,store")
+   (set_attr "mode" "DI")]
+)
+
+(define_insn "load_hf_ind_postinc<GPR:mode>"
+  [(set (match_operand:HF 0 "register_operand" "=f")
+        (mem:HF (post_inc:GPR (match_operand:GPR 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "xl.flh\t%0,2(%1)\t# load float post inc"
+  [(set_attr "type" "load")
+   (set_attr "mode" "HF")]
+)
+
+(define_insn "store_hf_ind_postinc<GPR:mode>"
+  [(set (mem:HF (post_inc:GPR (match_operand:GPR 0 "register_operand" "+r")))
+        (match_operand:HF 1 "register_operand" "f")
+   )
+  ]
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "xl.fsh\t%1,2(%0)\t# store float post inc"
+  [(set_attr "type" "store")
+   (set_attr "mode" "HF")]
+)
+
+(define_insn "load_hf_ind_postdec<GPR:mode>"
+  [(set (match_operand:HF 0 "register_operand" "=f")
+        (mem:HF (post_dec:GPR (match_operand:GPR 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "xl.flh\t%0,-2(%1)\t# load float post dec"
+  [(set_attr "type" "load")
+   (set_attr "mode" "SF")]
+)
+
+(define_insn "store_hf_ind_postdec<GPR:mode>"
+  [(set (mem:HF (post_dec:GPR (match_operand:GPR 0 "register_operand" "+r")))
+        (match_operand:HF 1 "register_operand" "f")
+   )
+  ]
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "xl.fsh\t%1,-2(%0)\t# store float post dec"
+  [(set_attr "type" "store")
+   (set_attr "mode" "HF")]
+)
+
+(define_insn "load_sf_ind_postinc<GPR:mode>"
+  [(set (match_operand:SF 0 "register_operand" "=f")
+        (mem:SF (post_inc:GPR (match_operand:GPR 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.flw\t%0,4(%1)\t# load float post inc"
+  [(set_attr "type" "load")
+   (set_attr "mode" "SF")]
+)
+
+(define_insn "store_sf_ind_postinc<GPR:mode>"
+  [(set (mem:SF (post_inc:GPR (match_operand:GPR 0 "register_operand" "+r")))
+        (match_operand:SF 1 "register_operand" "f")
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.fsw\t%1,4(%0)\t# store float post inc"
+  [(set_attr "type" "store")
+   (set_attr "mode" "SF")]
+)
+
+(define_insn "load_sf_ind_postdec<GPR:mode>"
+  [(set (match_operand:SF 0 "register_operand" "=f")
+        (mem:SF (post_dec:GPR (match_operand:GPR 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.flw\t%0,-4(%1)\t# load float post dec"
+  [(set_attr "type" "load")
+   (set_attr "mode" "SF")]
+)
+
+(define_insn "store_sf_ind_postdec<GPR:mode>"
+  [(set (mem:SF (post_dec:GPR (match_operand:GPR 0 "register_operand" "+r")))
+        (match_operand:SF 1 "register_operand" "f")
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.fsw\t%1,-4(%0)\t# store float post dec"
+  [(set_attr "type" "store")
+   (set_attr "mode" "SF")]
+)
+
+(define_insn "load_df_ind_postinc<GPR:mode>"
+  [(set (match_operand:DF 0 "register_operand" "=f")
+        (mem:DF (post_inc:GPR (match_operand:GPR 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.fld\t%0,8(%1)\t# load fp post inc"
+  [(set_attr "type" "load")
+   (set_attr "mode" "DF")]
+)
+
+
+(define_insn "load_df_ind_postdec<GPR:mode>"
+  [(set (match_operand:DF 0 "register_operand" "=f")
+        (mem:DF (post_dec:GPR (match_operand:GPR 1 "register_operand" "+r")))
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.fld\t%0,-8(%1)\t# load fp post dec"
+  [(set_attr "type" "load")
+   (set_attr "mode" "DF")]
+)
+
+
+(define_insn "store_df_ind_postinc<GPR:mode>"
+  [(set (mem:DF (post_inc:GPR (match_operand:GPR 0 "register_operand" "+r")))
+        (match_operand:DF 1 "register_operand" "f")
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.fsd\t%1,8(%0)\t# store fp post inc"
+  [(set_attr "type" "store")
+   (set_attr "mode" "DF")]
+)
+
+(define_insn "store_df_ind_postdec<GPR:mode>"
+  [(set (mem:DF (post_dec:GPR (match_operand:GPR 0 "register_operand" "+r")))
+        (match_operand:DF 1 "register_operand" "f")
+   )
+  ]
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "xl.fsd\t%1,-8(%0)\t# store fp post dec"
+  [(set_attr "type" "store")
+   (set_attr "mode" "DF")]
 )
 
 (define_insn "load<mode>_<u>ext_ind_postinc"
@@ -74,6 +255,32 @@
    xl.s<size_load_store>\tx0,-<size_mem>(%0)\t# store 0 post dec"
   [(set_attr "type" "store,store")
    (set_attr "mode" "<LDSTINDMODE>")]
+)
+
+(define_insn "load_di_ind_postinc2"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (zero_extend:DI
+          (mem:SI (post_inc:DI (match_operand:DI 1 "register_operand" "+r")))
+        )
+   )
+  ]
+  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "xl.lwu\t%0,4(%1)\t# load word unsigned post inc"
+  [(set_attr "type" "load")
+   (set_attr "mode" "DI")]
+)
+
+(define_insn "load_di_ind_postdec2"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (zero_extend:DI
+          (mem:SI (post_dec:DI (match_operand:DI 1 "register_operand" "+r")))
+        )
+   )
+  ]
+  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "xl.lwu\t%0,-4(%1)\t# load word unsigned post dec"
+  [(set_attr "type" "load")
+   (set_attr "mode" "DI")]
 )
 
 ;; Bitop insns
