@@ -1,6 +1,7 @@
 /* { dg-do compile } */
 /* { dg-options "-O1 -finstrument-functions -fno-forward-propagate -fno-delete-dead-exceptions -fnon-call-exceptions" } */
 /* { dg-require-effective-target exceptions } */
+/* { dg-require-effective-target int128 } */
 
 /* PR rtl-optimization/116053 */
 
