@@ -437,14 +437,14 @@
   [(set_attr "type" "arith")
    (set_attr "mode" "SI")])
 
-(define_insn "xl_slet<u>si3"
-  [(set (match_operand:SI 0 "register_operand" "=r")
-        (any_le:SI (match_operand:SI 1 "register_operand" "r")
-                   (match_operand:SI 2 "register_operand" "r")))]
+(define_insn "xl_slet<u>si3<GPR:mode>"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (any_le:GPR (match_operand:GPR 1 "register_operand" "r")
+                   (match_operand:GPR 2 "register_operand" "r")))]
   "TARGET_XXLCZSLET"
   "xl.slet<u>\t%0,%1,%2"
-  [(set_attr "type" "slt")
-   (set_attr "mode" "SI")])
+  [(set_attr "type" "arith")
+   (set_attr "mode" "none")])
 
 
 (define_insn "xl_mulisi3"

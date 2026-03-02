@@ -38,8 +38,8 @@ DIRECT_BUILTIN1(xl_ff0si2,     ff0,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
 
 DIRECT_BUILTIN1(xl_clbsi2,     clb,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
 
-DIRECT_BUILTIN1(xl_sletsi3,    slet,    RISCV_USI_FTYPE_SI_SI, xxlczslet)
-DIRECT_BUILTIN1(xl_sletusi3,   slet_u,  RISCV_USI_FTYPE_USI_USI, xxlczslet)
+DIRECT_BUILTIN1(xl_sletsi3si,    slet,    RISCV_USI_FTYPE_SI_SI, xxlczslet)
+DIRECT_BUILTIN1(xl_sletusi3si,   slet_u,  RISCV_USI_FTYPE_USI_USI, xxlczslet)
 
 DIRECT_BUILTIN1(xl_mulisi3,    muli,   RISCV_INT_FTYPE_INT_SHORT, xxlczmac)
 
