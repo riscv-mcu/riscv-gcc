@@ -1555,14 +1555,21 @@
 		   (match_operand:SI 1 "register_operand" " r"))
 		 (any_extend:DI
 		   (match_operand:SI 2 "register_operand" " r"))))]
-  "(TARGET_ZMMUL || TARGET_MUL) && !TARGET_64BIT"
+  "(TARGET_ZMMUL || TARGET_MUL || TARGET_ZPN) && !TARGET_64BIT"
 {
+    if (TARGET_ZPN)
+    {
+        ;
+    }
+    else
+    {
   rtx temp = gen_reg_rtx (SImode);
   riscv_emit_binary (MULT, temp, operands[1], operands[2]);
   emit_insn (gen_<su>mulsi3_highpart (riscv_subword (operands[0], true),
 				     operands[1], operands[2]));
   emit_insn (gen_movsi (riscv_subword (operands[0], false), temp));
   DONE;
+    }
 })
 
 (define_insn "<su>mulsi3_highpart"

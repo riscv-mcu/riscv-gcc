@@ -12584,11 +12584,6 @@ riscv_mode_priority (int, int n)
   return n;
 }
 
-bool riscv_rvp_autovec_enable(void)
-{
-  return riscv_rvp_autovec_p;
-}
-
 /* Implement TARGET_VECTORIZE_AUTOVECTORIZE_VECTOR_MODES.  */
 unsigned int
 riscv_autovectorize_vector_modes (vector_modes *modes, bool all)

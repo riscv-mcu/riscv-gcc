@@ -3141,15 +3141,31 @@
   [(set_attr "type" "simd")])
 
 ;; MADDR32, MSUBR32
-(define_insn "*maddr32_vec"
-  [(set (match_operand:SI 0 "register_operand"                   "=r")
-	(plus:SI (mult:SI (match_operand:SI 1 "register_operand" " r")
-			  (match_operand:SI 2 "register_operand" " r"))
-		 (match_operand:SI 3 "register_operand"          " 0")))]
-  "TARGET_ZPN && riscv_rvp_autovec_enable() && TARGET_NUCLEI_DSP_AUTOVEC"
+;; RV32 version
+(define_insn "*maddr32_vec_rv32"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+        (plus:SI (mult:SI (match_operand:SI 1 "register_operand" " r")
+                          (match_operand:SI 2 "register_operand" " r"))
+                 (match_operand:SI 3 "register_operand" "0")))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && !TARGET_64BIT"
   "maddr32\t%0, %1, %2"
-  [(set_attr "type"   "mac")
-   (set_attr "length"   "4")])
+  [(set_attr "type" "mac")
+   (set_attr "length" "4")])
+
+;; RV64 version - with sign extension
+(define_insn "*maddr32_vec_rv64"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (sign_extend:DI
+          (plus:SI (mult:SI (match_operand:SI 1 "register_operand" " r")
+                            (match_operand:SI 2 "register_operand" " r"))
+                   (subreg:SI (match_operand:DI 3 "register_operand" "0") 0))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && TARGET_64BIT"
+  "maddr32\t%0, %1, %2"
+  [(set_attr "type" "mac")
+   (set_attr "length" "4")
+   (set_attr "mode" "DI")])
+
+
 
 (define_insn "maddr32<mode>"
   [(set (match_operand:VSHI 0 "register_operand"                   "=r")
@@ -3172,15 +3188,31 @@
   [(set_attr "type"   "dsp")
    (set_attr "mode" "<MODE>")])
 
-(define_insn "*msubr32_vec"
-  [(set (match_operand:SI 0 "register_operand"                    "=r")
-	(minus:SI (match_operand:SI 3 "register_operand"          " 0")
-		  (mult:SI (match_operand:SI 1 "register_operand" " r")
-			   (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPN && riscv_rvp_autovec_enable() && TARGET_NUCLEI_DSP_AUTOVEC"
+;; RV32 version: Rd = Rd - (Rs1 * Rs2)
+(define_insn "*msubr32_vec_rv32"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+        (minus:SI (match_operand:SI 3 "register_operand" "0")
+                  (mult:SI (match_operand:SI 1 "register_operand" " r")
+                           (match_operand:SI 2 "register_operand" " r"))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && !TARGET_64BIT"
   "msubr32\t%0, %1, %2"
-  [(set_attr "type"   "dsp")
-   (set_attr "length"   "4")])
+  [(set_attr "type" "mac")
+   (set_attr "length" "4")])
+
+;; RV64 version: Rd = sext(Rd[31:0] - (Rs1[31:0] * Rs2[31:0]))
+(define_insn "*msubr32_vec_rv64"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (sign_extend:DI
+          (minus:SI
+            (subreg:SI (match_operand:DI 3 "register_operand" "0") 0)
+            (mult:SI (match_operand:SI 1 "register_operand" " r")
+                     (match_operand:SI 2 "register_operand" " r")))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && TARGET_64BIT"
+  "msubr32\t%0, %1, %2"
+  [(set_attr "type" "mac")
+   (set_attr "length" "4")
+   (set_attr "mode" "DI")])
+
 
 ;; MAXW, MINW
 (define_insn "psmaxsi3"
@@ -3231,14 +3263,65 @@
   "mulr64\t%0, %1, %2"
   [(set_attr "type"   "dsp")])
 			 
-(define_insn "*umulsidi3_vec"
-  [(set (match_operand:DI 0 "register_operand"                          "=r")
-	(mult:DI (zero_extend:DI (match_operand:SI 1 "register_operand" " r"))
-		 (zero_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
-  "TARGET_ZPSF && TARGET_64BIT && riscv_rvp_autovec_enable() &&TARGET_NUCLEI_DSP_AUTOVEC"
+;; ============================================
+;; MULR64: Unsigned 32-bit multiply, 64-bit result
+;; ============================================
+
+;; RV32 Version
+;; Description:
+;;   Result[63:0] = (unsigned)Rs1[31:0] * (unsigned)Rs2[31:0]
+;;   Writes to register pair (2d, 2d+1)
+;; Note on Register Allocation:
+;;   GCC's standard constraints cannot enforce "even register pairs".
+;;   This pattern tells GCC to use a DImode destination.
+;;   You may need custom register allocation logic or rely on
+;;   the compiler/backend to naturally pick aligned registers,
+;;   OR check if your toolchain adds a specific constraint like 'e' for even regs.
+(define_insn "*mulr64_vec_rv32"
+  [(set (match_operand:DI 0 "register_operand" "=R")         ; Destination: Register Pair
+        (mult:DI (zero_extend:DI (match_operand:SI 1 "register_operand" " r"))
+                 (zero_extend:DI (match_operand:SI 2 "register_operand" " r"))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && !TARGET_64BIT"
   "mulr64\t%0, %1, %2"
-  [(set_attr "type"   "dsp")
-   (set_attr "mode"   "DI")])
+  [(set_attr "type" "imul")
+   (set_attr "length" "4")])
+
+;; RV64 Version
+;; Description:
+;;   Result[63:0] = (unsigned)Rs1[31:0] * (unsigned)Rs2[31:0]
+;;   Writes to Rd (standard 64-bit register)
+(define_insn "*mulr64_vec_rv64"
+  [(set (match_operand:DI 0 "register_operand" "=R")
+        (mult:DI (zero_extend:DI 
+                   (subreg:SI (match_operand:DI 1 "register_operand" " r") 0))
+                 (zero_extend:DI 
+                   (subreg:SI (match_operand:DI 2 "register_operand" " r") 0))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && TARGET_64BIT"
+  "mulr64\t%0, %1, %2"
+  [(set_attr "type" "imul")
+   (set_attr "length" "4")])
+
+
+(define_insn "*mulsr64_rv32"
+  [(set (match_operand:DI 0 "register_operand" "=R")
+        (mult:DI (sign_extend:DI (match_operand:SI 1 "register_operand" "r"))
+                 (sign_extend:DI (match_operand:SI 2 "register_operand" "r"))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC &&  !TARGET_64BIT"
+  "mulsr64\t%0, %1, %2"
+  [(set_attr "type" "imul")
+   (set_attr "length" "4")])
+
+(define_insn "*mulsr64_rv64"
+  [(set (match_operand:DI 0 "register_operand" "=R")
+        (mult:DI (sign_extend:DI 
+                   (subreg:SI (match_operand:DI 1 "register_operand" "r") 0))
+                 (sign_extend:DI 
+                   (subreg:SI (match_operand:DI 2 "register_operand" "r") 0))))]
+  "TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC && TARGET_64BIT"
+  "mulsr64\t%0, %1, %2"
+  [(set_attr "type" "imul")
+   (set_attr "length" "4")])
+
 
 (define_insn "rvp_mulsidi3"
   [(set (match_operand:DI 0 "register_operand"                          "=r")
@@ -4336,7 +4419,7 @@
 
 ;; RV32P KMSR64, KMAR64
 (define_insn "<u>m<opcode>sidi4"
-  [(set (match_operand:DI 0 "register_operand"       "=r")
+  [(set (match_operand:DI 0 "register_operand"       "=R")
 	(plus_minus:DI
 	  (mult:DI
 	    (any_extend:DI
@@ -4344,7 +4427,7 @@
 	    (any_extend:DI
 	      (match_operand:SI 2 "register_operand"  " r")))
 	  (match_operand:DI 3 "register_operand"      " 0")))]
-  "TARGET_ZPSF && !TARGET_64BIT && riscv_rvp_autovec_enable() &&TARGET_NUCLEI_DSP_AUTOVEC"
+  "TARGET_ZPSF && TARGET_NUCLEI_DSP_AUTOVEC"
   "<su>m<add_sub>r64\t%0, %1, %2"
   [(set_attr "type"   "dsp64")
    (set_attr "mode"   "DI")])
