@@ -4427,7 +4427,7 @@
 	    (any_extend:DI
 	      (match_operand:SI 2 "register_operand"  " r")))
 	  (match_operand:DI 3 "register_operand"      " 0")))]
-  "TARGET_ZPSF && TARGET_NUCLEI_DSP_AUTOVEC"
+  "TARGET_ZPSF && TARGET_NUCLEI_DSP_AUTOVEC && !TARGET_64BIT"
   "<su>m<add_sub>r64\t%0, %1, %2"
   [(set_attr "type"   "dsp64")
    (set_attr "mode"   "DI")])
@@ -4438,7 +4438,7 @@
 		    (match_operand:SI 2 "register_operand" " r")
 			(match_operand:SI 3 "register_operand" " r")]
 		    UNSPEC_SMAR64))]
-  "TARGET_ZPSF && !TARGET_64BIT"
+  "TARGET_ZPSF"
   "smar64\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
@@ -4449,7 +4449,7 @@
 		    (match_operand:SI 2 "register_operand" " r")
 			(match_operand:SI 3 "register_operand" " r")]
 		    UNSPEC_UMAR64))]
-  "TARGET_ZPSF && !TARGET_64BIT"
+  "TARGET_ZPSF"
   "umar64\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
@@ -5497,7 +5497,7 @@
 		    (match_operand:SI 2 "register_operand" " r")
 			(match_operand:SI 3 "register_operand" " r")]
 		    UNSPEC_SMSR64))]
-  "TARGET_ZPSF && !TARGET_64BIT"
+  "TARGET_ZPSF"
   "smsr64\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
@@ -5508,7 +5508,7 @@
 		    (match_operand:SI 2 "register_operand" " r")
 			(match_operand:SI 3 "register_operand" " r")]
 		    UNSPEC_UMSR64))]
-  "TARGET_ZPSF && !TARGET_64BIT"
+  "TARGET_ZPSF"
   "umsr64\t%0, %2, %3"
   [(set_attr "type" "dsp64")
    (set_attr "mode" "DI")])
