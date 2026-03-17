@@ -1333,6 +1333,19 @@
   [(set_attr "type" "fmul")
    (set_attr "mode" "<UNITMODE>")])
 
+(define_expand "mul<mode>3"
+  [(set (match_operand:X 0 "register_operand")
+        (mult:X (match_operand:X 1 "register_operand")
+                (match_operand:X 2 "const_arith_operand")))]
+  "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC"
+{
+  if (CONST_INT_P (operands[2]))
+    {
+      emit_insn (gen_xl_muli<mode>3 (operands[0], operands[1], operands[2]));
+      DONE;
+    }
+})
+
 (define_insn "*mulsi3"
   [(set (match_operand:SI          0 "register_operand" "=r")
 	(mult:SI (match_operand:SI 1 "register_operand" " r")
@@ -1342,7 +1355,7 @@
   [(set_attr "type" "imul")
    (set_attr "mode" "SI")])
 
-(define_expand "mulsi3"
+(define_expand "mulsi3_2"
   [(set (match_operand:SI          0 "register_operand" "=r")
        (mult:SI (match_operand:SI 1 "register_operand" " r")
                 (match_operand:SI 2 "register_operand" " r")))]
@@ -1360,7 +1373,7 @@
     }
 })
 
-(define_insn "muldi3"
+(define_insn "*muldi3"
   [(set (match_operand:DI          0 "register_operand" "=r")
 	(mult:DI (match_operand:DI 1 "register_operand" " r")
 		 (match_operand:DI 2 "register_operand" " r")))]

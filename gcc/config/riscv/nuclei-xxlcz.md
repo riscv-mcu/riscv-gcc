@@ -446,16 +446,14 @@
   [(set_attr "type" "arith")
    (set_attr "mode" "none")])
 
-
-(define_insn "xl_mulisi3"
-  [(set (match_operand:SI  0 "register_operand" "=r")
-  (mult:SI (match_operand:SI 1 "register_operand" "r")
-           (sign_extend:SI
-           (match_operand:HI 2 "immediate_operand" "i"))))]
-  "TARGET_XXLCZMAC"
+(define_insn "xl_muli<mode>3"
+  [(set (match_operand:X          0 "register_operand" "=r")
+	(mult:X (match_operand:X 1 "register_operand" " r")
+		 (match_operand:X 2 "const_arith_operand" " I")))]
+  "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC"
   "xl.muli\t%0,%1,%2"
   [(set_attr "type" "imul")
-   (set_attr "mode" "SI")])
+   (set_attr "mode" "<MODE>")])
 
 (define_insn "xl_bitrevsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
