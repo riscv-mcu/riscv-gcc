@@ -458,13 +458,24 @@
 (define_insn "xl_bitrevsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
         (unspec:SI [(match_operand:SI 1 "register_operand" "r")
-                    (match_operand:QI 2 "immediate_operand" "i")
-                    (match_operand:QI 3 "immediate_operand" "i")]
+                    (match_operand:SI 2 "const_0_2_operand" "i")
+                    (match_operand:SI 3 "const_0_31_operand" "i")]
          UNSPEC_XXLCZ_BITREV))]
   "TARGET_XXLCZBITREV"
   "xl.bitrev\t%0,%1,%2,%3"
   [(set_attr "type" "bitmanip")
-  (set_attr "mode" "SI")])
+   (set_attr "mode" "SI")])
+
+(define_insn "xl_bitrevdi4"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+        (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                    (match_operand:DI 2 "const_0_2_operand" "i")
+                    (match_operand:DI 3 "const_0_31_operand" "i")]
+         UNSPEC_XXLCZ_BITREV))]
+  "TARGET_XXLCZBITREV && TARGET_64BIT"
+  "xl.bitrev\t%0,%1,%2,%3"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "DI")])
 
 (define_insn "xl_nzmsksi2"
   [(set (match_operand:SI 0 "register_operand" "=r")
