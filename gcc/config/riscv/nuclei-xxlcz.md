@@ -331,51 +331,135 @@
  (set_attr "mode" "SI")]
 )
 
+;; xl.extract rd, rs1, uimm3(len), uimm2(bottom) - Extract signed, immediate
 (define_insn "xl_extractsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
-                (match_operand:QI 2 "immediate_operand" "i")
-                (match_operand:QI 3 "immediate_operand" "i")]
+                (match_operand:SI 2 "const_1_31_operand" "i")
+                (match_operand:SI 3 "const_0_31_operand" "i")]
   UNSPEC_XXLCZ_EXTRACT))]
   "TARGET_XXLCZBITOP"
-  "xl.extract \t%0,%1,%2,%3 # Bit extract signed"
-  [(set_attr "type" "logical")
-   (set_attr "length" "1")]
+  "xl.extract \t%0,%1,%2,%3"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "SI")]
 )
 
+(define_insn "xl_extractdi4"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:DI 2 "const_1_63_operand" "i")
+                (match_operand:DI 3 "const_0_63_operand" "i")]
+  UNSPEC_XXLCZ_EXTRACT))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.extract \t%0,%1,%2,%3"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "DI")]
+)
+
+;; xl.extractr rd, rs1, rs2 - Extract signed, register
+;; rs2[4:0] = bottom, rs2[9:5] = len
 (define_insn "xl_extractsi3_reg"
   [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
-                (match_operand:HI 2 "register_operand" "r")]
+                (match_operand:SI 2 "register_operand" "r")]
   UNSPEC_XXLCZ_EXTRACTR))]
   "TARGET_XXLCZBITOP"
-  "xl.extractr \t%0,%1,%2 # Bit extract signed, arg reg"
-  [(set_attr "type" "logical")
-   (set_attr "length" "1")]
+  "xl.extractr \t%0,%1,%2"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "SI")]
 )
 
+(define_insn "xl_extractdi3_reg"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:DI 2 "register_operand" "r")]
+  UNSPEC_XXLCZ_EXTRACTR))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.extractr \t%0,%1,%2"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "DI")]
+)
+
+;; xl.extractu rd, rs1, uimm3(len), uimm2(bottom) - Extract unsigned, immediate
 (define_insn "xl_extractusi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
-                (match_operand:QI 2 "immediate_operand" "i")
-                (match_operand:QI 3 "immediate_operand" "i")]
+                (match_operand:SI 2 "const_1_31_operand" "i")
+                (match_operand:SI 3 "const_0_31_operand" "i")]
   UNSPEC_XXLCZ_EXTRACTU))]
   "TARGET_XXLCZBITOP"
-  "xl.extractu\t%0,%1,%2,%3 # Bit extract unsigned"
-[(set_attr "type" "logical")
- (set_attr "mode" "SI")]
+  "xl.extractu\t%0,%1,%2,%3"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "SI")]
 )
 
+(define_insn "xl_extractudi4"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:DI 2 "const_1_63_operand" "i")
+                (match_operand:DI 3 "const_0_63_operand" "i")]
+  UNSPEC_XXLCZ_EXTRACTU))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.extractu\t%0,%1,%2,%3"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "DI")]
+)
+
+;; xl.extractur rd, rs1, rs2 - Extract unsigned, register
+;; rs2[4:0] = bottom, rs2[9:5] = len
 (define_insn "xl_extractusi3_reg"
   [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
-                (match_operand:HI 2 "register_operand" "r")]
+                (match_operand:SI 2 "register_operand" "r")]
   UNSPEC_XXLCZ_EXTRACTUR))]
   "TARGET_XXLCZBITOP"
-  "xl.extractur\t%0,%1,%2 # Bit extract unsigned, reg arg";
-[(set_attr "type" "logical")
- (set_attr "mode" "SI")]
+  "xl.extractur\t%0,%1,%2"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "SI")]
 )
+
+(define_insn "xl_extractudi3_reg"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:DI 2 "register_operand" "r")]
+  UNSPEC_XXLCZ_EXTRACTUR))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.extractur\t%0,%1,%2"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "DI")]
+)
+
+;; Extract signed bitfield (auto match for xl.extract)
+;; Sign-extend extract from rs1[pos : pos+len-1]
+;; operand2 = len, operand3 = pos
+(define_insn "*xl_extract<mode>4"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
+		       (match_operand 2 "const_int_operand" "i")
+		       (match_operand 3 "const_int_operand" "i")))]
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  {
+    /* len is operand2, pos is operand3 -> output matches instruction format */
+    return \"xl.extract\\t%0,%1,%2,%3\";
+  }
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "<GPR:MODE>")])
+
+;; Extract unsigned bitfield (auto match for xl.extractu)
+;; Zero-extend extract from rs1[pos : pos+len-1]
+;; operand2 = len, operand3 = pos
+(define_insn "*xl_extractu<mode>4"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
+			 (match_operand 2 "const_int_operand" "i")
+			 (match_operand 3 "const_int_operand" "i")))]
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  {
+    /* len is operand2, pos is operand3 -> output matches instruction format */
+    return \"xl.extractu\\t%0,%1,%2,%3\";
+  }
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "<GPR:MODE>")])
 
 (define_insn "xl_insertsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")

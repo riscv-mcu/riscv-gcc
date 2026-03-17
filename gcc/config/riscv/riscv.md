@@ -3321,6 +3321,7 @@
       || TARGET_XVENTANACONDOPS || TARGET_SFB_ALU)
      && (INTVAL (operands[2]) == 1))
    && !TARGET_XTHEADBB
+   && !TARGET_XXLCZBITOP
    && !(TARGET_64BIT
         && (INTVAL (operands[3]) > 0)
         && (INTVAL (operands[2]) + INTVAL (operands[3]) == 32))"
@@ -4583,7 +4584,7 @@
 	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand")
 			 (match_operand 3 "const_int_operand")))]
-  "TARGET_XTHEADBB"
+  "TARGET_XTHEADBB || TARGET_XXLCZBITOP"
 )
 
 (define_expand "extzv<mode>"
@@ -4591,9 +4592,9 @@
 	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand")
 			 (match_operand 3 "const_int_operand")))]
-  "TARGET_XTHEADBB"
+  "TARGET_XTHEADBB || TARGET_XXLCZBITOP"
 {
-  if (TARGET_XTHEADBB
+  if ((TARGET_XTHEADBB || TARGET_XXLCZBITOP)
       && (INTVAL (operands[2]) < 8) && (INTVAL (operands[3]) == 0))
     FAIL;
 })

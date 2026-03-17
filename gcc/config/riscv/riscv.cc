@@ -1081,7 +1081,7 @@ riscv_build_integer_1 (struct riscv_integer_op codes[RISCV_MAX_INTEGER_OPS],
 	}
     }
 
-  if (cost > 2 && TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB))
+  if (cost > 2 && TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB || TARGET_XXLCZBITOP))
     {
       int leading_ones = clz_hwi (~value);
       int trailing_ones = ctz_hwi (~value);
@@ -4113,6 +4113,17 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  return true;
 	}
 
+      /* (x >> pos) & mask -> bitfield extract for xxlczbitop.  */
+      if (TARGET_XXLCZBITOP && speed
+          && GET_CODE (XEXP (x, 0)) == LSHIFTRT
+          && CONST_INT_P (XEXP (XEXP (x, 0), 1))
+          && CONST_INT_P (XEXP (x, 1)))
+        {
+          /* One instruction is better than two.  */
+          *total = COSTS_N_INSNS (1);
+          return true;
+        }
+
       gcc_fallthrough ();
     case IOR:
     case XOR:
@@ -4160,7 +4171,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	}
       gcc_fallthrough ();
     case SIGN_EXTRACT:
-      if (TARGET_XTHEADBB && outer_code == SET
+      if ((TARGET_XTHEADBB || TARGET_XXLCZBITOP) && outer_code == SET
 	  && CONST_INT_P (XEXP (x, 1))
 	  && CONST_INT_P (XEXP (x, 2)))
 	{
@@ -4401,8 +4412,30 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
 	  return true;
 	}
+      /* zero_extend((x >> pos) & mask) -> unsigned bitfield extract for xxlczbitop.  */
+      if (TARGET_XXLCZBITOP && speed
+          && GET_CODE (XEXP (x, 0)) == AND
+          && GET_CODE (XEXP (XEXP (x, 0), 0)) == LSHIFTRT
+          && CONST_INT_P (XEXP (XEXP (XEXP (x, 0), 0), 1))
+          && CONST_INT_P (XEXP (XEXP (x, 0), 1)))
+        {
+          /* One instruction is better than multiple instructions.  */
+          *total = COSTS_N_INSNS (1);
+          return true;
+        }
       /* Fall through.  */
     case SIGN_EXTEND:
+      /* sign_extend((x >> pos) & mask) -> signed bitfield extract for xxlczbitop.  */
+      if (TARGET_XXLCZBITOP && speed
+          && GET_CODE (XEXP (x, 0)) == AND
+          && GET_CODE (XEXP (XEXP (x, 0), 0)) == LSHIFTRT
+          && CONST_INT_P (XEXP (XEXP (XEXP (x, 0), 0), 1))
+          && CONST_INT_P (XEXP (XEXP (x, 0), 1)))
+        {
+          /* One instruction is better than multiple instructions.  */
+          *total = COSTS_N_INSNS (1);
+          return true;
+        }
       *total = riscv_extend_cost (XEXP (x, 0), GET_CODE (x) == ZERO_EXTEND);
       return false;
 
