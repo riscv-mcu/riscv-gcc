@@ -308,6 +308,29 @@
  (set_attr "mode" "SI")]
 )
 
+(define_insn "xl_bclrdi4"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:QI 2 "immediate_operand" "i")
+                (match_operand:QI 3 "immediate_operand" "i")]
+  UNSPEC_XXLCZ_BCLR))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.bclr \t%0,%1,%2,%3 # Bit clear"
+[(set_attr "type" "logical")
+ (set_attr "mode" "DI")]
+)
+
+(define_insn "xl_bclrdi3_reg"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:SI 2 "register_operand" "r")]
+  UNSPEC_XXLCZ_BCLRR))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.bclrr \t%0,%1,%2 # Bit clear reg"
+[(set_attr "type" "logical")
+ (set_attr "mode" "DI")]
+)
+
 (define_insn "xl_bsetsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
@@ -330,6 +353,82 @@
 [(set_attr "type" "logical")
  (set_attr "mode" "SI")]
 )
+
+(define_insn "xl_bsetdi4"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:QI 2 "immediate_operand" "i")
+                (match_operand:QI 3 "immediate_operand" "i")]
+  UNSPEC_XXLCZ_BSET))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.bset \t%0,%1,%2,%3 # Bit set"
+[(set_attr "type" "logical")
+ (set_attr "mode" "DI")]
+)
+
+(define_insn "xl_bsetdi3_reg"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:SI 2 "register_operand" "r")]
+  UNSPEC_XXLCZ_BSETR))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.bsetr \t%0,%1,%2 # Bit set reg"
+[(set_attr "type" "logical")
+ (set_attr "mode" "DI")]
+)
+
+;; Auto-match for contiguous mask set: x | (((1 << len) - 1) << pos) -> xl.bset
+;; Auto-match for contiguous mask set: x | (((1 << len) - 1) << pos) -> xl.bset
+(define_insn "*bset<mode>_xlcz"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (ior:GPR (match_operand:GPR 1 "register_operand" "r")
+                 (match_operand:GPR 2 "xxlcz_contiguous_mask_1_7" "i")))]
+  "TARGET_XXLCZBITOP"
+{
+  HOST_WIDE_INT mask = INTVAL (operands[2]);
+  unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)mask;
+  int pos = 0;
+  int len = 0;
+  unsigned HOST_WIDE_INT m = umask;
+  while ((m & 1) == 0 && m != 0) { pos++; m >>= 1; }
+  len = 0;
+  while (m & 1) { len++; m >>= 1; }
+  rtx tmp[4];
+    tmp[0] = operands[0];
+    tmp[1] = operands[1];
+    tmp[2] = GEN_INT (len);
+    tmp[3] = GEN_INT (pos);
+    output_asm_insn (\"xl.bset\\t%0,%1,%2,%3\", tmp);
+    return \"\";
+  }
+  [(set_attr "type" "logical")
+   (set_attr "mode" "<GPR:MODE>")])
+
+;; Auto-match for contiguous mask clear: x & ~(((1 << len) - 1) << pos) -> xl.bclr
+(define_insn "*bclr<mode>_xlcz"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (and:GPR (match_operand:GPR 1 "register_operand" "r")
+                 (match_operand:GPR 2 "xxlcz_not_contiguous_mask_1_7" "i")))]
+  "TARGET_XXLCZBITOP"
+{
+  HOST_WIDE_INT not_mask = INTVAL (operands[2]);
+  unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)(~not_mask);
+  int pos = 0;
+  int len = 0;
+  unsigned HOST_WIDE_INT m = umask;
+  while ((m & 1) == 0 && m != 0) { pos++; m >>= 1; }
+  len = 0;
+  while (m & 1) { len++; m >>= 1; }
+  rtx tmp[4];
+    tmp[0] = operands[0];
+    tmp[1] = operands[1];
+    tmp[2] = GEN_INT (len);
+    tmp[3] = GEN_INT (pos);
+    output_asm_insn (\"xl.bclr\\t%0,%1,%2,%3\", tmp);
+    return \"\";
+  }
+  [(set_attr "type" "logical")
+   (set_attr "mode" "<GPR:MODE>")])
 
 ;; xl.extract rd, rs1, uimm3(len), uimm2(bottom) - Extract signed, immediate
 (define_insn "xl_extractsi4"
@@ -437,7 +536,7 @@
 	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 		       (match_operand 2 "const_int_operand" "i")
 		       (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 7 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extract\\t%0,%1,%2,%3\";
@@ -453,7 +552,7 @@
 	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand" "i")
 			 (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 7 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extractu\\t%0,%1,%2,%3\";
@@ -472,6 +571,41 @@
 [(set_attr "type" "logical")
  (set_attr "mode" "SI")]
 )
+
+(define_insn "xl_insertdi4"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:QI 2 "immediate_operand" "i")
+                (match_operand:QI 3 "immediate_operand" "i")]
+  UNSPEC_XXLCZ_INSERT))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.insert\t%0,%1,%2,%3"
+[(set_attr "type" "logical")
+ (set_attr "mode" "DI")]
+)
+
+;; xl.insertr rd, rs1, rs2 - Insert, register version
+;; rs2[4:0] = bottom, rs2[9:5] = len
+(define_insn "xl_insertsi3_reg"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+    (unspec:SI [(match_operand:SI 1 "register_operand" "r")
+                (match_operand:SI 2 "register_operand" "r")]
+  UNSPEC_XXLCZ_INSERTR))]
+  "TARGET_XXLCZBITOP"
+  "xl.insertr\t%0,%1,%2"
+  [(set_attr "type" "logical")
+   (set_attr "mode" "SI")])
+
+(define_insn "xl_insertdi3_reg"
+  [(set (match_operand:DI 0 "register_operand" "=r")
+    (unspec:DI [(match_operand:DI 1 "register_operand" "r")
+                (match_operand:DI 2 "register_operand" "r")]
+  UNSPEC_XXLCZ_INSERTR))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.insertr\t%0,%1,%2"
+  [(set_attr "type" "logical")
+   (set_attr "mode" "DI")])
+
 
 (define_insn "xl_ff1si2"
   [(set (match_operand:QI 0 "register_operand" "=r")
@@ -513,6 +647,62 @@
  (set_attr "mode" "SI")]
 )
 
+(define_insn "xl_ff1di2"
+  [(set (match_operand:QI 0 "register_operand" "=r")
+    (unspec:QI [(match_operand:DI 1 "register_operand" "r")]
+  UNSPEC_XXLCZ_FF1))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.ff1 \t%0,%1"
+  [(set_attr "type" "arith")
+   (set_attr "mode" "DI")])
+
+(define_insn "xl_fl1di2"
+  [(set (match_operand:QI 0 "register_operand" "=r")
+    (unspec:QI [(match_operand:DI 1 "register_operand" "r")]
+  UNSPEC_XXLCZ_FL1))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.fl1 \t%0,%1"
+  [(set_attr "type" "arith")
+   (set_attr "mode" "DI")])
+
+(define_insn "xl_ff0di2"
+  [(set (match_operand:QI 0 "register_operand" "=r")
+    (unspec:QI [(match_operand:DI 1 "register_operand" "r")]
+  UNSPEC_XXLCZ_FF0))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.ff0 \t%0,%1"
+  [(set_attr "type" "arith")
+   (set_attr "mode" "DI")])
+
+(define_insn "xl_fl0di2"
+  [(set (match_operand:QI 0 "register_operand" "=r")
+    (unspec:QI [(match_operand:DI 1 "register_operand" "r")]
+  UNSPEC_XXLCZ_FL0))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.fl0 \t%0,%1"
+  [(set_attr "type" "arith")
+   (set_attr "mode" "DI")])
+
+;; Auto-match for GCC standard CLZ (count leading zeros) -> xl.ff1
+;; clz returns number of leading 0s from MSB, which is exactly the position of first 1 from MSB
+(define_insn "*clz<mode>2_xlcz"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(clz:GPR (match_operand:GPR 1 "register_operand" "r")))]
+  "TARGET_XXLCZBITOP"
+  "xl.ff1\t%0,%1"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "<GPR:MODE>")])
+
+;; Auto-match for GCC standard CTZ (count trailing zeros) -> xl.fl1
+;; ctz returns number of trailing 0s from LSB, which is exactly the position of first 1 from LSB
+(define_insn "*ctz<mode>2_xlcz"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(ctz:GPR (match_operand:GPR 1 "register_operand" "r")))]
+  "TARGET_XXLCZBITOP"
+  "xl.fl1\t%0,%1"
+  [(set_attr "type" "bitmanip")
+   (set_attr "mode" "<GPR:MODE>")])
+
 (define_insn "xl_clbsi2"
   [(set (match_operand:QI 0 "register_operand" "=r")
         (unspec:QI [(match_operand:SI 1 "register_operand" "r")] UNSPEC_XXLCZ_CLB))]
@@ -520,6 +710,14 @@
   "xl.clb\t%0,%1"
   [(set_attr "type" "arith")
    (set_attr "mode" "SI")])
+
+(define_insn "xl_clbdi2"
+  [(set (match_operand:QI 0 "register_operand" "=r")
+        (unspec:QI [(match_operand:DI 1 "register_operand" "r")] UNSPEC_XXLCZ_CLB))]
+  "TARGET_XXLCZBITOP && TARGET_64BIT"
+  "xl.clb\t%0,%1"
+  [(set_attr "type" "arith")
+   (set_attr "mode" "DI")])
 
 (define_insn "xl_slet<u>si3<GPR:mode>"
   [(set (match_operand:GPR 0 "register_operand" "=r")

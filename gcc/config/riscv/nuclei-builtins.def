@@ -29,6 +29,7 @@ DIRECT_BUILTIN1(xl_extractusi4,     extractu,   RISCV_USI_FTYPE_USI_UQI_UQI,  xx
 DIRECT_BUILTIN1(xl_extractusi3_reg, extractu_r, RISCV_USI_FTYPE_USI_UHI,      xxlczbitop)
 
 DIRECT_BUILTIN1(xl_insertsi4,       insert,     RISCV_SI_FTYPE_USI_UQI_UQI,   xxlczbitop)
+DIRECT_BUILTIN1(xl_insertsi3_reg,   insert_r,   RISCV_SI_FTYPE_USI_UHI,       xxlczbitop)
 
 DIRECT_BUILTIN1(xl_fl1si2,     fl1,    RISCV_UQI_FTYPE_USI,    xxlczbitop)
 DIRECT_BUILTIN1(xl_ff1si2,     ff1,    RISCV_UQI_FTYPE_USI,    xxlczbitop)

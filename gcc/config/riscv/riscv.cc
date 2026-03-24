@@ -4119,13 +4119,83 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
           && CONST_INT_P (XEXP (XEXP (x, 0), 1))
           && CONST_INT_P (XEXP (x, 1)))
         {
-          /* One instruction is better than two.  */
-          *total = COSTS_N_INSNS (1);
-          return true;
+          HOST_WIDE_INT mask = INTVAL (XEXP (x, 1));
+          unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)mask;
+          if (umask != 0)
+            {
+              int len = 0;
+              unsigned HOST_WIDE_INT m = umask;
+              if ((m & (m + 1)) == 0)
+                {
+                  len = 0;
+                  while (m & 1) { len++; m >>= 1; }
+                  if (len >= 1 && len <= 7
+                      && INTVAL (XEXP (XEXP (x, 0), 1)) + len <= GET_MODE_BITSIZE (mode).to_constant ())
+                    {
+                      /* One instruction is better than two.  */
+                      *total = COSTS_N_INSNS (1);
+                      return true;
+                    }
+                }
+            }
         }
-
+      /* x & ~(((1 << len) - 1) << pos) -> bit clear for xxlczbitop.  */
+      if (TARGET_XXLCZBITOP && speed
+          && CONST_INT_P (XEXP (x, 1)))
+        {
+          HOST_WIDE_INT not_mask = INTVAL (XEXP (x, 1));
+          unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)(~not_mask);
+          if (umask != 0)
+            {
+              int pos = 0;
+              int len = 0;
+              unsigned HOST_WIDE_INT m = umask;
+              while ((m & 1) == 0 && m != 0) { pos++; m >>= 1; }
+              // After removing trailing zeros, remaining should be all 1s
+              if ((m & (m + 1)) == 0)
+                {
+                  len = 0;
+                  while (m & 1) { len++; m >>= 1; }
+                  if (len >= 1 && len <= 7 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                    {
+                      /* One instruction is better than multiple.  */
+                      *total = COSTS_N_INSNS (1);
+                      return true;
+                    }
+                }
+            }
+        }
       gcc_fallthrough ();
+
     case IOR:
+      /* x | (((1 << len) - 1) << pos) -> bit set for xxlczbitop.  */
+      if (TARGET_XXLCZBITOP && speed
+          && CONST_INT_P (XEXP (x, 1)))
+        {
+          HOST_WIDE_INT mask = INTVAL (XEXP (x, 1));
+          unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)mask;
+          if (umask != 0)
+            {
+              int pos = 0;
+              int len = 0;
+              unsigned HOST_WIDE_INT m = umask;
+              while ((m & 1) == 0 && m != 0) { pos++; m >>= 1; }
+              // After removing trailing zeros, remaining should be all 1s
+              if ((m & (m + 1)) == 0)
+                {
+                  len = 0;
+                  while (m & 1) { len++; m >>= 1; }
+                  if (len >= 1 && len <= 7 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                    {
+                      /* One instruction is better than multiple.  */
+                      *total = COSTS_N_INSNS (1);
+                      return true;
+                    }
+                }
+            }
+        }
+      gcc_fallthrough ();
+
     case XOR:
       /* orn, andn and xorn pattern for zbb.  */
       if (TARGET_ZBB
@@ -4158,8 +4228,13 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  && (INTVAL (XEXP (x, 2)) > 0)
 	  && (INTVAL (XEXP (x, 1)) + INTVAL (XEXP (x, 2)) == 32))
 	{
-	  *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
-	  return true;
+	  if (TARGET_XXLCZBITOP
+	      && (INTVAL (XEXP (x, 1)) >= 1)
+	      && (INTVAL (XEXP (x, 1)) <= 7))
+	    {
+	      *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
+	      return true;
+	    }
 	}
       /* bit extraction pattern (zbs:bext, xtheadbs:tst).  */
       if ((TARGET_ZBS || TARGET_XTHEADBS) && outer_code == SET
@@ -4175,8 +4250,13 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  && CONST_INT_P (XEXP (x, 1))
 	  && CONST_INT_P (XEXP (x, 2)))
 	{
-	  *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
-	  return true;
+	  if (TARGET_XXLCZBITOP
+	      && (INTVAL (XEXP (x, 1)) >= 1)
+	      && (INTVAL (XEXP (x, 1)) <= 7))
+	    {
+	      *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
+	      return true;
+	    }
 	}
       return false;
 
@@ -4445,6 +4525,24 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  /* RISC-V only defines rev8 for XLEN, so we will need an extra
 	     shift-right instruction for smaller modes. */
 	  *total = COSTS_N_INSNS (mode == word_mode ? 1 : 2);
+	  return true;
+	}
+      return false;
+
+    case CLZ:
+      if (TARGET_XXLCZBITOP)
+	{
+	  /* xl.ff1 performs CLZ in one instruction.  */
+	  *total = COSTS_N_INSNS (1);
+	  return true;
+	}
+      return false;
+
+    case CTZ:
+      if (TARGET_XXLCZBITOP)
+	{
+	  /* xl.fl1 performs CTZ in one instruction.  */
+	  *total = COSTS_N_INSNS (1);
 	  return true;
 	}
       return false;

@@ -782,3 +782,41 @@
   (and (match_operand 0 "const_int_operand")
        (ior (match_test "satisfies_constraint_c15 (op)")
 	    (match_test "satisfies_constraint_c16 (op)"))))
+
+;; XXLCZ extension: A CONST_INT that is a contiguous run of 1 <= len <= 7 bits.
+(define_predicate "xxlcz_contiguous_mask_1_7"
+  (match_code "const_int")
+{
+  unsigned HOST_WIDE_INT umask = UINTVAL (op);
+  if (umask == 0)
+    return false;
+  int pos = 0;
+  int len = 0;
+  unsigned HOST_WIDE_INT m = umask;
+  while ((m & 1) == 0 && m != 0) { pos++; m >>= 1; }
+  // After removing trailing zeros, remaining should be all 1s -> (m & (m+1)) == 0
+  if ((m & (m + 1)) != 0)
+    return false;
+  len = 0;
+  while (m & 1) { len++; m >>= 1; }
+  return (len >= 1 && len <= 7);
+})
+
+;; XXLCZ extension: A CONST_INT where ~op is a contiguous run of 1 <= len <= 7 bits.
+(define_predicate "xxlcz_not_contiguous_mask_1_7"
+  (match_code "const_int")
+{
+  unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)(~INTVAL (op));
+  if (umask == 0)
+    return false;
+  int pos = 0;
+  int len = 0;
+  unsigned HOST_WIDE_INT m = umask;
+  while ((m & 1) == 0 && m != 0) { pos++; m >>= 1; }
+  // After removing trailing zeros, remaining should be all 1s -> (m & (m+1)) == 0
+  if ((m & (m + 1)) != 0)
+    return false;
+  len = 0;
+  while (m & 1) { len++; m >>= 1; }
+  return (len >= 1 && len <= 7);
+})
