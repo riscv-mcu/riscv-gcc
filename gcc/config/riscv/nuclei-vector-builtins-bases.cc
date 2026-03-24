@@ -396,6 +396,31 @@ public:
   }
 };
 
+template<int UNSPEC>
+class vds_novdop : public function_base
+{
+public:
+  unsigned int call_properties (const function_instance &) const override
+  {
+      return CP_WRITE_CSR;
+  }
+  bool can_be_overloaded_p (enum predication_type_index pred) const override
+  {
+    return false;
+  }
+  bool apply_tail_policy_p () const override { return false; }
+  bool apply_mask_policy_p () const override { return false; }
+
+  rtx expand (function_expander &e) const override
+  {
+    if (e.op_info->op == OP_TYPE_vv)
+      return e.use_exact_insn (code_for_pred_vds_vv (UNSPEC, e.vector_mode ()));
+    if (e.op_info->op == OP_TYPE_vs)
+      return e.use_exact_insn (code_for_pred_vds_vs (UNSPEC, e.vector_mode ()));
+    gcc_unreachable ();
+  }
+};
+
 class vcpack : public function_base
 {
 public:
@@ -430,10 +455,16 @@ public:
 class vdsmacini : public function_base
 {
 public:
+  unsigned int call_properties (const function_instance &) const override
+  {
+      return CP_WRITE_CSR;
+  }
   bool can_be_overloaded_p (enum predication_type_index pred) const override
   {
     return false;
   }
+  bool apply_tail_policy_p () const override { return false; }
+  bool apply_mask_policy_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
     switch (e.op_info->op)
@@ -500,6 +531,8 @@ public:
 class vperm : public function_base
 {
 public:
+  bool apply_mask_policy_p () const override { return false; }
+  bool use_mask_predication_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
       return e.use_exact_insn (code_for_pred_vperm_vi (e.vector_mode ()));
@@ -510,15 +543,21 @@ template<int UNSPEC>
 class vlnlp : public function_base
 {
 public:
+  bool apply_mask_policy_p () const override { return false; }
+  bool use_mask_predication_p () const override { return false; }
+  bool apply_tail_policy_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
       return e.use_exact_insn (code_for_pred_vlnlp_v (UNSPEC,e.vector_mode ()));
   }
 };
+
 template<int UNSPEC>
 class xxlvw_vfs : public function_base
 {
 public:
+  bool apply_mask_policy_p () const override { return false; }
+  bool use_mask_predication_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
       return e.use_exact_insn (code_for_pred_vfs_vv (UNSPEC, e.vector_mode ()));
@@ -529,6 +568,8 @@ template<int UNSPEC>
 class xxlvw_vfcvt : public function_base
 {
 public:
+  bool apply_mask_policy_p () const override { return false; }
+  bool use_mask_predication_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
       return e.use_exact_insn (code_for_pred_vfcvt (UNSPEC, e.vector_mode ()));
@@ -538,6 +579,8 @@ public:
 class vfcvt_b2w : public function_base
 {
 public:
+  bool apply_mask_policy_p () const override { return false; }
+  bool use_mask_predication_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
       return e.use_exact_insn (code_for_pred_vfcvt_b2w (e.vector_mode ()));
@@ -547,6 +590,8 @@ public:
 class xl_vfcvt_w2b : public function_base
 {
 public:
+  bool apply_mask_policy_p () const override { return false; }
+  bool use_mask_predication_p () const override { return false; }
   rtx expand (function_expander &e) const override
   {
       return e.use_exact_insn (code_for_pred_vfcvt_w2b (e.vector_mode ()));
@@ -603,9 +648,9 @@ static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULR> vdscmulr_obj;
 static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULI> vdscmuli_obj;
 static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULJR> vdscmuljr_obj;
 static CONSTEXPR const vds_binop<UNSPEC_VDS_CMULJI> vdscmulji_obj;
-static CONSTEXPR const vds_binop<UNSPEC_VDS_MAC> vdsmac_obj;
-static CONSTEXPR const vds_binop<UNSPEC_VDS_CMAC> vdscmac_obj;
-static CONSTEXPR const vds_binop<UNSPEC_VDS_CMACJ> vdscmacj_obj;
+static CONSTEXPR const vds_novdop<UNSPEC_VDS_MAC> vdsmac_obj;
+static CONSTEXPR const vds_novdop<UNSPEC_VDS_CMAC> vdscmac_obj;
+static CONSTEXPR const vds_novdop<UNSPEC_VDS_CMACJ> vdscmacj_obj;
 static CONSTEXPR const vcpack vcpack_obj;
 static CONSTEXPR const vcunpackr vcunpackr_obj;
 static CONSTEXPR const vcunpacki vcunpacki_obj;
