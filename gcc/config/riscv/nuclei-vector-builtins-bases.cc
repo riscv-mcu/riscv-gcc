@@ -61,17 +61,11 @@ public:
   bool has_merge_operand_p () const override { return false; }
   bool apply_mask_policy_p () const override { return false; }
   bool use_mask_predication_p () const override { return false; }
-
-  bool can_be_overloaded_p (enum predication_type_index pred) const override
-  {
-    return pred == PRED_TYPE_tu;
-  }
-
   rtx expand (function_expander &e) const override
   {
     if (e.op_info->op == OP_TYPE_4x4x4)
     {
-      return e.use_widen_ternop_insn (code_for_pred_matrix_mul_plus_qoq (SIGN_EXTEND, e.vector_mode ()));
+      return e.use_exact_insn (code_for_pred_matrix_mul_plus_qoq (SIGN_EXTEND, e.vector_mode ()));
     }
     gcc_unreachable ();
   }
@@ -84,14 +78,10 @@ public:
   bool has_merge_operand_p () const override { return false; }
   bool apply_mask_policy_p () const override { return false; }
   bool use_mask_predication_p () const override { return false; }
-  bool can_be_overloaded_p (enum predication_type_index pred) const override
-  {
-    return pred == PRED_TYPE_tu;
-  }
   rtx expand (function_expander &e) const override
   {
     if (e.op_info->op == OP_TYPE_4x4x4)
-      return e.use_widen_ternop_insn (code_for_pred_matrix_mul_plus_qoq (ZERO_EXTEND, e.vector_mode ()));
+      return e.use_exact_insn (code_for_pred_matrix_mul_plus_qoq (ZERO_EXTEND, e.vector_mode ()));
     gcc_unreachable ();
   }
 };
@@ -103,16 +93,10 @@ public:
   bool has_merge_operand_p () const override { return false; }
   bool apply_mask_policy_p () const override { return false; }
   bool use_mask_predication_p () const override { return false; }
-
-  bool can_be_overloaded_p (enum predication_type_index pred) const override
-  {
-    return pred == PRED_TYPE_tu;
-  }
-
   rtx expand (function_expander &e) const override
   {
     if (e.op_info->op == OP_TYPE_4x4x4)
-      return e.use_widen_ternop_insn (code_for_pred_matrix_mul_plussu_qoq (e.vector_mode ()));
+      return e.use_exact_insn (code_for_pred_matrix_mul_plussu_qoq (e.vector_mode ()));
     gcc_unreachable ();
   }
 };
@@ -124,14 +108,10 @@ public:
   bool has_merge_operand_p () const override { return false; }
   bool apply_mask_policy_p () const override { return false; }
   bool use_mask_predication_p () const override { return false; }
-  bool can_be_overloaded_p (enum predication_type_index pred) const override
-  {
-    return pred == PRED_TYPE_tu;
-  }
   rtx expand (function_expander &e) const override
   {
     if (e.op_info->op == OP_TYPE_4x4x4)
-      return e.use_widen_ternop_insn (code_for_pred_matrix_mul_plusus_qoq (e.vector_mode ()));
+      return e.use_exact_insn (code_for_pred_matrix_mul_plusus_qoq (e.vector_mode ()));
     gcc_unreachable ();
   }
 };

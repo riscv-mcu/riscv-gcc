@@ -41,24 +41,22 @@
   [(set (match_operand:XL_VSI 0 "register_operand"                    "=&vr")
 	(if_then_else:XL_VSI
 	  (unspec:<VM>
-	    [(match_operand:<VM> 1 "vector_mask_operand"             "vmWc1")
-	     (match_operand 5 "vector_length_operand"                "   rK")
+	    [(match_operand 4 "vector_length_operand"                "   rK")
+	     (match_operand 5 "const_int_operand"                    "    i")
 	     (match_operand 6 "const_int_operand"                    "    i")
-	     (match_operand 7 "const_int_operand"                    "    i")
-	     (match_operand 8 "const_int_operand"                    "    i")
 	     (reg:SI VL_REGNUM)
 	     (reg:SI VTYPE_REGNUM)] UNSPEC_VPREDICATE)
 	  (plus:XL_VSI
 	    (mult:XL_VSI
 	      (any_extend:XL_VSI
-	        (match_operand:RVVM1QI 3 "register_operand" "   vr"))
+	        (match_operand:RVVM1QI 2 "register_operand" "   vr"))
 	      (any_extend:XL_VSI
-	        (match_operand:<XL_VQMACC_QOQ> 4 "register_operand" "   vr")))
-	    (match_operand:XL_VSI 2 "register_operand"               "    0"))
-	  (match_dup 2)))]
+	        (match_operand:<XL_VQMACC_QOQ> 3 "register_operand" "   vr")))
+	    (match_operand:XL_VSI 1 "register_operand"               "    0"))
+	  (match_dup 1)))]
   "TARGET_VECTOR && TARGET_XXLVQMACC"
-  "xl.vqmacc<u>.vv\t%0,%3,%4"
-  [(set_attr "type" "xl_vqmacc")
+  "xl.vqmacc<u>.vv\t%0,%2,%3"
+  [(set_attr "type" "vqmacc")
    (set_attr "mode" "<MODE>")])
 
 
@@ -66,46 +64,42 @@
   [(set (match_operand:XL_VSI 0 "register_operand"                    "=&vr")
 	(if_then_else:XL_VSI
 	  (unspec:<VM>
-	    [(match_operand:<VM> 1 "vector_mask_operand"             "vmWc1")
-	     (match_operand 5 "vector_length_operand"                "   rK")
+	    [(match_operand 4 "vector_length_operand"                "   rK")
+	     (match_operand 5 "const_int_operand"                    "    i")
 	     (match_operand 6 "const_int_operand"                    "    i")
-	     (match_operand 7 "const_int_operand"                    "    i")
-	     (match_operand 8 "const_int_operand"                    "    i")
 	     (reg:SI VL_REGNUM)
 	     (reg:SI VTYPE_REGNUM)] UNSPEC_VPREDICATE)
 	  (plus:XL_VSI
 	    (mult:XL_VSI
 	      (sign_extend:XL_VSI
-	        (match_operand:RVVM1QI 3 "register_operand" "   vr"))
+	        (match_operand:RVVM1QI 2 "register_operand" "   vr"))
 	      (zero_extend:XL_VSI
-	        (match_operand:<XL_VQMACC_QOQ> 4 "register_operand" "   vr")))
-	    (match_operand:XL_VSI 2 "register_operand"               "    0"))
-	  (match_dup 2)))]
+	        (match_operand:<XL_VQMACC_QOQ> 3 "register_operand" "   vr")))
+	    (match_operand:XL_VSI 1 "register_operand"               "    0"))
+	  (match_dup 1)))]
   "TARGET_VECTOR && TARGET_XXLVQMACC"
-  "xl.vqmaccsu.vv\t%0,%3,%4"
-  [(set_attr "type" "xl_vqmacc")
+  "xl.vqmaccsu.vv\t%0,%2,%3"
+  [(set_attr "type" "vqmacc")
    (set_attr "mode" "<MODE>")])
 
 (define_insn "@pred_matrix_mul_plusus<mode>_qoq"
   [(set (match_operand:XL_VSI 0 "register_operand"                    "=&vr")
 	(if_then_else:XL_VSI
 	  (unspec:<VM>
-	    [(match_operand:<VM> 1 "vector_mask_operand"             "vmWc1")
-	     (match_operand 5 "vector_length_operand"                "   rK")
+	    [(match_operand 4 "vector_length_operand"                "   rK")
+	     (match_operand 5 "const_int_operand"                    "    i")
 	     (match_operand 6 "const_int_operand"                    "    i")
-	     (match_operand 7 "const_int_operand"                    "    i")
-	     (match_operand 8 "const_int_operand"                    "    i")
 	     (reg:SI VL_REGNUM)
 	     (reg:SI VTYPE_REGNUM)] UNSPEC_VPREDICATE)
 	  (plus:XL_VSI
 	    (mult:XL_VSI
 	      (zero_extend:XL_VSI
-	        (match_operand:RVVM1QI 3 "register_operand" "   vr"))
+	        (match_operand:RVVM1QI 2 "register_operand" "   vr"))
 	      (sign_extend:XL_VSI
-	        (match_operand:<XL_VQMACC_QOQ> 4 "register_operand" "   vr")))
-	    (match_operand:XL_VSI 2 "register_operand"               "    0"))
-	  (match_dup 2)))]
+	        (match_operand:<XL_VQMACC_QOQ> 3 "register_operand" "   vr")))
+	    (match_operand:XL_VSI 1 "register_operand"               "    0"))
+	  (match_dup 1)))]
   "TARGET_VECTOR && TARGET_XXLVQMACC"
-  "xl.vqmaccus.vv\t%0,%3,%4"
-  [(set_attr "type" "xl_vqmacc")
+  "xl.vqmaccus.vv\t%0,%2,%3"
+  [(set_attr "type" "vqmacc")
    (set_attr "mode" "<MODE>")])

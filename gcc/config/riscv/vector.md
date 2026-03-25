@@ -56,7 +56,7 @@
 			  vror,vwsll,vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
 			  vaeskf1,vaeskf2,vaesz,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,vsm3me,vsm3c,\
 			  vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,novdop,vcpack,vcunpack,vlsb,vdsmacini,\
-			  vperm,vfsop,vlnlp,vconvert")
+			  vperm,vfsop,vlnlp,vconvert,vqmacc")
 	 (const_string "true")]
 	(const_string "false")))
 
@@ -82,7 +82,7 @@
 			  vror,vwsll,vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
 			  vaeskf1,vaeskf2,vaesz,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,vsm3me,vsm3c,\
 			  vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,novdop,vcpack,vcunpack,vlsb,vdsmacini,\
-			  vperm,vfsop,vlnlp,vconvert")
+			  vperm,vfsop,vlnlp,vconvert,vqmacc")
 	 (const_string "true")]
 	(const_string "false")))
 
@@ -491,7 +491,7 @@
 			  vclmul,vclmulh,vghsh,vgmul,vaesef,vaesem,vaesdf,vaesdm,\
 			  vaeskf1,vaeskf2,vaesz,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm4r,\
 			  vsm3me,vsm3c,vfncvtbf16,vfwcvtbf16,vfwmaccbf16,vdsop,novdop,vcpack,\
-			  vcunpack,vdsmacini,vlsb,vperm,vfsop,vlnlp,vconvert")
+			  vcunpack,vdsmacini,vlsb,vperm,vfsop,vlnlp,vconvert,vqmacc")
 	   (const_int INVALID_ATTRIBUTE)
 	(and (eq_attr "type" "vlde,vste,vlsegde,vssegte,vlsegds,vssegts,\
 			       vlsegdff,vssegtux,vlsegdox,vlsegdux")
@@ -846,7 +846,7 @@
 			  vfncvtftoi,vfncvtftof,vfclass,vimovxv,vfmovfv,vcompress,\
 			  vlsegde,vssegts,vssegtux,vssegtox,vlsegdff,vbrev,vbrev8,vrev8,\
                           vghsh,vaeskf1,vaeskf2,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm3me,vsm3c,\
-			  vfncvtbf16,vfwcvtbf16,vdsmacini,vcunpack,vlsb,vperm,vfsop")
+			  vfncvtbf16,vfwcvtbf16,vdsmacini,vcunpack,vlsb,vperm,vfsop,vqmacc")
 	   (const_int 4)
 
 	 ;; If operands[3] of "vlds" is not vector mode, it is pred_broadcast.
@@ -880,7 +880,7 @@
 			  vfncvtitof,vfncvtftoi,vfncvtftof,vfclass,vimovxv,vfmovfv,\
 			  vcompress,vldff,vlsegde,vlsegdff,vbrev,vbrev8,vrev8,vghsh,\
                           vaeskf1,vaeskf2,vsha2ms,vsha2ch,vsha2cl,vsm4k,vsm3me,vsm3c,\
-			  vfncvtbf16,vfwcvtbf16,vcunpack,vlsb,vperm,vfsop")
+			  vfncvtbf16,vfwcvtbf16,vcunpack,vlsb,vperm,vfsop,vqmacc")
 	   (symbol_ref "riscv_vector::get_ta(operands[5])")
 
 	 ;; If operands[3] of "vlds" is not vector mode, it is pred_broadcast.
@@ -973,7 +973,7 @@
 	   (const_int 9)
 
 	 (eq_attr "type" "vmsfs,vmidx,vcompress,vghsh,vaeskf1,vaeskf2,vsha2ms,vsha2ch,vsha2cl,\
-                          vsm4k,vsm3me,vsm3c,novdop,vperm,vfsop")
+                          vsm4k,vsm3me,vsm3c,novdop,vperm,vfsop,vqmacc")
 	   (const_int 6)
 
 	 (eq_attr "type" "vmpop,vmffs,vssegte,vcpop,vclz,vctz,vlnlp")
