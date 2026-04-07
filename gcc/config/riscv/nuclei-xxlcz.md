@@ -732,7 +732,7 @@
   [(set (match_operand:X          0 "register_operand" "=r")
 	(mult:X (match_operand:X 1 "register_operand" " r")
 		 (match_operand:X 2 "const_arith_operand" " I")))]
-  "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC"
+  "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC && (INTVAL (operands[2]) >= 0) && (INTVAL (operands[2]) <= 255)"
   "xl.muli\t%0,%1,%2"
   [(set_attr "type" "imul")
    (set_attr "mode" "<MODE>")])

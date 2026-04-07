@@ -1340,11 +1340,26 @@
                 (match_operand:X 2 "const_arith_operand")))]
   "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC"
 {
+  HOST_WIDE_INT imm;
   if (CONST_INT_P (operands[2]))
+    imm = INTVAL (operands[2]);
+  else if (CONST_INT_P (operands[1]))
     {
-      emit_insn (gen_xl_muli<mode>3 (operands[0], operands[1], operands[2]));
-      DONE;
+      // Multiply is commutative - GCC may have swapped operands
+      imm = INTVAL (operands[1]);
+      // Swap back to have register first, immediate second
+      rtx tmp = operands[1];
+      operands[1] = operands[2];
+      operands[2] = tmp;
     }
+  else
+    FAIL;
+
+  // xl.muli supports 0-8 bits unsigned (0 - 255)
+  if (imm < 0 || imm > 255)
+    FAIL; // Fall back to normal expansion for larger immediates
+  emit_insn (gen_xl_muli<mode>3 (operands[0], operands[1], operands[2]));
+  DONE;
 })
 
 (define_insn "*mulsi3"

@@ -4453,6 +4453,17 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
     case MULT:
       if (float_mode_p)
 	*total = tune_param->fp_mul[mode == DFmode];
+      else if (TARGET_XXLCZMAC && CONST_INT_P (XEXP (x, 1)))
+        {
+          HOST_WIDE_INT imm = INTVAL (XEXP (x, 1));
+          // Only adjust cost when immediate fits in 0-8 bits (0 - 255) for xl.muli
+          if (imm >= 0 && imm <= 255)
+            {
+              // Multiply by immediate is a single instruction
+              *total = COSTS_N_INSNS (1);
+              return true;
+            }
+        }
       else if (!(TARGET_MUL || TARGET_ZMMUL))
 	/* Estimate the cost of a library call.  */
 	*total = COSTS_N_INSNS (speed ? 32 : 6);
