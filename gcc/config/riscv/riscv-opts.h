@@ -201,6 +201,10 @@ enum riscv_tls_type {
 #define TARGET_XXLDSPN2X  ((riscv_rvp_subext & MASK_XXLDSPN2X) != 0)
 #define TARGET_XXLDSPN3X  ((riscv_rvp_subext & MASK_XXLDSPN3X) != 0)
 
+
+#define TARGET_VECTOR_AUTOVEC					       \
+  (TARGET_VECTOR && flag_tree_loop_vectorize && flag_tree_slp_vectorize)
+
 /* On some microarchitectures, vector segment loads and stores are excessively
    expensive, so predicate the generation of those instrunctions.  */
 #define TARGET_VECTOR_AUTOVEC_SEGMENT					       \
