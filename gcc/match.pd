@@ -5868,6 +5868,17 @@ DEFINE_INT_AND_FLOAT_ROUND_FN (RINT)
           && integer_nonzerop (fold_build2 (GE_EXPR, boolean_type_node, @3, @4)))
       (max @2 @4))))))
 
+/* Optimize signed < 0 ? positive : MIN<signed, positive> to
+   MIN<(unsigned)signed, (unsigned)positive>. */
+(simplify
+ (cond (lt @0 integer_zerop)
+  tree_expr_nonnegative_p@1
+  (min:c @0 @1))
+ (if (INTEGRAL_TYPE_P (type)
+      && !TYPE_UNSIGNED (type))
+  (with { tree utype = unsigned_type_for (type); }
+   (convert (min (convert:utype @0) (convert:utype @1))))))
+
 #if GIMPLE
 /* These patterns should be after min/max detection as simplifications
    of `(type)(zero_one ==/!= 0)` to `(type)(zero_one)`
