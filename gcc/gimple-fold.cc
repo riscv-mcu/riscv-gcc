@@ -6412,13 +6412,11 @@ fold_stmt_1 (gimple_stmt_iterator *gsi, bool inplace, tree (*valueize) (tree))
       gimple_seq seq = NULL;
       gimple_match_op res_op;
       if (gimple_simplify (stmt, &res_op, inplace ? NULL : &seq,
-			   valueize, valueize))
-	{
-	  if (replace_stmt_with_simplification (gsi, &res_op, &seq, inplace))
-	    changed = true;
-	  else
-	    gimple_seq_discard (seq);
-	}
+			   valueize, valueize)
+	  && replace_stmt_with_simplification (gsi, &res_op, &seq, inplace))
+	changed = true;
+      else
+	gimple_seq_discard (seq);
     }
 
   stmt = gsi_stmt (*gsi);
