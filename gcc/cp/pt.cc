@@ -7273,18 +7273,22 @@ invalid_tparm_referent_p (tree type, tree expr, tsubst_flags_t complain)
 			"because %qD has no linkage", expr, type, decl);
 	    return true;
 	  }
-	/* C++17: For a non-type template-parameter of reference or pointer
-	   type, the value of the constant expression shall not refer to (or
-	   for a pointer type, shall not be the address of):
-	   * a subobject (4.5),
-	   * a temporary object (15.2),
-	   * a string literal (5.13.5),
-	   * the result of a typeid expression (8.2.8), or
-	   * a predefined __func__ variable (11.4.1).  */
+	/* For a constant template parameter of reference or pointer type,
+	   or for each non-static data member of reference or pointer type
+	   in a constant template parameter of class type or subobject thereof,
+	   the reference or pointer value shall not refer or point to
+	   (respectively):
+	   -- a temporary object,
+	   -- a string literal object,
+	   -- the result of a typeid expression,
+	   -- a predefined __func__ variable, or
+	   -- a subobject of one of the above.  */
 	else if (VAR_P (decl) && DECL_ARTIFICIAL (decl)
 		 && !DECL_NTTP_OBJECT_P (decl))
 	  {
-	    gcc_checking_assert (DECL_TINFO_P (decl) || DECL_FNAME_P (decl));
+	    gcc_checking_assert (DECL_TINFO_P (decl)
+				 || DECL_FNAME_P (decl)
+				 || DECL_IGNORED_P (decl));
 	    if (complain & tf_error)
 	      error ("the address of %qD is not a valid template argument",
 		     decl);
