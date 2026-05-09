@@ -382,7 +382,7 @@
 (define_insn "*bset<mode>_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (ior:GPR (match_operand:GPR 1 "register_operand" "r")
-                 (match_operand:GPR 2 "xxlcz_contiguous_mask_1_7" "i")))]
+                 (match_operand:GPR 2 "xxlcz_contiguous_mask_1_31" "i")))]
   "TARGET_XXLCZBITOP"
 {
   HOST_WIDE_INT mask = INTVAL (operands[2]);
@@ -408,7 +408,7 @@
 (define_insn "*bclr<mode>_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (and:GPR (match_operand:GPR 1 "register_operand" "r")
-                 (match_operand:GPR 2 "xxlcz_not_contiguous_mask_1_7" "i")))]
+                 (match_operand:GPR 2 "xxlcz_not_contiguous_mask_1_31" "i")))]
   "TARGET_XXLCZBITOP"
 {
   HOST_WIDE_INT not_mask = INTVAL (operands[2]);
@@ -536,7 +536,7 @@
 	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 		       (match_operand 2 "const_int_operand" "i")
 		       (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 7 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extract\\t%0,%1,%2,%3\";
@@ -552,7 +552,7 @@
 	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand" "i")
 			 (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 7 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extractu\\t%0,%1,%2,%3\";

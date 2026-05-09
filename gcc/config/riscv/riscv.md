@@ -4584,7 +4584,14 @@
 			 (match_operand 2 "const_int_operand")
 			 (match_operand 3 "const_int_operand")))]
   "TARGET_XTHEADBB || TARGET_XXLCZBITOP"
-)
+{
+  if (TARGET_XXLCZBITOP)
+    {
+      // xl.extract supports 1-31 bit length (5-bit immediate)
+      if (INTVAL (operands[2]) < 1 || INTVAL (operands[2]) > 31)
+        FAIL;
+    }
+})
 
 (define_expand "extzv<mode>"
   [(set (match_operand:GPR 0 "register_operand" "=r")
@@ -4593,8 +4600,14 @@
 			 (match_operand 3 "const_int_operand")))]
   "TARGET_XTHEADBB || TARGET_XXLCZBITOP"
 {
-  if ((TARGET_XTHEADBB || TARGET_XXLCZBITOP)
-      && (INTVAL (operands[2]) < 8) && (INTVAL (operands[3]) == 0))
+  if (TARGET_XXLCZBITOP)
+    {
+      // xl.extractu supports 1-31 bit length (5-bit immediate)
+      if (INTVAL (operands[2]) < 1 || INTVAL (operands[2]) > 31)
+        FAIL;
+    }
+  else if (TARGET_XTHEADBB
+           && (INTVAL (operands[2]) < 8 && INTVAL (operands[3]) == 0))
     FAIL;
 })
 

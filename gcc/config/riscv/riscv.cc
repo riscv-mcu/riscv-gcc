@@ -4129,7 +4129,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 1 && len <= 7
+                  if (len >= 1 && len <= 31
                       && INTVAL (XEXP (XEXP (x, 0), 1)) + len <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than two.  */
@@ -4156,7 +4156,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 1 && len <= 7 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                  if (len >= 1 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than multiple.  */
                       *total = COSTS_N_INSNS (1);
@@ -4185,7 +4185,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 1 && len <= 7 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                  if (len >= 1 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than multiple.  */
                       *total = COSTS_N_INSNS (1);
@@ -4230,7 +4230,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	{
 	  if (TARGET_XXLCZBITOP
 	      && (INTVAL (XEXP (x, 1)) >= 1)
-	      && (INTVAL (XEXP (x, 1)) <= 7))
+	      && (INTVAL (XEXP (x, 1)) <= 31))
 	    {
 	      *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
 	      return true;
@@ -4252,7 +4252,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	{
 	  if (TARGET_XXLCZBITOP
 	      && (INTVAL (XEXP (x, 1)) >= 1)
-	      && (INTVAL (XEXP (x, 1)) <= 7))
+	      && (INTVAL (XEXP (x, 1)) <= 31))
 	    {
 	      *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
 	      return true;

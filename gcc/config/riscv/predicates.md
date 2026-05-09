@@ -783,8 +783,8 @@
        (ior (match_test "satisfies_constraint_c15 (op)")
 	    (match_test "satisfies_constraint_c16 (op)"))))
 
-;; XXLCZ extension: A CONST_INT that is a contiguous run of 1 <= len <= 7 bits.
-(define_predicate "xxlcz_contiguous_mask_1_7"
+;; XXLCZ extension: A CONST_INT that is a contiguous run of 1 <= len <= 31 bits.
+(define_predicate "xxlcz_contiguous_mask_1_31"
   (match_code "const_int")
 {
   unsigned HOST_WIDE_INT umask = UINTVAL (op);
@@ -799,11 +799,11 @@
     return false;
   len = 0;
   while (m & 1) { len++; m >>= 1; }
-  return (len >= 1 && len <= 7);
+  return (len >= 1 && len <= 31);
 })
 
-;; XXLCZ extension: A CONST_INT where ~op is a contiguous run of 1 <= len <= 7 bits.
-(define_predicate "xxlcz_not_contiguous_mask_1_7"
+;; XXLCZ extension: A CONST_INT where ~op is a contiguous run of 1 <= len <= 31 bits.
+(define_predicate "xxlcz_not_contiguous_mask_1_31"
   (match_code "const_int")
 {
   unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)(~INTVAL (op));
@@ -818,5 +818,5 @@
     return false;
   len = 0;
   while (m & 1) { len++; m >>= 1; }
-  return (len >= 1 && len <= 7);
+  return (len >= 1 && len <= 31);
 })
