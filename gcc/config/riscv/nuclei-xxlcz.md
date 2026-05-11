@@ -729,9 +729,9 @@
    (set_attr "mode" "none")])
 
 (define_insn "xl_muli<mode>3"
-  [(set (match_operand:X          0 "register_operand" "=r")
-	(mult:X (match_operand:X 1 "register_operand" " r")
-		 (match_operand:X 2 "const_arith_operand" " I")))]
+  [(set (match_operand:GPR        0 "register_operand" "=r")
+	(mult:GPR (match_operand:GPR 1 "register_operand" " r")
+		 (match_operand:GPR 2 "const_arith_operand" " I")))]
   "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC && (INTVAL (operands[2]) >= 0) && (INTVAL (operands[2]) <= 255)"
   "xl.muli\t%0,%1,%2"
   [(set_attr "type" "imul")

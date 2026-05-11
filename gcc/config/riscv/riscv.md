@@ -1335,30 +1335,23 @@
    (set_attr "mode" "<UNITMODE>")])
 
 (define_expand "mul<mode>3"
-  [(set (match_operand:X 0 "register_operand")
-        (mult:X (match_operand:X 1 "register_operand")
-                (match_operand:X 2 "const_arith_operand")))]
-  "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC"
+  [(set (match_operand:GPR 0 "register_operand")
+        (mult:GPR (match_operand:GPR 1 "register_operand")
+                  (match_operand:GPR 2 "const_arith_operand")))]
+  "TARGET_ZMMUL || TARGET_MUL"
 {
-  HOST_WIDE_INT imm;
-  if (CONST_INT_P (operands[2]))
-    imm = INTVAL (operands[2]);
-  else if (CONST_INT_P (operands[1]))
+  if (TARGET_XXLCZMAC && CONST_INT_P (operands[2]))
     {
-      // Multiply is commutative - GCC may have swapped operands
-      imm = INTVAL (operands[1]);
-      // Swap back to have register first, immediate second
-      rtx tmp = operands[1];
-      operands[1] = operands[2];
-      operands[2] = tmp;
+      HOST_WIDE_INT imm = INTVAL (operands[2]);
+      if (imm >= 0 && imm <= 255)
+        {
+          emit_insn (gen_xl_muli<mode>3 (operands[0], operands[1], operands[2]));
+          DONE;
+        }
     }
-  else
-    FAIL;
-
-  // xl.muli supports 0-8 bits unsigned (0 - 255)
-  if (imm < 0 || imm > 255)
-    FAIL; // Fall back to normal expansion for larger immediates
-  emit_insn (gen_xl_muli<mode>3 (operands[0], operands[1], operands[2]));
+  /* Convert immediate to register and emit standard mul.  */
+  operands[2] = force_reg (<MODE>mode, operands[2]);
+  emit_insn (gen_rtx_SET (operands[0], gen_rtx_MULT (<MODE>mode, operands[1], operands[2])));
   DONE;
 })
 
