@@ -1334,27 +1334,6 @@
   [(set_attr "type" "fmul")
    (set_attr "mode" "<UNITMODE>")])
 
-(define_expand "mul<mode>3"
-  [(set (match_operand:GPR 0 "register_operand")
-        (mult:GPR (match_operand:GPR 1 "register_operand")
-                  (match_operand:GPR 2 "const_arith_operand")))]
-  "TARGET_ZMMUL || TARGET_MUL"
-{
-  if (TARGET_XXLCZMAC && CONST_INT_P (operands[2]))
-    {
-      HOST_WIDE_INT imm = INTVAL (operands[2]);
-      if (imm >= 0 && imm <= 255)
-        {
-          emit_insn (gen_xl_muli<mode>3 (operands[0], operands[1], operands[2]));
-          DONE;
-        }
-    }
-  /* Convert immediate to register and emit standard mul.  */
-  operands[2] = force_reg (<MODE>mode, operands[2]);
-  emit_insn (gen_rtx_SET (operands[0], gen_rtx_MULT (<MODE>mode, operands[1], operands[2])));
-  DONE;
-})
-
 (define_insn "*mulsi3"
   [(set (match_operand:SI          0 "register_operand" "=r")
 	(mult:SI (match_operand:SI 1 "register_operand" " r")
@@ -1364,25 +1343,37 @@
   [(set_attr "type" "imul")
    (set_attr "mode" "SI")])
 
-(define_expand "mulsi3_2"
+(define_expand "mulsi3"
   [(set (match_operand:SI          0 "register_operand" "=r")
        (mult:SI (match_operand:SI 1 "register_operand" " r")
                 (match_operand:SI 2 "register_operand" " r")))]
-  "TARGET_ZMMUL || TARGET_MUL"
+  "TARGET_ZMMUL || TARGET_MUL || TARGET_XXLCZMAC"
 {
-  if (TARGET_64BIT)
+    if(TARGET_XXLCZMAC && !TARGET_64BIT && CONST_INT_P (operands[2]))
     {
-      rtx t = gen_reg_rtx (DImode);
-      emit_insn (gen_mulsi3_extended (t, operands[1], operands[2]));
-      t = gen_lowpart (SImode, t);
-      SUBREG_PROMOTED_VAR_P (t) = 1;
-      SUBREG_PROMOTED_SET (t, SRP_SIGNED);
-      emit_move_insn (operands[0], t);
-      DONE;
+      HOST_WIDE_INT imm = INTVAL (operands[2]);
+      if (imm >= 0 && imm <= 255)
+        {
+          emit_insn (gen_xl_mulisi3 (operands[0], operands[1], operands[2]));
+          DONE;
+        }
+    }
+    else
+    {
+        if (TARGET_64BIT)
+            {
+            rtx t = gen_reg_rtx (DImode);
+            emit_insn (gen_mulsi3_extended (t, operands[1], operands[2]));
+            t = gen_lowpart (SImode, t);
+            SUBREG_PROMOTED_VAR_P (t) = 1;
+            SUBREG_PROMOTED_SET (t, SRP_SIGNED);
+            emit_move_insn (operands[0], t);
+            DONE;
+            }
     }
 })
 
-(define_insn "*muldi3"
+(define_insn "muldi3"
   [(set (match_operand:DI          0 "register_operand" "=r")
 	(mult:DI (match_operand:DI 1 "register_operand" " r")
 		 (match_operand:DI 2 "register_operand" " r")))]
@@ -1582,7 +1573,7 @@
 		   (match_operand:SI 2 "register_operand" " r"))))]
   "(TARGET_ZMMUL || TARGET_MUL || TARGET_ZPN) && !TARGET_64BIT"
 {
-    if (TARGET_ZPN)
+    if (TARGET_ZPN && TARGET_NUCLEI_DSP_AUTOVEC)
     {
         ;
     }
@@ -3330,7 +3321,6 @@
       || TARGET_XVENTANACONDOPS || TARGET_SFB_ALU)
      && (INTVAL (operands[2]) == 1))
    && !TARGET_XTHEADBB
-   && !TARGET_XXLCZBITOP
    && !(TARGET_64BIT
         && (INTVAL (operands[3]) > 0)
         && (INTVAL (operands[2]) + INTVAL (operands[3]) == 32))"
@@ -3555,7 +3545,7 @@
 			  (match_operand:X 3 "reg_or_0_operand" "rJ")])
 	 (label_ref (match_operand 0 "" ""))
 	 (pc)))]
-  "(!TARGET_XCVBI && !TARGET_XXLCZBRI) || TARGET_ZIBI"
+  "(!TARGET_XCVBI && !TARGET_XXLCZBRI)"
 {
   if (get_attr_length (insn) == 12)
     return "b%N1\t%2,%z3,1f; jump\t%l0,ra; 1:";

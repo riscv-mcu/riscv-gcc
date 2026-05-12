@@ -728,14 +728,14 @@
   [(set_attr "type" "arith")
    (set_attr "mode" "none")])
 
-(define_insn "xl_muli<mode>3"
-  [(set (match_operand:GPR        0 "register_operand" "=r")
-	(mult:GPR (match_operand:GPR 1 "register_operand" " r")
-		 (match_operand:GPR 2 "const_arith_operand" " I")))]
-  "(TARGET_ZMMUL || TARGET_MUL) && TARGET_XXLCZMAC && (INTVAL (operands[2]) >= 0) && (INTVAL (operands[2]) <= 255)"
+(define_insn "xl_mulisi3"
+  [(set (match_operand:SI        0 "register_operand" "=r")
+	(mult:SI (match_operand:SI 1 "register_operand" " r")
+		 (match_operand:SI 2 "const_arith_operand" " I")))]
+  "(TARGET_ZMMUL || TARGET_MUL) && !TARGET_64BIT &&TARGET_XXLCZMAC && (INTVAL (operands[2]) >= 0) && (INTVAL (operands[2]) <= 255)"
   "xl.muli\t%0,%1,%2"
   [(set_attr "type" "imul")
-   (set_attr "mode" "<MODE>")])
+   (set_attr "mode" "none")])
 
 (define_insn "xl_bitrevsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
