@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-march=rv32imac_xxlcbitop -mabi=ilp32 -O2" } */
+/* { dg-options "-march=rv32imac_xxlczbitop -mabi=ilp32 -O2" } */
 
 unsigned int extract_5bits(unsigned int x)
 {

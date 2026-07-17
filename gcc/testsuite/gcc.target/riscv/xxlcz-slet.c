@@ -12,5 +12,5 @@ int test_slet(int rs1, int rs2) {
     return rd;
 }
 
-/* { dg-final { scan-assembler-times "xl\\.sletu" 1 } } */
-/* { dg-final { scan-assembler-times "xl\\.slet" 1 } } */
+/* { dg-final { scan-assembler-times "xl\\.sletu\t" 1 } } */
+/* { dg-final { scan-assembler-times "xl\\.slet\t" 1 } } */

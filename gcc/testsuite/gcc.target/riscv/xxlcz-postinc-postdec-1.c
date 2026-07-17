@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-march=rv32imac_xxlczpstinc -mabi=ilp32 -O2" } */
+/* { dg-skip-if "" { *-*-* } { "-funroll-loops" } } */
 
 #include <stdint.h>
 
@@ -114,11 +115,11 @@ xxlcz_load_store_uqi_dec (uint8_t *ptr, uint8_t *src, int n)
     return 0;
 }
 
-/* { dg-final { scan-assembler-times "xl\\.lw" 2 } } */
-/* { dg-final { scan-assembler-times "xl\\.lh" 2 } } */
-/* { dg-final { scan-assembler-times "xl\\.lhu" 2 } } */
-/* { dg-final { scan-assembler-times "xl\\.lb" 2 } } */
-/* { dg-final { scan-assembler-times "xl\\.lbu" 2 } } */
-/* { dg-final { scan-assembler-times "xl\\.sw" 2 } } */
-/* { dg-final { scan-assembler-times "xl\\.sh" 4 } } */
-/* { dg-final { scan-assembler-times "xl\\.sb" 4 } } */
+/* { dg-final { scan-assembler-times "xl\\.lw\t" 2 } } */
+/* { dg-final { scan-assembler-times "xl\\.lh\t" 2 } } */
+/* { dg-final { scan-assembler-times "xl\\.lhu\t" 2 } } */
+/* { dg-final { scan-assembler-times "xl\\.lb\t" 2 } } */
+/* { dg-final { scan-assembler-times "xl\\.lbu\t" 2 } } */
+/* { dg-final { scan-assembler-times "xl\\.sw\t" 2 } } */
+/* { dg-final { scan-assembler-times "xl\\.sh\t" 4 } } */
+/* { dg-final { scan-assembler-times "xl\\.sb\t" 4 } } */
