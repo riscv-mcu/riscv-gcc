@@ -701,8 +701,8 @@ Enable (default) or disable generation of vector segment load/store instructions
 
 mautovec-dsp
 Target Integer Var(riscv_mautovec_dsp) Init(0)
-Enable or disable (default) of nuclei dsp autovec
+Enable or disable (default) of nuclei dsp autovec.
 
 maddibne
 Target Var(riscv_maddibne) Init(0)
-Enable or disable (default) xxlcz subext addibne instruction
+Enable or disable (default) xxlcz subext addibne instruction.
