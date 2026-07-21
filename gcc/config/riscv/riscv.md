@@ -2056,13 +2056,39 @@
   [(set_attr "type" "fcvt")
    (set_attr "mode" "HF")])
 
-(define_insn "truncdfbf2"
+;; Only Xxlfbf generate fcvt.h.d
+(define_insn "truncdfbf2_internal"
   [(set (match_operand:BF     0 "register_operand" "=f")
-       (float_truncate:BF
-           (match_operand:DF 1 "register_operand" " f")))]
+        (float_truncate:BF
+            (match_operand:DF 1 "register_operand" " f")))]
   "(TARGET_XXLFBF && TARGET_DOUBLE_FLOAT) ||
    (TARGET_XXLFBF && TARGET_ZDINX)"
   "fcvt.h.d\t%0,%1"
+  [(set_attr "type" "fcvt")
+   (set_attr "mode" "BF")])
+
+(define_expand "truncdfbf2"
+  [(set (match_operand:BF     0 "register_operand")
+        (float_truncate:BF
+            (match_operand:DF 1 "register_operand")))]
+  "(TARGET_XXLFBF && TARGET_DOUBLE_FLOAT) ||
+   (TARGET_XXLFBF && TARGET_ZDINX) ||
+   TARGET_ZFBFMIN"
+  {
+    if ((TARGET_XXLFBF && TARGET_DOUBLE_FLOAT) ||
+        (TARGET_XXLFBF && TARGET_ZDINX))
+      {
+        emit_insn (gen_truncdfbf2_internal (operands[0], operands[1]));
+        DONE;
+      }
+    if (TARGET_ZFBFMIN)
+      {
+        convert_move (operands[0],
+          convert_modes (SFmode, DFmode, operands[1], 0), 0);
+        DONE;
+      }
+    FAIL;
+  }
   [(set_attr "type" "fcvt")
    (set_attr "mode" "BF")])
 
