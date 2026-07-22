@@ -799,7 +799,9 @@
     return false;
   len = 0;
   while (m & 1) { len++; m >>= 1; }
-  return (len >= 1 && len <= 31);
+  // pos must fit the gas 'bi' operand (5 bits, 0-31), otherwise xl.bset/bclr
+  // would emit an illegal operand (e.g. pos=48 for high-bit masks on DI mode).
+  return (len >= 1 && len <= 31 && pos <= 31);
 })
 
 ;; XXLCZ extension: A CONST_INT where ~op is a contiguous run of 1 <= len <= 31 bits.
@@ -818,5 +820,7 @@
     return false;
   len = 0;
   while (m & 1) { len++; m >>= 1; }
-  return (len >= 1 && len <= 31);
+  // pos must fit the gas 'bi' operand (5 bits, 0-31), otherwise xl.bset/bclr
+  // would emit an illegal operand (e.g. pos=48 for high-bit masks on DI mode).
+  return (len >= 1 && len <= 31 && pos <= 31);
 })
