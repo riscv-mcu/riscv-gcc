@@ -802,6 +802,11 @@
 )
 
 ;; XXLCZBRI Instructions
+;; xl.beqi/xl.bnei: branch if register ==/!= immediate (5-bit signed, -16..15)
+;; Only generated when xxlczbri is enabled and zibi is NOT (zibi uses beqi/bnei
+;; with the same encoding; when both are on, zibi takes precedence).
+;; Relational comparisons (lt/le/gt/ge/etc.) use the standard
+;; *branch<mode>_relational_comparison pattern which is not disabled by xxlczbri.
 (define_insn "*xl_branch<mode>"
   [(set (pc)
 	(if_then_else
@@ -816,24 +821,6 @@
     return "xl.b%N1i\t%2,%z3,1f; jump\t%l0,ra; 1:";
 
   return "xl.b%C1i\t%2,%3,%0";
-}
-  [(set_attr "type" "branch")
-   (set_attr "mode" "none")])
-
-(define_insn "*branch<mode>"
-  [(set (pc)
-        (if_then_else
-         (match_operator 1 "ordered_comparison_operator"
-                         [(match_operand:X 2 "register_operand" "r")
-                          (match_operand:X 3 "reg_or_0_operand" "rJ")])
-         (label_ref (match_operand 0 "" ""))
-         (pc)))]
-  "TARGET_XXLCZBRI && !TARGET_ZIBI"
-{
-  if (get_attr_length (insn) == 12)
-    return "b%N1\t%2,%z3,1f; jump\t%l0,ra; 1:";
-
-  return "b%C1\t%2,%z3,%l0";
 }
   [(set_attr "type" "branch")
    (set_attr "mode" "none")])
