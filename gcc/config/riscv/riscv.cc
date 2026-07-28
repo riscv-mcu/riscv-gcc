@@ -12139,8 +12139,11 @@ riscv_support_vector_misalignment (machine_mode mode,
 static opt_machine_mode
 riscv_get_mask_mode (machine_mode mode)
 {
-  if (TARGET_VECTOR && riscv_v_ext_mode_p (mode))
+  if (TARGET_VECTOR && riscv_mautovec_rvv && riscv_v_ext_mode_p (mode))
     return riscv_vector::get_mask_mode (mode);
+
+  if (TARGET_VECTOR && !riscv_mautovec_rvv)
+    return opt_machine_mode ();
 
   return default_get_mask_mode (mode);
 }
@@ -12310,7 +12313,7 @@ riscv_use_divmod_expander (void)
 static machine_mode
 riscv_preferred_simd_mode (scalar_mode mode)
 {
-  if (TARGET_VECTOR && !TARGET_XTHEADVECTOR)
+  if (TARGET_VECTOR && riscv_mautovec_rvv && !TARGET_XTHEADVECTOR)
     return riscv_vector::preferred_simd_mode (mode);
 
   return word_mode;
@@ -12735,12 +12738,12 @@ riscv_autovectorize_vector_modes (vector_modes *modes, bool all)
     riscv_rvp_autovec_p = true;
   }
 
-  if(TARGET_VECTOR)
+  if(TARGET_VECTOR && riscv_mautovec_rvv)
   {
     riscv_rvv_autovec_p = true;
   }
 
-  if (TARGET_VECTOR && !TARGET_XTHEADVECTOR)
+  if (TARGET_VECTOR && riscv_mautovec_rvv && !TARGET_XTHEADVECTOR)
     return riscv_vector::autovectorize_vector_modes (modes, all);
 
   return default_autovectorize_vector_modes (modes, all);
@@ -12751,10 +12754,13 @@ opt_machine_mode
 riscv_vectorize_related_mode (machine_mode vector_mode, scalar_mode element_mode,
 			      poly_uint64 nunits)
 {
-  if (TARGET_VECTOR)
+  if (TARGET_VECTOR && riscv_mautovec_rvv)
     return riscv_vector::vectorize_related_mode (vector_mode, element_mode,
 						 nunits);
-  return default_vectorize_related_mode (vector_mode, element_mode, nunits);
+  /* When riscv_mautovec_rvv is disabled, avoid returning RVV modes via
+     default_vectorize_related_mode, which would query
+     targetm.vector_mode_supported_p and find RVV modes supported.  */
+  return word_mode;
 }
 
 /* Implement TARGET_VECTORIZE_VEC_PERM_CONST.  */
@@ -12764,7 +12770,7 @@ riscv_vectorize_vec_perm_const (machine_mode vmode, machine_mode op_mode,
 				rtx target, rtx op0, rtx op1,
 				const vec_perm_indices &sel)
 {
-  if (TARGET_VECTOR && riscv_v_ext_mode_p (vmode))
+  if (TARGET_VECTOR && riscv_mautovec_rvv && riscv_v_ext_mode_p (vmode))
     return riscv_vector::expand_vec_perm_const (vmode, op_mode, target, op0,
 						op1, sel);
 
@@ -12876,7 +12882,7 @@ riscv_builtin_vectorization_cost (enum vect_cost_for_stmt type_of_cost,
 static vector_costs *
 riscv_vectorize_create_costs (vec_info *vinfo, bool costing_for_scalar)
 {
-  if (TARGET_VECTOR)
+  if (TARGET_VECTOR && riscv_mautovec_rvv)
     return new riscv_vector::costs (vinfo, costing_for_scalar);
   /* Default vector costs.  */
   return new vector_costs (vinfo, costing_for_scalar);
@@ -12932,12 +12938,20 @@ extract_base_offset_in_addr (rtx mem, rtx *base, rtx *offset)
   return false;
 }
 
-/* Implements target hook vector_mode_supported_any_target_p.  */
+/* Implements target hook vector_mode_supported_any_target_p.
+   This hook is used by mode_for_vector to discover vector modes for
+   auto-vectorization.  When riscv_mautovec_rvv is disabled, block RVV
+   modes so the vectorizer cannot discover them.  Intrinsic types are
+   unaffected because they are created with explicit modes during builtin
+   registration and do not go through mode_for_vector.  */
 
 static bool
-riscv_vector_mode_supported_any_target_p (machine_mode)
+riscv_vector_mode_supported_any_target_p (machine_mode mode)
 {
   if (TARGET_XTHEADVECTOR)
+    return false;
+  if (TARGET_VECTOR && !riscv_mautovec_rvv
+      && riscv_v_ext_mode_p (mode))
     return false;
   return true;
 }
