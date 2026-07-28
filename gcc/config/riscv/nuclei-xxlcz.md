@@ -531,12 +531,13 @@
 ;; Extract signed bitfield (auto match for xl.extract)
 ;; Sign-extend extract from rs1[pos : pos+len-1]
 ;; operand2 = len, operand3 = pos
+;; pos must be <= 31 (gas 'bi' constraint is 5 bits), even on DI mode.
 (define_insn "*xl_extract<mode>4"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 		       (match_operand 2 "const_int_operand" "i")
 		       (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extract\\t%0,%1,%2,%3\";
@@ -547,12 +548,13 @@
 ;; Extract unsigned bitfield (auto match for xl.extractu)
 ;; Zero-extend extract from rs1[pos : pos+len-1]
 ;; operand2 = len, operand3 = pos
+;; pos must be <= 31 (gas 'bi' constraint is 5 bits), even on DI mode.
 (define_insn "*xl_extractu<mode>4"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand" "i")
 			 (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extractu\\t%0,%1,%2,%3\";
