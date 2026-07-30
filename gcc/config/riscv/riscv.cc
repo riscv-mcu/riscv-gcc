@@ -1081,7 +1081,7 @@ riscv_build_integer_1 (struct riscv_integer_op codes[RISCV_MAX_INTEGER_OPS],
 	}
     }
 
-  if (cost > 2 && TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB || TARGET_XXLCZBITOP))
+  if (cost > 2 && TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)))
     {
       int leading_ones = clz_hwi (~value);
       int trailing_ones = ctz_hwi (~value);
@@ -4114,7 +4114,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	}
 
       /* (x >> pos) & mask -> bitfield extract for xxlczbitop.  */
-      if (TARGET_XXLCZBITOP && speed
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && speed
           && GET_CODE (XEXP (x, 0)) == LSHIFTRT
           && CONST_INT_P (XEXP (XEXP (x, 0), 1))
           && CONST_INT_P (XEXP (x, 1)))
@@ -4140,7 +4140,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
             }
         }
       /* x & ~(((1 << len) - 1) << pos) -> bit clear for xxlczbitop.  */
-      if (TARGET_XXLCZBITOP && speed
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && speed
           && CONST_INT_P (XEXP (x, 1)))
         {
           HOST_WIDE_INT not_mask = INTVAL (XEXP (x, 1));
@@ -4169,7 +4169,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 
     case IOR:
       /* x | (((1 << len) - 1) << pos) -> bit set for xxlczbitop.  */
-      if (TARGET_XXLCZBITOP && speed
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && speed
           && CONST_INT_P (XEXP (x, 1)))
         {
           HOST_WIDE_INT mask = INTVAL (XEXP (x, 1));
@@ -4228,7 +4228,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  && (INTVAL (XEXP (x, 2)) > 0)
 	  && (INTVAL (XEXP (x, 1)) + INTVAL (XEXP (x, 2)) == 32))
 	{
-	  if (TARGET_XXLCZBITOP
+	  if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
 	      && (INTVAL (XEXP (x, 1)) >= 1)
 	      && (INTVAL (XEXP (x, 1)) <= 31))
 	    {
@@ -4246,11 +4246,11 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	}
       gcc_fallthrough ();
     case SIGN_EXTRACT:
-      if ((TARGET_XTHEADBB || TARGET_XXLCZBITOP) && outer_code == SET
+      if ((TARGET_XTHEADBB || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)) && outer_code == SET
 	  && CONST_INT_P (XEXP (x, 1))
 	  && CONST_INT_P (XEXP (x, 2)))
 	{
-	  if (TARGET_XXLCZBITOP
+	  if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
 	      && (INTVAL (XEXP (x, 1)) >= 1)
 	      && (INTVAL (XEXP (x, 1)) <= 31))
 	    {
@@ -4453,7 +4453,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
     case MULT:
       if (float_mode_p)
 	*total = tune_param->fp_mul[mode == DFmode];
-      else if (TARGET_XXLCZMAC && CONST_INT_P (XEXP (x, 1)))
+      else if (TARGET_XXLCZMAC && TARGET_NUCLEI_XXLCZ_AUTOGEN && CONST_INT_P (XEXP (x, 1)))
         {
           HOST_WIDE_INT imm = INTVAL (XEXP (x, 1));
           // Only adjust cost when immediate fits in 0-8 bits (0 - 255) for xl.muli
@@ -4504,7 +4504,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  return true;
 	}
       /* zero_extend((x >> pos) & mask) -> unsigned bitfield extract for xxlczbitop.  */
-      if (TARGET_XXLCZBITOP && speed
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && speed
           && GET_CODE (XEXP (x, 0)) == AND
           && GET_CODE (XEXP (XEXP (x, 0), 0)) == LSHIFTRT
           && CONST_INT_P (XEXP (XEXP (XEXP (x, 0), 0), 1))
@@ -4517,7 +4517,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
       /* Fall through.  */
     case SIGN_EXTEND:
       /* sign_extend((x >> pos) & mask) -> signed bitfield extract for xxlczbitop.  */
-      if (TARGET_XXLCZBITOP && speed
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && speed
           && GET_CODE (XEXP (x, 0)) == AND
           && GET_CODE (XEXP (XEXP (x, 0), 0)) == LSHIFTRT
           && CONST_INT_P (XEXP (XEXP (XEXP (x, 0), 0), 1))
@@ -4541,7 +4541,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
       return false;
 
     case CLZ:
-      if (TARGET_XXLCZBITOP)
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)
 	{
 	  /* xl.ff1 performs CLZ in one instruction.  */
 	  *total = COSTS_N_INSNS (1);
@@ -4550,7 +4550,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
       return false;
 
     case CTZ:
-      if (TARGET_XXLCZBITOP)
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)
 	{
 	  /* xl.fl1 performs CTZ in one instruction.  */
 	  *total = COSTS_N_INSNS (1);

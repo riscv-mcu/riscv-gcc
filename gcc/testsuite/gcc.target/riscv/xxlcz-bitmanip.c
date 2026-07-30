@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-require-effective-target rv32 } */
-/* { dg-options "-march=rv32imac_xxlczbitop -mabi=ilp32 -O2" } */
+/* { dg-options "-march=rv32imac_xxlczbitop -mabi=ilp32 -O2 -mautogen-xxlcz" } */
 /* { dg-final { scan-assembler-times "xl\\.extractu" 1 } } */
 /* { dg-final { scan-assembler-times "xl\\.extract" 2 } } */
 /* { dg-final { scan-assembler-times "xl\\.bset" 2 } } */

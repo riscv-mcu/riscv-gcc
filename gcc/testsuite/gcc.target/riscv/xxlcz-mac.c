@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-march=rv32imac_xxlczmac -mabi=ilp32 -O2 -mtune=nuclei-100-series" } */
+/* { dg-options "-march=rv32imac_xxlczmac -mabi=ilp32 -O2 -mtune=nuclei-100-series -mautogen-xxlcz" } */
 
 int foo (int a)
 {

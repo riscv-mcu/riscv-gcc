@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-require-effective-target rv32 } */
-/* { dg-options "-march=rv32imac_xxlczbitop -mabi=ilp32 -O2" } */
+/* { dg-options "-march=rv32imac_xxlczbitop -mabi=ilp32 -O2 -mautogen-xxlcz" } */
 
 unsigned int extract_5bits(unsigned int x)
 {

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-march=rv32imac_xxlczslet -mabi=ilp32 -O2" } */
+/* { dg-options "-march=rv32imac_xxlczslet -mabi=ilp32 -O2 -mautogen-xxlcz" } */
 
 //rv32 and rv64
 unsigned int test_sletu(unsigned int rs1, unsigned int rs2) {

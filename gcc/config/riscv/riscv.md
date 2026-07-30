@@ -1349,7 +1349,7 @@
                 (match_operand:SI 2 "register_operand" " r")))]
   "TARGET_ZMMUL || TARGET_MUL || TARGET_XXLCZMAC"
 {
-    if(TARGET_XXLCZMAC && !TARGET_64BIT && CONST_INT_P (operands[2]))
+    if(TARGET_XXLCZMAC && TARGET_NUCLEI_XXLCZ_AUTOGEN && !TARGET_64BIT && CONST_INT_P (operands[2]))
     {
       HOST_WIDE_INT imm = INTVAL (operands[2]);
       if (imm >= 0 && imm <= 255)

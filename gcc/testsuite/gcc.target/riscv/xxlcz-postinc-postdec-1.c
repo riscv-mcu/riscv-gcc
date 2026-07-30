@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-march=rv32imac_xxlczpstinc -mabi=ilp32 -O2" } */
+/* { dg-options "-march=rv32imac_xxlczpstinc -mabi=ilp32 -O2 -mautogen-xxlcz" } */
 /* { dg-skip-if "" { *-*-* } { "-funroll-loops" } } */
 
 #include <stdint.h>

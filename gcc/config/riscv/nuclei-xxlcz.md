@@ -5,7 +5,7 @@
         (mem:SUBDISF (post_inc:SI (match_operand:SI 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_XXLCZPSTINC"
+  "TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.l<size_load_store>\t%0,<size_mem>(%1)\t# load post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "<LDSTINDMODE>")]
@@ -16,7 +16,7 @@
         (mem:DI (post_inc:DI (match_operand:DI 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "TARGET_64BIT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.ld\t%0,8(%1)\t# load post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "DI")]
@@ -28,7 +28,7 @@
         (mem:DI (post_dec:DI (match_operand:DI 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "TARGET_64BIT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.ld\t%0,-8(%1)\t# load post dec"
   [(set_attr "type" "load")
    (set_attr "mode" "DI")]
@@ -39,7 +39,7 @@
         (match_operand:DI 1 "nonmemory_operand" "r,J")
    )
   ]
-  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "TARGET_64BIT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "@
    xl.sd\t%1,8(%0)\t# store post inc
    xl.sd\tx0,8(%0)\t# store 0 post inc"
@@ -52,7 +52,7 @@
         (match_operand:DI 1 "nonmemory_operand" "r,J")
    )
   ]
-  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "TARGET_64BIT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "@
    xl.sd\t%1,-8(%0)\t# store post dec
    xl.sd\tx0,-8(%0)\t# store 0 post dec"
@@ -65,7 +65,7 @@
         (mem:HF (post_inc:GPR (match_operand:GPR 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.flh\t%0,2(%1)\t# load float post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "HF")]
@@ -76,7 +76,7 @@
         (match_operand:HF 1 "register_operand" "f")
    )
   ]
-  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fsh\t%1,2(%0)\t# store float post inc"
   [(set_attr "type" "store")
    (set_attr "mode" "HF")]
@@ -87,7 +87,7 @@
         (mem:HF (post_dec:GPR (match_operand:GPR 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.flh\t%0,-2(%1)\t# load float post dec"
   [(set_attr "type" "load")
    (set_attr "mode" "SF")]
@@ -98,7 +98,7 @@
         (match_operand:HF 1 "register_operand" "f")
    )
   ]
-  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC"
+  "TARGET_ZFHMIN && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fsh\t%1,-2(%0)\t# store float post dec"
   [(set_attr "type" "store")
    (set_attr "mode" "HF")]
@@ -109,7 +109,7 @@
         (mem:SF (post_inc:GPR (match_operand:GPR 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.flw\t%0,4(%1)\t# load float post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "SF")]
@@ -120,7 +120,7 @@
         (match_operand:SF 1 "register_operand" "f")
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fsw\t%1,4(%0)\t# store float post inc"
   [(set_attr "type" "store")
    (set_attr "mode" "SF")]
@@ -131,7 +131,7 @@
         (mem:SF (post_dec:GPR (match_operand:GPR 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.flw\t%0,-4(%1)\t# load float post dec"
   [(set_attr "type" "load")
    (set_attr "mode" "SF")]
@@ -142,7 +142,7 @@
         (match_operand:SF 1 "register_operand" "f")
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fsw\t%1,-4(%0)\t# store float post dec"
   [(set_attr "type" "store")
    (set_attr "mode" "SF")]
@@ -153,7 +153,7 @@
         (mem:DF (post_inc:GPR (match_operand:GPR 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fld\t%0,8(%1)\t# load fp post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "DF")]
@@ -165,7 +165,7 @@
         (mem:DF (post_dec:GPR (match_operand:GPR 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fld\t%0,-8(%1)\t# load fp post dec"
   [(set_attr "type" "load")
    (set_attr "mode" "DF")]
@@ -177,7 +177,7 @@
         (match_operand:DF 1 "register_operand" "f")
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fsd\t%1,8(%0)\t# store fp post inc"
   [(set_attr "type" "store")
    (set_attr "mode" "DF")]
@@ -188,7 +188,7 @@
         (match_operand:DF 1 "register_operand" "f")
    )
   ]
-  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC"
+  "TARGET_HARD_FLOAT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fsd\t%1,-8(%0)\t# store fp post dec"
   [(set_attr "type" "store")
    (set_attr "mode" "DF")]
@@ -201,7 +201,7 @@
         )
    )
   ]
-  "TARGET_XXLCZPSTINC"
+  "TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.l<size_load_store><u>\t%0,<size_mem>(%1)\t# load post inc, ext"
   [(set_attr "type" "load")
    (set_attr "mode" "<LDSTINDMODE>")]
@@ -212,7 +212,7 @@
         (mem:SUBDISF (post_dec:SI (match_operand:SI 1 "register_operand" "+r")))
    )
   ]
-  "TARGET_XXLCZPSTINC"
+  "TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.l<size_load_store>\t%0,-<size_mem>(%1)\t# load post dec"
   [(set_attr "type" "load")
    (set_attr "mode" "<LDSTINDMODE>")]
@@ -225,7 +225,7 @@
         )
    )
   ]
-  "TARGET_XXLCZPSTINC"
+  "TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.l<size_load_store><u>\t%0,-<size_mem>(%1)\t# load post dec, ext"
   [(set_attr "type" "load")
    (set_attr "mode" "<LDSTINDMODE>")]
@@ -236,7 +236,7 @@
         (match_operand:SUBDISF 1 "nonmemory_operand" "r,J")
    )
   ]
-  "TARGET_XXLCZPSTINC"
+  "TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "@
    xl.s<size_load_store>\t%1,<size_mem>(%0)\t# store post inc
    xl.s<size_load_store>\tx0,<size_mem>(%0)\t# store 0 post inc"
@@ -249,7 +249,7 @@
         (match_operand:SUBDISF 1 "nonmemory_operand" "r,J")
    )
   ]
-  "TARGET_XXLCZPSTINC"
+  "TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "@
    xl.s<size_load_store>\t%1,-<size_mem>(%0)\t# store post dec
    xl.s<size_load_store>\tx0,-<size_mem>(%0)\t# store 0 post dec"
@@ -264,7 +264,7 @@
         )
    )
   ]
-  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "TARGET_64BIT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.lwu\t%0,4(%1)\t# load word unsigned post inc"
   [(set_attr "type" "load")
    (set_attr "mode" "DI")]
@@ -277,7 +277,7 @@
         )
    )
   ]
-  "TARGET_64BIT && TARGET_XXLCZPSTINC"
+  "TARGET_64BIT && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.lwu\t%0,-4(%1)\t# load word unsigned post dec"
   [(set_attr "type" "load")
    (set_attr "mode" "DI")]
@@ -383,7 +383,7 @@
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (ior:GPR (match_operand:GPR 1 "register_operand" "r")
                  (match_operand:GPR 2 "xxlcz_contiguous_mask_1_31" "i")))]
-  "TARGET_XXLCZBITOP"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
 {
   HOST_WIDE_INT mask = INTVAL (operands[2]);
   unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)mask;
@@ -409,7 +409,7 @@
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (and:GPR (match_operand:GPR 1 "register_operand" "r")
                  (match_operand:GPR 2 "xxlcz_not_contiguous_mask_1_31" "i")))]
-  "TARGET_XXLCZBITOP"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
 {
   HOST_WIDE_INT not_mask = INTVAL (operands[2]);
   unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)(~not_mask);
@@ -537,7 +537,7 @@
 	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 		       (match_operand 2 "const_int_operand" "i")
 		       (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extract\\t%0,%1,%2,%3\";
@@ -554,7 +554,7 @@
 	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand" "i")
 			 (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
   {
     /* len is operand2, pos is operand3 -> output matches instruction format */
     return \"xl.extractu\\t%0,%1,%2,%3\";
@@ -690,7 +690,7 @@
 (define_insn "*clz<mode>2_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(clz:GPR (match_operand:GPR 1 "register_operand" "r")))]
-  "TARGET_XXLCZBITOP"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.ff1\t%0,%1"
   [(set_attr "type" "bitmanip")
    (set_attr "mode" "<GPR:MODE>")])
@@ -700,7 +700,7 @@
 (define_insn "*ctz<mode>2_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(ctz:GPR (match_operand:GPR 1 "register_operand" "r")))]
-  "TARGET_XXLCZBITOP"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fl1\t%0,%1"
   [(set_attr "type" "bitmanip")
    (set_attr "mode" "<GPR:MODE>")])
@@ -725,7 +725,7 @@
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (any_le:GPR (match_operand:GPR 1 "register_operand" "r")
                    (match_operand:GPR 2 "register_operand" "r")))]
-  "TARGET_XXLCZSLET"
+  "TARGET_XXLCZSLET && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.slet<u>\t%0,%1,%2"
   [(set_attr "type" "arith")
    (set_attr "mode" "none")])
@@ -734,7 +734,7 @@
   [(set (match_operand:SI        0 "register_operand" "=r")
 	(mult:SI (match_operand:SI 1 "register_operand" " r")
 		 (match_operand:SI 2 "const_arith_operand" " I")))]
-  "(TARGET_ZMMUL || TARGET_MUL) && !TARGET_64BIT &&TARGET_XXLCZMAC && (INTVAL (operands[2]) >= 0) && (INTVAL (operands[2]) <= 255)"
+  "(TARGET_ZMMUL || TARGET_MUL) && !TARGET_64BIT &&TARGET_XXLCZMAC && TARGET_NUCLEI_XXLCZ_AUTOGEN && (INTVAL (operands[2]) >= 0) && (INTVAL (operands[2]) <= 255)"
   "xl.muli\t%0,%1,%2"
   [(set_attr "type" "imul")
    (set_attr "mode" "none")])
@@ -817,7 +817,7 @@
 			  (match_operand:X 3 "const_int5s_operand" "CV_bi_sign5")])
 	 (label_ref (match_operand 0 "" ""))
 	 (pc)))]
-  "TARGET_XXLCZBRI && !TARGET_ZIBI"
+  "TARGET_XXLCZBRI && !TARGET_ZIBI && TARGET_NUCLEI_XXLCZ_AUTOGEN"
 {
   if (get_attr_length (insn) == 12)
     return "xl.b%N1i\t%2,%z3,1f; jump\t%l0,ra; 1:";

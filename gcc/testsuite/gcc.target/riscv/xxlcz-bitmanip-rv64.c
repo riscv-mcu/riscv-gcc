@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-require-effective-target rv64 } */
-/* { dg-options "-march=rv64imac_xxlczbitop -mabi=lp64 -O2" } */
+/* { dg-options "-march=rv64imac_xxlczbitop -mabi=lp64 -O2 -mautogen-xxlcz" } */
 /* { dg-final { scan-assembler-times "xl\\.extractu" 1 } } */
 /* { dg-final { scan-assembler-times "xl\\.extract" 1 } } */
 /* { dg-final { scan-assembler-times "xl\\.bset" 1 } } */

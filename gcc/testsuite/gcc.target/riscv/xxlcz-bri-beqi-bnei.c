@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-skip-if "" { *-*-* } { "-O0" "-flto" } { "" } } */
-/* { dg-options "-march=rv64gc_xxlczbri -mabi=lp64 -mtune=rocket" } */
+/* { dg-options "-march=rv64gc_xxlczbri -mabi=lp64 -mtune=rocket -mautogen-xxlcz" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
 int foo_n1(int a, int b, int c)
