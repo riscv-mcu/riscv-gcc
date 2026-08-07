@@ -710,7 +710,3 @@ Enable or disable (default) of nuclei xxlcz autogen.
 mautovec-rvv=
 Target Joined UInteger Var(riscv_mautovec_rvv) Init(0)
 Enable or disable (default) RVV auto-vectorization.
-
-maddibne
-Target Var(riscv_maddibne) Init(0)
-Enable or disable (default) xxlcz subext addibne instruction.

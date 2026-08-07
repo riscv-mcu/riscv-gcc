@@ -494,6 +494,13 @@
   (and (match_code "const_int")
        (match_test "IN_RANGE (INTVAL (op), -16, 15)")))
 
+;; Operand for xl.addibne addend: a negative power-of-two decrement,
+;; -N with N in {1,2,4,8}.
+(define_predicate "xl_addibne_addend_operand"
+  (and (match_code "const_int")
+       (match_test "INTVAL (op) < 0
+		    && (unsigned) exact_log2 (-INTVAL (op)) <= 3")))
+
 ;; Predicates for the V extension.
 (define_special_predicate "vector_length_operand"
   (ior (match_operand 0 "pmode_register_operand")
