@@ -707,6 +707,6 @@ mautogen-xxlcz
 Target Integer Var(riscv_mautogen_xxlcz) Init(0)
 Enable or disable (default) of nuclei xxlcz autogen.
 
-mautovec-rvv=
-Target Joined UInteger Var(riscv_mautovec_rvv) Init(0)
-Enable or disable (default) RVV auto-vectorization.
+mautovec-rvv
+Target Integer Var(riscv_mautovec_rvv) Init(1)
+Enable(default) or disable RVV auto-vectorization.
