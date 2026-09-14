@@ -790,8 +790,10 @@
        (ior (match_test "satisfies_constraint_c15 (op)")
 	    (match_test "satisfies_constraint_c16 (op)"))))
 
-;; XXLCZ extension: A CONST_INT that is a contiguous run of 1 <= len <= 31 bits.
-(define_predicate "xxlcz_contiguous_mask_1_31"
+;; XXLCZ extension: A CONST_INT that is a contiguous run of 8 <= len <= 31 bits.
+;; Only byte-wide or wider masks are worth an xl.bset/xl.bclr; shorter runs
+;; are as cheap (or cheaper) with standard andi/ori/li+or sequences.
+(define_predicate "xxlcz_contiguous_mask_8_31"
   (match_code "const_int")
 {
   unsigned HOST_WIDE_INT umask = UINTVAL (op);
@@ -808,11 +810,11 @@
   while (m & 1) { len++; m >>= 1; }
   // pos must fit the gas 'bi' operand (5 bits, 0-31), otherwise xl.bset/bclr
   // would emit an illegal operand (e.g. pos=48 for high-bit masks on DI mode).
-  return (len >= 1 && len <= 31 && pos <= 31);
+  return (len >= 8 && len <= 31 && pos <= 31);
 })
 
-;; XXLCZ extension: A CONST_INT where ~op is a contiguous run of 1 <= len <= 31 bits.
-(define_predicate "xxlcz_not_contiguous_mask_1_31"
+;; XXLCZ extension: A CONST_INT where ~op is a contiguous run of 8 <= len <= 31 bits.
+(define_predicate "xxlcz_not_contiguous_mask_8_31"
   (match_code "const_int")
 {
   unsigned HOST_WIDE_INT umask = (unsigned HOST_WIDE_INT)(~INTVAL (op));
@@ -829,5 +831,5 @@
   while (m & 1) { len++; m >>= 1; }
   // pos must fit the gas 'bi' operand (5 bits, 0-31), otherwise xl.bset/bclr
   // would emit an illegal operand (e.g. pos=48 for high-bit masks on DI mode).
-  return (len >= 1 && len <= 31 && pos <= 31);
+  return (len >= 8 && len <= 31 && pos <= 31);
 })

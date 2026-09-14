@@ -378,11 +378,12 @@
 )
 
 ;; Auto-match for contiguous mask set: x | (((1 << len) - 1) << pos) -> xl.bset
-;; Auto-match for contiguous mask set: x | (((1 << len) - 1) << pos) -> xl.bset
+;; Only for byte-wide or wider masks (len >= 8); shorter runs stay on
+;; standard andi/ori sequences.
 (define_insn "*bset<mode>_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (ior:GPR (match_operand:GPR 1 "register_operand" "r")
-                 (match_operand:GPR 2 "xxlcz_contiguous_mask_1_31" "i")))]
+                 (match_operand:GPR 2 "xxlcz_contiguous_mask_8_31" "i")))]
   "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
 {
   HOST_WIDE_INT mask = INTVAL (operands[2]);
@@ -408,7 +409,7 @@
 (define_insn "*bclr<mode>_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (and:GPR (match_operand:GPR 1 "register_operand" "r")
-                 (match_operand:GPR 2 "xxlcz_not_contiguous_mask_1_31" "i")))]
+                 (match_operand:GPR 2 "xxlcz_not_contiguous_mask_8_31" "i")))]
   "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
 {
   HOST_WIDE_INT not_mask = INTVAL (operands[2]);
@@ -431,6 +432,11 @@
    (set_attr "mode" "<GPR:MODE>")])
 
 ;; xl.extract rd, rs1, uimm3(len), uimm2(bottom) - Extract signed, immediate
+;; NOTE: there is deliberately no auto-match (sign_extract) pattern for the
+;; signed form.  combine would otherwise synthesize xl.extract for plain
+;; shift-pair idioms ((x >> p) << n) >> n) where the shift sequence is just
+;; as good; signed bitfields reach the extv<mode> expander instead, which
+;; emits the instruction directly.
 (define_insn "xl_extractsi4"
   [(set (match_operand:SI 0 "register_operand" "=r")
     (unspec:SI [(match_operand:SI 1 "register_operand" "r")
@@ -527,23 +533,6 @@
   [(set_attr "type" "bitmanip")
    (set_attr "mode" "DI")]
 )
-
-;; Extract signed bitfield (auto match for xl.extract)
-;; Sign-extend extract from rs1[pos : pos+len-1]
-;; operand2 = len, operand3 = pos
-;; pos must be <= 31 (gas 'bi' constraint is 5 bits), even on DI mode.
-(define_insn "*xl_extract<mode>4"
-  [(set (match_operand:GPR 0 "register_operand" "=r")
-	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
-		       (match_operand 2 "const_int_operand" "i")
-		       (match_operand 3 "const_int_operand" "i")))]
-  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN && INTVAL (operands[2]) >= 1 && INTVAL (operands[2]) <= 31 && INTVAL (operands[3]) <= 31 && INTVAL (operands[2]) + INTVAL (operands[3]) <= GET_MODE_BITSIZE (<MODE>mode)"
-  {
-    /* len is operand2, pos is operand3 -> output matches instruction format */
-    return \"xl.extract\\t%0,%1,%2,%3\";
-  }
-  [(set_attr "type" "bitmanip")
-   (set_attr "mode" "<GPR:MODE>")])
 
 ;; Extract unsigned bitfield (auto match for xl.extractu)
 ;; Zero-extend extract from rs1[pos : pos+len-1]

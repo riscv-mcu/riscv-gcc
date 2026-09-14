@@ -3335,6 +3335,7 @@
 ;; * Single-bit extraction (Zicondops/XVentanaCondops)
 ;; * Single-bit extraction (SFB)
 ;; * Extraction instruction th.ext(u) (XTheadBb)
+;; * Extraction instruction xl.extract(u) (XxlczBitop)
 ;; * lshrsi3_extend_2 (see above)
 (define_insn_and_split "*<any_extract:optab><GPR:mode>3"
   [(set (match_operand:GPR 0 "register_operand" "=r")
@@ -3347,6 +3348,7 @@
       || TARGET_XVENTANACONDOPS || TARGET_SFB_ALU)
      && (INTVAL (operands[2]) == 1))
    && !TARGET_XTHEADBB
+   && !(TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)
    && !(TARGET_64BIT
         && (INTVAL (operands[3]) > 0)
         && (INTVAL (operands[2]) + INTVAL (operands[3]) == 32))"
@@ -4609,13 +4611,27 @@
 	(sign_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand")
 			 (match_operand 3 "const_int_operand")))]
-  "TARGET_XTHEADBB || TARGET_XXLCZBITOP"
+  "TARGET_XTHEADBB
+   || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
+       /* SImode xl.extract has undefined behavior on rv64, only use it
+	  for DImode there.  */
+       && (!TARGET_64BIT || <MODE>mode == DImode))"
 {
   if (TARGET_XXLCZBITOP)
     {
-      // xl.extract supports 1-31 bit length (5-bit immediate)
-      if (INTVAL (operands[2]) < 1 || INTVAL (operands[2]) > 31)
-        FAIL;
+      /* xl.extract supports a 1-31 bit length and 0-31 bit position,
+	 with the field inside the mode width.  Emit the instruction
+	 directly: leaving a sign_extract in the stream would let combine
+	 synthesize the same pattern for shift-pair idioms, where the
+	 plain shift sequence is just as good.  */
+      if (INTVAL (operands[2]) < 1 || INTVAL (operands[2]) > 31
+	  || INTVAL (operands[3]) < 0 || INTVAL (operands[3]) > 31
+	  || INTVAL (operands[2]) + INTVAL (operands[3])
+	     > GET_MODE_BITSIZE (<MODE>mode))
+	FAIL;
+      emit_insn (gen_xl_extract<mode>4 (operands[0], operands[1],
+					operands[2], operands[3]));
+      DONE;
     }
 })
 
@@ -4624,13 +4640,17 @@
 	(zero_extract:GPR (match_operand:GPR 1 "register_operand" "r")
 			 (match_operand 2 "const_int_operand")
 			 (match_operand 3 "const_int_operand")))]
-  "TARGET_XTHEADBB || TARGET_XXLCZBITOP"
+  "TARGET_XTHEADBB || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)"
 {
   if (TARGET_XXLCZBITOP)
     {
-      // xl.extractu supports 1-31 bit length (5-bit immediate)
-      if (INTVAL (operands[2]) < 1 || INTVAL (operands[2]) > 31)
-        FAIL;
+      /* xl.extractu supports a 1-31 bit length and 0-31 bit position,
+	 with the field inside the mode width.  */
+      if (INTVAL (operands[2]) < 1 || INTVAL (operands[2]) > 31
+	  || INTVAL (operands[3]) < 0 || INTVAL (operands[3]) > 31
+	  || INTVAL (operands[2]) + INTVAL (operands[3])
+	     > GET_MODE_BITSIZE (<MODE>mode))
+	FAIL;
     }
   else if (TARGET_XTHEADBB
            && (INTVAL (operands[2]) < 8 && INTVAL (operands[3]) == 0))

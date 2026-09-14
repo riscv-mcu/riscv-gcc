@@ -4156,7 +4156,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 1 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                  if (len >= 8 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than multiple.  */
                       *total = COSTS_N_INSNS (1);
@@ -4185,7 +4185,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 1 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                  if (len >= 8 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than multiple.  */
                       *total = COSTS_N_INSNS (1);
@@ -4228,13 +4228,8 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	  && (INTVAL (XEXP (x, 2)) > 0)
 	  && (INTVAL (XEXP (x, 1)) + INTVAL (XEXP (x, 2)) == 32))
 	{
-	  if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
-	      && (INTVAL (XEXP (x, 1)) >= 1)
-	      && (INTVAL (XEXP (x, 1)) <= 31))
-	    {
-	      *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
-	      return true;
-	    }
+	  *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
+	  return true;
 	}
       /* bit extraction pattern (zbs:bext, xtheadbs:tst).  */
       if ((TARGET_ZBS || TARGET_XTHEADBS) && outer_code == SET
@@ -4246,17 +4241,37 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
 	}
       gcc_fallthrough ();
     case SIGN_EXTRACT:
-      if ((TARGET_XTHEADBB || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)) && outer_code == SET
+      if (TARGET_XTHEADBB && outer_code == SET
 	  && CONST_INT_P (XEXP (x, 1))
 	  && CONST_INT_P (XEXP (x, 2)))
 	{
-	  if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
-	      && (INTVAL (XEXP (x, 1)) >= 1)
-	      && (INTVAL (XEXP (x, 1)) <= 31))
-	    {
-	      *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
-	      return true;
-	    }
+	  *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
+	  return true;
+	}
+      /* xl.extractu is a single instruction, keep zero-extraction cheap
+	 enough for combine to prefer it over the and+shift pair.  */
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
+	  && outer_code == SET
+	  && GET_CODE (x) == ZERO_EXTRACT
+	  && CONST_INT_P (XEXP (x, 1)) && CONST_INT_P (XEXP (x, 2))
+	  && INTVAL (XEXP (x, 1)) >= 1 && INTVAL (XEXP (x, 1)) <= 31)
+	{
+	  *total = COSTS_N_INSNS (SINGLE_SHIFT_COST);
+	  return true;
+	}
+      /* A signed extraction (xl.extract) is only a clear win when it
+	 comes from a real bit-field access, which is already formed at
+	 tree level.  For (x >> c1) << c2 >> c3 idioms the two shifts
+	 are just as good, so do not encourage combine to build the
+	 extraction.  */
+      if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
+	  && outer_code == SET
+	  && GET_CODE (x) == SIGN_EXTRACT
+	  && CONST_INT_P (XEXP (x, 1)) && CONST_INT_P (XEXP (x, 2))
+	  && INTVAL (XEXP (x, 1)) >= 1 && INTVAL (XEXP (x, 1)) <= 31)
+	{
+	  *total = COSTS_N_INSNS (2);
+	  return true;
 	}
       return false;
 

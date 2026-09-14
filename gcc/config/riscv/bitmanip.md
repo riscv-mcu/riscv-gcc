@@ -206,17 +206,24 @@
 (define_expand "clzdi2"
   [(set (match_operand:DI 0 "register_operand")
 	(clz:DI (match_operand:DI 1 "register_operand")))]
-  "TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB)")
+  "TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB
+		    || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN))")
 
+;; SImode clz only maps to xl.ff1 on rv32: on rv64 the ff1 operand is
+;; XLEN-wide, so a 32-bit clz cannot use it.
 (define_expand "clzsi2"
   [(set (match_operand:SI 0 "register_operand")
 	(clz:SI (match_operand:SI 1 "register_operand")))]
-  "TARGET_ZBB || (!TARGET_64BIT && TARGET_XTHEADBB)")
+  "TARGET_ZBB || (!TARGET_64BIT && TARGET_XTHEADBB)
+   || (!TARGET_64BIT && TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)")
 
+;; ctz maps to xl.fl1; scanning from the LSB gives the same result for
+;; any wider XLEN operand, so SImode is fine on rv64 too.
 (define_expand "ctz<mode>2"
   [(set (match_operand:GPR 0 "register_operand")
 	(ctz:GPR (match_operand:GPR 1 "register_operand")))]
-  "TARGET_ZBB")
+  "TARGET_ZBB
+   || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)")
 
 (define_expand "popcount<mode>2"
   [(set (match_operand:GPR 0 "register_operand")
