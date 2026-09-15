@@ -9,7 +9,7 @@
 int loop_m1(int n)
 {
     int s = 0;
-    for (int i = n; i != 0; i -= 1)
+    for (int i = n; i != 0; i += 1)
         s += i;
     return s;
 }
@@ -17,7 +17,7 @@ int loop_m1(int n)
 int loop_m2(int n)
 {
     int s = 0;
-    for (int i = n; i != 0; i -= 2)
+    for (int i = n; i != 0; i += 2)
         s += i;
     return s;
 }
@@ -25,7 +25,7 @@ int loop_m2(int n)
 int loop_m4(int n)
 {
     int s = 0;
-    for (int i = n; i != 0; i -= 4)
+    for (int i = n; i != 0; i += 4)
         s += i;
     return s;
 }
@@ -33,7 +33,7 @@ int loop_m4(int n)
 int loop_m8(int n)
 {
     int s = 0;
-    for (int i = n; i != 0; i -= 8)
+    for (int i = n; i != 0; i += 8)
         s += i;
     return s;
 }

@@ -816,9 +816,10 @@
   [(set_attr "type" "branch")
    (set_attr "mode" "none")])
 
-;; xl.addibne: fuse  addi rd,rd,-N  +  bne rd,rs1,label  into one insn
-;; (RV32 only; the bne may be the bnez form, bne rd,x0,label).  Only under
-;; the xxlcz autogen path.  rd is written back on both the taken and
+;; xl.addibne: fuse  addi rd,rd,+N  +  bne rd,rs1,label  into one insn
+;; (RV32 only; the bne may be the bnez form, bne rd,x0,label, and the
+;; comparison may be written in either operand order).  Only under the
+;; xxlcz autogen path.  rd is written back on both the taken and
 ;; fall-through paths, so any liveness of rd after the branch is preserved.
 (define_peephole2
   [(set (match_operand:SI 0 "register_operand" "")
@@ -832,9 +833,11 @@
 	  (pc)))]
   "TARGET_XXLCZBRI && TARGET_NUCLEI_XXLCZ_AUTOGEN && !TARGET_64BIT
    && REGNO (operands[1]) == REGNO (operands[0])
-   && REGNO (operands[3]) == REGNO (operands[0])
-   && (INTVAL (operands[2]) == -1 || INTVAL (operands[2]) == -2
-       || INTVAL (operands[2]) == -4 || INTVAL (operands[2]) == -8)"
+   && (REGNO (operands[3]) == REGNO (operands[0])
+       || (REG_P (operands[4])
+	   && REGNO (operands[4]) == REGNO (operands[0])))
+   && (INTVAL (operands[2]) == 1 || INTVAL (operands[2]) == 2
+       || INTVAL (operands[2]) == 4 || INTVAL (operands[2]) == 8)"
   [(parallel
     [(set (pc)
 	  (if_then_else
@@ -848,19 +851,23 @@
 		   (match_dup 2)))])]
 {
   /* Renumber for the fused insn: 0=rd, 1=rs1, 2=addend, 3=label.
-     rs1 may arrive as const0_rtx (bnez form) -> normalize to x0.  */
-  operands[1] = operands[4];
+     rs1 is the comparison operand that is not the loop counter; it may
+     arrive as const0_rtx (bnez form) -> normalize to x0.  */
+  rtx cmp = (REGNO (operands[3]) == REGNO (operands[0]))
+	    ? operands[4] : operands[3];
+  operands[1] = REG_P (cmp) ? cmp : gen_rtx_REG (SImode, 0);
   operands[3] = operands[5];
-  if (!REG_P (operands[1]))
-    operands[1] = gen_rtx_REG (SImode, 0);
 })
 
-;; Fused xl.addibne: rd += addend; if (rd != rs1) goto label.
-;; addend is the signed decrement (-1/-2/-4/-8); gas derives the SCALE field
-;; from it and resolves the label through BFD_RELOC_RISCV_XL_ADDIBNE.
+;; Fused xl.addibne: rd += scale; if (rs1 != rd) goto label.
+;; scale is the positive increment (1/2/4/8); gas maps it straight to the
+;; 2-bit SCALE field and resolves the label through
+;; BFD_RELOC_RISCV_XL_ADDIBNE.  The offset field only holds x[9:1], so
+;; reachable offsets are the even values up to 1022 -- keep the first tier
+;; inside that.
 ;; Length tiers override the default branch attr (which assumes operand 0 is
 ;; the label; here operand 3 is the label):
-;;   4  : xl.addibne reaches backward offsets <= 1024    -> 1 insn
+;;   4  : xl.addibne reaches backward offsets <= 1022    -> 1 insn
 ;;   8  : plain bne reach (+/-4KiB) but outside addibne  -> addi;bne
 ;;   16 : beyond bne reach                               -> addi;beq 1f;jump;1:
 (define_insn "*xl_addibne"
@@ -888,7 +895,7 @@
    (set (attr "length")
 	(if_then_else
 	  (and (le (minus (match_dup 3) (pc)) (const_int 0))
-	       (le (minus (pc) (match_dup 3)) (const_int 1024)))
+	       (le (minus (pc) (match_dup 3)) (const_int 1022)))
 	  (const_int 4)
 	  (if_then_else
 	    (and (le (minus (match_dup 3) (pc)) (const_int 4088))

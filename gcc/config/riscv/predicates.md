@@ -494,12 +494,12 @@
   (and (match_code "const_int")
        (match_test "IN_RANGE (INTVAL (op), -16, 15)")))
 
-;; Operand for xl.addibne addend: a negative power-of-two decrement,
-;; -N with N in {1,2,4,8}.
+;; Operand for xl.addibne: the positive scale/increment, 1/2/4/8.  The
+;; instruction performs rd = rd + scale and branches while rs1 != rd.
 (define_predicate "xl_addibne_addend_operand"
   (and (match_code "const_int")
-       (match_test "INTVAL (op) < 0
-		    && (unsigned) exact_log2 (-INTVAL (op)) <= 3")))
+       (match_test "INTVAL (op) > 0
+		    && (unsigned) exact_log2 (INTVAL (op)) <= 3")))
 
 ;; Predicates for the V extension.
 (define_special_predicate "vector_length_operand"
