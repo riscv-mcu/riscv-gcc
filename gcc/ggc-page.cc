@@ -955,7 +955,7 @@ alloc_page (unsigned order)
       /* If we allocated multiple pages, put the rest on the free list.  */
       if (multiple_pages)
 	{
-	  struct page_entry *e, *f = G.free_pages;
+	  struct page_entry *e, *f = free_list->free_pages;
 	  for (a = enda - G.pagesize; a != page; a -= G.pagesize)
 	    {
 	      e = XCNEWVAR (struct page_entry, page_entry_size);
