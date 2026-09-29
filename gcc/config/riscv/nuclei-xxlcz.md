@@ -814,7 +814,21 @@
   return "xl.b%C1i\t%2,%3,%0";
 }
   [(set_attr "type" "branch")
-   (set_attr "mode" "none")])
+   (set_attr "mode" "none")
+   ;; The 12-byte far form (inverted xl.b<i> + jump) exists exactly because
+   ;; the 4-byte near form cannot reach every target.  Without this attribute
+   ;; get_attr_length is the default 4, the == 12 test never fires, and an
+   ;; out-of-range near form gets assembled into a branch with a truncated
+   ;; offset field -- observed as a branch to itself (self-loop) on rv64
+   ;; coremark.  Keep the near form inside the standard B-type reach with a
+   ;; small margin; the far form is only 12 bytes (xl.b<i> + jump), where the
+   ;; forward branch to 1f is always encodable and jump covers +/-1MiB.
+   (set (attr "length")
+	(if_then_else
+	    (and (ge (minus (match_dup 0) (pc)) (const_int -4090))
+		 (le (minus (pc) (match_dup 0)) (const_int 4090)))
+	    (const_int 4)
+	    (const_int 12)))])
 
 ;; xl.addibne: fuse  addi rd,rd,+N  +  bne rd,rs1,label  into one insn
 ;; (RV32 only; the bne may be the bnez form, bne rd,x0,label, and the
