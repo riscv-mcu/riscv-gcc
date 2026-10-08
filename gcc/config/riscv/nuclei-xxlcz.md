@@ -888,7 +888,7 @@
   [(parallel
     [(set (pc)
 	  (if_then_else
-	    (ne (plus:SI (match_operand:SI 0 "register_operand" "=r")
+	    (ne (plus:SI (match_operand:SI 0 "register_operand" "+r")
 			 (match_operand:SI 2 "xl_addibne_addend_operand" "i"))
 		(match_operand:SI 1 "register_operand" "r"))
 	    (label_ref (match_operand 3 "" ""))
