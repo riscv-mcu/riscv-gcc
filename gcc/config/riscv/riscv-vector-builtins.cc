@@ -3310,7 +3310,8 @@ riscv_pragma_intrinsic_flags_pollute (struct pragma_intrinsic_flags *flags)
   flags->intrinsic_riscv_zvl_flags = riscv_zvl_flags;
 
   target_flags = target_flags
-    | MASK_VECTOR;
+    | MASK_VECTOR
+    | MASK_MUL;
 
   riscv_zvl_flags = riscv_zvl_flags
     | MASK_ZVL32B
