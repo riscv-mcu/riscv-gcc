@@ -2175,6 +2175,21 @@ riscv_v_ext_mode_p (machine_mode mode)
 	 || riscv_v_ext_vls_mode_p (mode);
 }
 
+/* Return true if the current function is an interrupt handler.  */
+static bool
+riscv_cfun_interrupt_handler_p (void)
+{
+  return cfun && cfun->machine && cfun->machine->interrupt_handler_p;
+}
+
+/* Return true if RVV auto-vectorization is enabled for the current function.  */
+static bool
+riscv_autovec_rvv_enabled_p (void)
+{
+  return TARGET_VECTOR && riscv_mautovec_rvv
+	 && !riscv_cfun_interrupt_handler_p ();
+}
+
 static unsigned
 riscv_v_vls_mode_aggregate_gpr_count (unsigned vls_unit_size,
 				      unsigned scalar_unit_size)
@@ -7703,6 +7718,13 @@ riscv_save_reg_p (unsigned int regno)
       if (regno == GP_REGNUM || regno == THREAD_POINTER_REGNUM)
 	return false;
 
+      /* Interrupt handlers are expected to have RVV-free call chains.
+	 Do not save every call-clobbered V register for an unknown callee.
+	 Keep saving registers used directly by the handler, but this does
+	 not provide full vector context preservation.  */
+      if (V_REG_P (regno))
+	return df_regs_ever_live_p (regno);
+
       /* We must save every register used in this function.  If this is not a
 	 leaf function, then we must save all temporary registers.  */
       if (df_regs_ever_live_p (regno)
@@ -12029,7 +12051,9 @@ static bool
 riscv_vector_mode_supported_p (machine_mode mode)
 {
   if (TARGET_VECTOR)
-    return riscv_v_ext_mode_p (mode);
+    /* Keep vector type modes independent of the current function, and
+       restrict their use through this current-target hook instead.  */
+    return !riscv_cfun_interrupt_handler_p () && riscv_v_ext_mode_p (mode);
 
   if (TARGET_ZPN && riscv_rvp_support_vector_mode_p (mode))
     return true;
@@ -12154,10 +12178,11 @@ riscv_support_vector_misalignment (machine_mode mode,
 static opt_machine_mode
 riscv_get_mask_mode (machine_mode mode)
 {
-  if (TARGET_VECTOR && riscv_mautovec_rvv && riscv_v_ext_mode_p (mode))
+  if (riscv_autovec_rvv_enabled_p () && riscv_v_ext_mode_p (mode))
     return riscv_vector::get_mask_mode (mode);
 
-  if (TARGET_VECTOR && !riscv_mautovec_rvv)
+  if (TARGET_VECTOR
+      && (!riscv_mautovec_rvv || riscv_cfun_interrupt_handler_p ()))
     return opt_machine_mode ();
 
   return default_get_mask_mode (mode);
@@ -12328,7 +12353,7 @@ riscv_use_divmod_expander (void)
 static machine_mode
 riscv_preferred_simd_mode (scalar_mode mode)
 {
-  if (TARGET_VECTOR && riscv_mautovec_rvv && !TARGET_XTHEADVECTOR)
+  if (riscv_autovec_rvv_enabled_p () && !TARGET_XTHEADVECTOR)
     return riscv_vector::preferred_simd_mode (mode);
 
   return word_mode;
@@ -12753,12 +12778,12 @@ riscv_autovectorize_vector_modes (vector_modes *modes, bool all)
     riscv_rvp_autovec_p = true;
   }
 
-  if(TARGET_VECTOR && riscv_mautovec_rvv)
+  if (riscv_autovec_rvv_enabled_p())
   {
     riscv_rvv_autovec_p = true;
   }
 
-  if (TARGET_VECTOR && riscv_mautovec_rvv && !TARGET_XTHEADVECTOR)
+  if (riscv_autovec_rvv_enabled_p() && !TARGET_XTHEADVECTOR)
     return riscv_vector::autovectorize_vector_modes (modes, all);
 
   return default_autovectorize_vector_modes (modes, all);
@@ -12769,13 +12794,13 @@ opt_machine_mode
 riscv_vectorize_related_mode (machine_mode vector_mode, scalar_mode element_mode,
 			      poly_uint64 nunits)
 {
-  if (TARGET_VECTOR && riscv_mautovec_rvv)
+  if (riscv_autovec_rvv_enabled_p ())
     return riscv_vector::vectorize_related_mode (vector_mode, element_mode,
 						 nunits);
-  /* When riscv_mautovec_rvv is disabled, avoid returning RVV modes via
+  /* When RVV auto-vectorization is disabled, avoid returning RVV modes via
      default_vectorize_related_mode, which would query
      targetm.vector_mode_supported_p and find RVV modes supported.  */
-  return word_mode;
+  return opt_machine_mode ();
 }
 
 /* Implement TARGET_VECTORIZE_VEC_PERM_CONST.  */
@@ -12897,7 +12922,7 @@ riscv_builtin_vectorization_cost (enum vect_cost_for_stmt type_of_cost,
 static vector_costs *
 riscv_vectorize_create_costs (vec_info *vinfo, bool costing_for_scalar)
 {
-  if (TARGET_VECTOR && riscv_mautovec_rvv)
+  if (riscv_autovec_rvv_enabled_p ())
     return new riscv_vector::costs (vinfo, costing_for_scalar);
   /* Default vector costs.  */
   return new vector_costs (vinfo, costing_for_scalar);
@@ -12958,7 +12983,8 @@ extract_base_offset_in_addr (rtx mem, rtx *base, rtx *offset)
    auto-vectorization.  When riscv_mautovec_rvv is disabled, block RVV
    modes so the vectorizer cannot discover them.  Intrinsic types are
    unaffected because they are created with explicit modes during builtin
-   registration and do not go through mode_for_vector.  */
+   registration and do not go through mode_for_vector.  Restrictions for
+   the current interrupt function belong in vector_mode_supported_p.  */
 
 static bool
 riscv_vector_mode_supported_any_target_p (machine_mode mode)
