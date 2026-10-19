@@ -397,7 +397,9 @@
   rtx tmp[4];
     tmp[0] = operands[0];
     tmp[1] = operands[1];
-    tmp[2] = GEN_INT (len);
+    /* Per the Nuclei spec the first immediate is (len - 1):
+       mask = ((1 << (uimm3 + 1)) - 1) << uimm2.  */
+    tmp[2] = GEN_INT (len - 1);
     tmp[3] = GEN_INT (pos);
     output_asm_insn (\"xl.bset\\t%0,%1,%2,%3\", tmp);
     return \"\";
@@ -423,7 +425,9 @@
   rtx tmp[4];
     tmp[0] = operands[0];
     tmp[1] = operands[1];
-    tmp[2] = GEN_INT (len);
+    /* Per the Nuclei spec the first immediate is (len - 1):
+       mask = ((1 << (uimm3 + 1)) - 1) << uimm2.  */
+    tmp[2] = GEN_INT (len - 1);
     tmp[3] = GEN_INT (pos);
     output_asm_insn (\"xl.bclr\\t%0,%1,%2,%3\", tmp);
     return \"\";
