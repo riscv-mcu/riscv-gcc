@@ -32,12 +32,14 @@ uint64_t test_bclr_20bits(uint64_t x)
         return x & ~(((1LL << 20) - 1) << 12);
 }
 
-int test_ff1_64(uint64_t x)
+int test_clz_64(uint64_t x)
 {
+        // __builtin_clzll -> xl.ff1 + xori (ff1 = MSB set bit index, clz = 63 - index)
         return __builtin_clzll(x);
 }
 
-int test_fl1_64(uint64_t x)
+int test_ctz_64(uint64_t x)
 {
+        // __builtin_ctzll -> xl.fl1 (fl1 = lowest set bit index)
         return __builtin_ctzll(x);
 }

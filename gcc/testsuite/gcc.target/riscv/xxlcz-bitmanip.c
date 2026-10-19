@@ -68,15 +68,15 @@ uint32_t test_bclr_5bits(uint32_t x) {
 
 
 /* ------------ find bits ------------ */
-int test_ff1(uint32_t x)
+int test_clz(uint32_t x)
 {
-        // __builtin_clz -> xl.ff1
+        // __builtin_clz -> xl.ff1 + xori (ff1 = MSB set bit index, clz = 31 - index)
         return __builtin_clz(x);
 }
 
-int test_fl1(uint32_t x)
+int test_ctz(uint32_t x)
 {
-        // __builtin_ctz -> xl.fl1
+        // __builtin_ctz -> xl.fl1 (fl1 = lowest set bit index)
         return __builtin_ctz(x);
 }
 

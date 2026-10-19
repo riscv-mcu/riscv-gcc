@@ -4573,8 +4573,8 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
     case CLZ:
       if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)
 	{
-	  /* xl.ff1 performs CLZ in one instruction.  */
-	  *total = COSTS_N_INSNS (1);
+	  /* CLZ maps to xl.ff1 (MSB set bit index) plus an xor.  */
+	  *total = COSTS_N_INSNS (2);
 	  return true;
 	}
       return false;
@@ -4582,7 +4582,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
     case CTZ:
       if (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)
 	{
-	  /* xl.fl1 performs CTZ in one instruction.  */
+	  /* xl.fl1 returns the lowest set bit index, which is CTZ.  */
 	  *total = COSTS_N_INSNS (1);
 	  return true;
 	}

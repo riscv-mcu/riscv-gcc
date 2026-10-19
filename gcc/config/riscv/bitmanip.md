@@ -209,8 +209,8 @@
   "TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB
 		    || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN))")
 
-;; SImode clz only maps to xl.ff1 on rv32: on rv64 the ff1 operand is
-;; XLEN-wide, so a 32-bit clz cannot use it.
+;; With xxlczbitop autogen, SImode clz is only enabled on rv32; on rv64 a
+;; 32-bit clz is expanded via clzdi2 (zero-extend + adjust) instead.
 (define_expand "clzsi2"
   [(set (match_operand:SI 0 "register_operand")
 	(clz:SI (match_operand:SI 1 "register_operand")))]

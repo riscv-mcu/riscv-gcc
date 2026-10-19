@@ -603,7 +603,7 @@
     (unspec:QI [(match_operand:SI 1 "register_operand" "r")]
   UNSPEC_XXLCZ_FF1))]
 "TARGET_XXLCZBITOP"
-"xl.ff1 \t%0,%1\t# position of first set bit from lsb"
+"xl.ff1 \t%0,%1\t# first '1' from MSB = highest set bit index"
 [(set_attr "type" "arith")
  (set_attr "mode" "SI")]
 )
@@ -613,7 +613,7 @@
     (unspec:QI [(match_operand:SI 1 "register_operand" "r")]
   UNSPEC_XXLCZ_FL1))]
 "TARGET_XXLCZBITOP"
-"xl.fl1 \t%0,%1\t# position of first set bit from msb"
+"xl.fl1 \t%0,%1\t# last '1' seen from MSB = lowest set bit index"
 [(set_attr "type" "arith")
  (set_attr "mode" "SI")]
 )
@@ -623,7 +623,7 @@
     (unspec:QI [(match_operand:SI 1 "register_operand" "r")]
   UNSPEC_XXLCZ_FF0))]
 "TARGET_XXLCZBITOP"
-"xl.ff0 \t%0,%1\t# position of first clr bit from lsb"
+"xl.ff0 \t%0,%1\t# first '0' from MSB = highest clear bit index"
 [(set_attr "type" "arith")
  (set_attr "mode" "SI")]
 )
@@ -633,7 +633,7 @@
     (unspec:QI [(match_operand:SI 1 "register_operand" "r")]
   UNSPEC_XXLCZ_FL0))]
 "TARGET_XXLCZBITOP"
-"xl.fl0 \t%0,%1\t# position of first clr bit from msb"
+"xl.fl0 \t%0,%1\t# last '0' seen from MSB = lowest clear bit index"
 [(set_attr "type" "arith")
  (set_attr "mode" "SI")]
 )
@@ -674,24 +674,49 @@
   [(set_attr "type" "arith")
    (set_attr "mode" "DI")])
 
-;; Auto-match for GCC standard CLZ (count leading zeros) -> xl.ff1
-;; clz returns number of leading 0s from MSB, which is exactly the position of first 1 from MSB
-(define_insn "*clz<mode>2_xlcz"
+;; GPR-output variant of xl.ff1 (find the first '1' seen from the MSB),
+;; which returns the bit index of the most significant set bit counted
+;; from bit 0.  Used by the clz auto-match sequence below.
+(define_insn "*xl_ff1_gpr<mode>"
   [(set (match_operand:GPR 0 "register_operand" "=r")
-	(clz:GPR (match_operand:GPR 1 "register_operand" "r")))]
-  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
+	(unspec:GPR [(match_operand:GPR 1 "register_operand" "r")] UNSPEC_XXLCZ_FF1))]
+  "TARGET_XXLCZBITOP"
   "xl.ff1\t%0,%1"
-  [(set_attr "type" "bitmanip")
+  [(set_attr "type" "arith")
    (set_attr "mode" "<GPR:MODE>")])
 
-;; Auto-match for GCC standard CTZ (count trailing zeros) -> xl.fl1
-;; ctz returns number of trailing 0s from LSB, which is exactly the position of first 1 from LSB
+;; Auto-match for GCC standard CTZ (count trailing zeros) -> xl.fl1.
+;; xl.fl1 (find the last '1' seen from the MSB, i.e. the least significant
+;; set bit) returns its bit index, which equals the number of trailing
+;; zeros.
 (define_insn "*ctz<mode>2_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(ctz:GPR (match_operand:GPR 1 "register_operand" "r")))]
   "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.fl1\t%0,%1"
   [(set_attr "type" "bitmanip")
+   (set_attr "mode" "<GPR:MODE>")])
+
+;; Auto-match for GCC standard CLZ (count leading zeros) -> xl.ff1 + xori.
+;; xl.ff1 returns the bit index i of the most significant set bit, so
+;; clz is (XLEN - 1) - i.  Since i is in [0, XLEN-1] the subtraction
+;; from the all-ones value never borrows, and (XLEN - 1) - i equals
+;; (XLEN - 1) ^ i, emitted as xl.ff1 + xori.
+(define_insn_and_split "*clz<mode>2_xlcz"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+	(clz:GPR (match_operand:GPR 1 "register_operand" "r")))]
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
+  "#"
+  "&& 1"
+  [(set (match_dup 0)
+	(unspec:GPR [(match_dup 1)] UNSPEC_XXLCZ_FF1))
+   (set (match_dup 0)
+	(xor:GPR (match_dup 0) (match_dup 2)))]
+  {
+    operands[2] = gen_int_mode (GET_MODE_BITSIZE (<GPR:MODE>mode) - 1,
+				<GPR:MODE>mode);
+  }
+  [(set_attr "type" "multi")
    (set_attr "mode" "<GPR:MODE>")])
 
 (define_insn "xl_clbsi2"
