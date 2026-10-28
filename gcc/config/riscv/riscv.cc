@@ -1081,7 +1081,12 @@ riscv_build_integer_1 (struct riscv_integer_op codes[RISCV_MAX_INTEGER_OPS],
 	}
     }
 
-  if (cost > 2 && TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)))
+  /* The rotate-based constant synthesis below emits a rotatert insn which
+   * requires a rotate instruction (rori via ZBB/ZBKB, or xtheadbb).  The
+   * xxlcz extension does not provide any rotate instruction, so enabling
+   * this under XXLCZBITOP/AUTOGEN alone produced unrecognizable insns
+   * (ICE in extract_insn) on rv64 targets without zbb.  */
+  if (cost > 2 && TARGET_64BIT && (TARGET_ZBB || TARGET_XTHEADBB))
     {
       int leading_ones = clz_hwi (~value);
       int trailing_ones = ctz_hwi (~value);
