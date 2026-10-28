@@ -696,28 +696,44 @@
 (define_insn "*ctz<mode>2_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(ctz:GPR (match_operand:GPR 1 "register_operand" "r")))]
-  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
+   && (!TARGET_64BIT || <MODE>mode == DImode)"
   "xl.fl1\t%0,%1"
   [(set_attr "type" "bitmanip")
    (set_attr "mode" "<GPR:MODE>")])
 
-;; Auto-match for GCC standard CLZ (count leading zeros) -> xl.ff1 + xori.
-;; xl.ff1 returns the bit index i of the most significant set bit, so
-;; clz is (XLEN - 1) - i.  Since i is in [0, XLEN-1] the subtraction
-;; from the all-ones value never borrows, and (XLEN - 1) - i equals
-;; (XLEN - 1) ^ i, emitted as xl.ff1 + xori.
+;; Auto-match for GCC standard CLZ (count leading zeros) -> xl.ff1.
+;; For a nonzero input xl.ff1 returns the bit index i of the most
+;; significant set bit, so clz is (XLEN - 1) - i.  Since i is in
+;; [0, XLEN-1] the subtraction from the all-ones value never borrows,
+;; and (XLEN - 1) - i equals (XLEN - 1) ^ i, emitted as xl.ff1 + xor.
+;; For a zero input xl.ff1 returns XLEN, while CLZ_DEFINED_VALUE_AT_ZERO
+;; promises the middle end that clz(0) is defined and equals the bitsize
+;; (and generic expanders rely on that to elide the zero fixup), so the
+;; correction term is realized as (XLEN - 1) & -(x != 0): snez + neg +
+;; andi, which zeroes the XOR for x == 0 so that the xl.ff1 result
+;; passes through unchanged, exactly the required XLEN.
 (define_insn_and_split "*clz<mode>2_xlcz"
   [(set (match_operand:GPR 0 "register_operand" "=r")
 	(clz:GPR (match_operand:GPR 1 "register_operand" "r")))]
-  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN"
+  "TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
+   && (!TARGET_64BIT || <MODE>mode == DImode)"
   "#"
   "&& 1"
-  [(set (match_dup 0)
+  [(set (match_dup 2)
 	(unspec:GPR [(match_dup 1)] UNSPEC_XXLCZ_FF1))
+   (set (match_dup 3)
+	(ne:GPR (match_dup 1) (const_int 0)))
+   (set (match_dup 3)
+	(minus:GPR (const_int 0) (match_dup 3)))
+   (set (match_dup 3)
+	(and:GPR (match_dup 3) (match_dup 4)))
    (set (match_dup 0)
-	(xor:GPR (match_dup 0) (match_dup 2)))]
+	(xor:GPR (match_dup 2) (match_dup 3)))]
   {
-    operands[2] = gen_int_mode (GET_MODE_BITSIZE (<GPR:MODE>mode) - 1,
+    operands[2] = gen_reg_rtx (<GPR:MODE>mode);
+    operands[3] = gen_reg_rtx (<GPR:MODE>mode);
+    operands[4] = gen_int_mode (GET_MODE_BITSIZE (<GPR:MODE>mode) - 1,
 				<GPR:MODE>mode);
   }
   [(set_attr "type" "multi")
@@ -743,7 +759,8 @@
   [(set (match_operand:GPR 0 "register_operand" "=r")
         (any_le:GPR (match_operand:GPR 1 "register_operand" "r")
                    (match_operand:GPR 2 "register_operand" "r")))]
-  "TARGET_XXLCZSLET && TARGET_NUCLEI_XXLCZ_AUTOGEN"
+  "TARGET_XXLCZSLET && TARGET_NUCLEI_XXLCZ_AUTOGEN
+   && (!TARGET_64BIT || <MODE>mode == DImode)"
   "xl.slet<u>\t%0,%1,%2"
   [(set_attr "type" "arith")
    (set_attr "mode" "none")])

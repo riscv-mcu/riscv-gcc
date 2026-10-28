@@ -218,12 +218,17 @@
    || (!TARGET_64BIT && TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)")
 
 ;; ctz maps to xl.fl1; scanning from the LSB gives the same result for
-;; any wider XLEN operand, so SImode is fine on rv64 too.
+;; any wider XLEN operand for nonzero inputs, but xl.fl1 is XLEN-wide:
+;; on rv64 an SImode operand's upper 32 bits are unspecified, and for a
+;; zero input fl1 returns 64 instead of the 32 promised by
+;; CTZ_DEFINED_VALUE_AT_ZERO.  As with clzsi2, SImode ctz on rv64 only
+;; uses the xl path on rv32; with Zbb the hardware ctzw handles it.
 (define_expand "ctz<mode>2"
   [(set (match_operand:GPR 0 "register_operand")
 	(ctz:GPR (match_operand:GPR 1 "register_operand")))]
   "TARGET_ZBB
-   || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN)")
+   || (TARGET_XXLCZBITOP && TARGET_NUCLEI_XXLCZ_AUTOGEN
+       && (!TARGET_64BIT || <MODE>mode == DImode))")
 
 (define_expand "popcount<mode>2"
   [(set (match_operand:GPR 0 "register_operand")
