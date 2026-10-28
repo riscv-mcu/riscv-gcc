@@ -16,7 +16,4 @@ int f(unsigned t)
   return 0;
 }
 
-// With -O2, CCP (flag_ipa_bit_cp) exports the narrowed range and bitmask
-// for g via set_bitmask, so EVRP no longer prints a new "Global Exported"
-// line; check the range with the mask in the evrp dump instead.
-// { dg-final { scan-tree-dump "g_\[0-9\]+.*MASK 0xfffffff0 VALUE 0x0" "evrp" } }
+// { dg-final { scan-tree-dump "Global Exported: g_.* MASK 0x1 VALUE 0x0" "evrp" } }
