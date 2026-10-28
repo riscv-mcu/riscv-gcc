@@ -4228,6 +4228,7 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
                   if (len >= 1 && len <= 31
+                      && INTVAL (XEXP (XEXP (x, 0), 1)) <= 31
                       && INTVAL (XEXP (XEXP (x, 0), 1)) + len <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than two.  */
@@ -4254,7 +4255,8 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 8 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                  if (len >= 8 && len <= 31 && pos <= 31
+                      && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than multiple.  */
                       *total = COSTS_N_INSNS (1);
@@ -4283,7 +4285,8 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
                 {
                   len = 0;
                   while (m & 1) { len++; m >>= 1; }
-                  if (len >= 8 && len <= 31 && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
+                  if (len >= 8 && len <= 31 && pos <= 31
+                      && (pos + len) <= GET_MODE_BITSIZE (mode).to_constant ())
                     {
                       /* One instruction is better than multiple.  */
                       *total = COSTS_N_INSNS (1);
@@ -4566,16 +4569,15 @@ riscv_rtx_costs (rtx x, machine_mode mode, int outer_code, int opno ATTRIBUTE_UN
     case MULT:
       if (float_mode_p)
 	*total = tune_param->fp_mul[mode == DFmode];
-      else if (TARGET_XXLCZMAC && TARGET_NUCLEI_XXLCZ_AUTOGEN && CONST_INT_P (XEXP (x, 1)))
+      else if (TARGET_XXLCZMAC && TARGET_NUCLEI_XXLCZ_AUTOGEN
+               && CONST_INT_P (XEXP (x, 1))
+               && INTVAL (XEXP (x, 1)) >= 0 && INTVAL (XEXP (x, 1)) <= 255)
         {
-          HOST_WIDE_INT imm = INTVAL (XEXP (x, 1));
-          // Only adjust cost when immediate fits in 0-8 bits (0 - 255) for xl.muli
-          if (imm >= 0 && imm <= 255)
-            {
-              // Multiply by immediate is a single instruction
-              *total = COSTS_N_INSNS (1);
-              return true;
-            }
+          /* Multiply by an immediate that fits xl.muli (0-255) is a
+             single instruction.  Out-of-range immediates fall through
+             to the standard integer multiply costing below.  */
+          *total = COSTS_N_INSNS (1);
+          return true;
         }
       else if (!(TARGET_MUL || TARGET_ZMMUL))
 	/* Estimate the cost of a library call.  */

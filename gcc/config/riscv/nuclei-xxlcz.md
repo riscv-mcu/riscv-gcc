@@ -90,7 +90,7 @@
   "TARGET_ZFHMIN && TARGET_XXLCZPSTINC && TARGET_NUCLEI_XXLCZ_AUTOGEN"
   "xl.flh\t%0,-2(%1)\t# load float post dec"
   [(set_attr "type" "load")
-   (set_attr "mode" "SF")]
+   (set_attr "mode" "HF")]
 )
 
 (define_insn "store_hf_ind_postdec<GPR:mode>"
